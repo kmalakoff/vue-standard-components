@@ -4,13 +4,12 @@
   div.search-form
     input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
     button.btn.btn-primary(@click.prevent="searchForIt") Search
-    span &nbsp; &nbsp;
-    button.btn.btn-danger(@click.prevent="increment") Inc
 </template>
 
 <script>
   import axios from 'axios'
   import cors from 'cors'
+  import { mapState } from 'vuex'
 
   export default {
 
@@ -52,13 +51,25 @@
       }
     },
 
+    computed: mapState([
+      'picked',
+      'searchStatus'
+    ]),
+
     methods: {
       increment () {
         console.log('Incremented')
         this.$store.commit('increment')
       },
+      deselect (id) {
+        this.$store.commit('unselectOne', {scope: this.scope, id: id})
+      },
       searchForIt () {
         console.log('Search for data containing...' + this.searchString)
+
+        this.$store.commit('clearErrors')
+        this.$store.commit('clearSearchResults', {scope: this.scope})
+        this.$store.commit('setSearchStatus', {scope: this.scope, status: 'searching'})
 
         var data = cors(this.corsOptions)
         console.log('CORS: ' + JSON.stringify(cors))
@@ -108,13 +119,17 @@
           }
           console.log('got results')
           var newdata = result.data
+
           _this.$store.commit('stashResults', {scope: _this.scope, data: newdata})
+          _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'complete'})
           _this.$store.commit('increment')
 
           console.log('set results: ' + JSON.stringify(newdata))
         })
         .catch(function (err) {
-          console.log('axios errror: ' + err)
+          _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
+          _this.$store.commit('setError', err)
+          console.log('axios error: ' + err)
         })
       },
 

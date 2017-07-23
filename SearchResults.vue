@@ -10,14 +10,17 @@
       tbody
         tr(v-for="record in searchResults[scope]")
           td(v-for="val, key in record")
-            a(href='#' data-html='true' data-model={model} data-attribute={key} v-on:click="onPick") {{val}}
-
+            span(v-if='reference && record[reference]')
+              a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} v-on:click="onPick(scope, record[reference], record[key])") {{val}}
+            span(v-else) {{val}}
     div(v-if='!searchResults[scope] || !searchResults[scope].length')
-      table 
+      table(align='center' v-if='noDataMsg') 
         tr
-          td nothing found
- 
-    b Highlight {{highlight}}
+          td {{noDataMsg}}
+    div(v-if='searchStatus[scope] === "searching"')
+      b Searching...
+    hr
+    b Highlight {{highlight}} status: {{searchStatus}}
 
 </template>
 
@@ -36,6 +39,12 @@
     props: {
       scope: {
         type: String
+      },
+      noDataMsg: {
+        type: String
+      },
+      reference: {
+        type: String
       }
     },
 
@@ -43,12 +52,16 @@
       'patient',
       'selected',
       'searchResults',
+      'searchStatus',
+      'picked',
       'count'
     ]),
 
     methods: {
-      onPick () {
-        console.log('picked')
+      onPick (scope, id, label) {
+        console.log(scope + ' picked ' + id)
+        this.$store.commit('selectOneMore', {scope: scope, id: id, label: label})
+        return false
       }
     }
 
