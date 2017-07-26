@@ -15,8 +15,6 @@
 
     data () {
       return {
-        fields: [],
-        condition: '',
         header: '',
         caseSensitive: false,
         show: [],
@@ -34,8 +32,20 @@
     },
 
     props: {
+      model: {
+        type: String
+      },
+      fields: {
+        type: Array
+      },
+      condition: {
+        type: String
+      },
       scope: {
         type: String
+      },
+      search: {
+        type: Object
       },
       url: {
         type: String
@@ -85,17 +95,32 @@
         }
 
         var method = this.method || 'post'
+        console.log('method = ' + method)
+
         if (method === 'post') {
           data = {}
-          data.model = this.scope
+
+          data.scope = this.search
           var conditions = this.conditions || [1]
 
           var searchConditions = []
-          for (var i = 0; i < this.fields.length; i++) {
-            searchConditions.push(this.fields[i] + ' LIKE "%' + this.searchString + '%"')
+
+          var fields = []
+          if (this.search && this.model && this.search[this.model]) {
+            fields = this.search[this.model]
+          } else {
+            fields = this.fields || []
           }
+          console.log('got fields: ' + fields + ' from ' + JSON.stringify(this.search) + ' && ' + this.scope)
+
+          for (var i = 0; i < fields.length; i++) {
+            searchConditions.push(fields[i] + ' LIKE "%' + this.searchString + '%"')
+            console.log('include ' + fields[i])
+          }
+
           var addCondition
           if (searchConditions.length) {
+            console.log('add ' + searchConditions.length + ' conditions')
             addCondition = '(' + searchConditions.join(' OR ') + ')'
           }
 
@@ -118,7 +143,13 @@
             console.log('axios call error')
           }
           console.log('got results')
-          var newdata = result.data
+
+          var newdata = {}
+          if (_this.model && result.data[_this.model]) {
+            newdata = result.data[_this.model]
+          } else {
+            newdata = result.data
+          }
 
           _this.$store.commit('stashResults', {scope: _this.scope, data: newdata})
           _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'complete'})
