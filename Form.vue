@@ -10,7 +10,7 @@
 
     button(v-if="type='append'") {{prompt}} 
     hr
-    button(@click.prevent="loadTable") Load Table
+    button(@click.prevent="loadTable") Load Generic Table
     b DB: {{DBfields}}
 </template>
 
@@ -21,6 +21,7 @@
 
     data () {
       return {
+        url: 'http://localhost:1234/Record_API/fields',
         DBfields: []
       }
     },
@@ -39,7 +40,7 @@
 
     methods: {
       loadTable () {
-        var DBfieldUrl = 'http://localhost:1234/Record_API/fields'
+        var DBfieldUrl = this.url
 
         var _this = this
         axios.post(DBfieldUrl, { table: this.table })
