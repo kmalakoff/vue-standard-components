@@ -21,7 +21,10 @@
       b Searching...
     hr
     b Highlight {{highlight}} status: {{searchStatus}}
-
+    div(v-if="picked && picked[scope] && picked[scope].length===1")
+      b Picked: {{ picked[scope][0] }}
+    div(v-else)
+      b nothing picked...
 </template>
 
 <script>
