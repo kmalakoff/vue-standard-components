@@ -20,7 +20,7 @@ import Vue from 'vue';
 
             div.modal-body
               slot(name="body")
-                div(v-show="formStatus='loaded'")
+                div(v-show="formStatus==='loaded'")
                   b {{table}}
                   hr
                   table.table.bordered-table
@@ -45,9 +45,7 @@ import Vue from 'vue';
                   b OK
 </template>
 
-
 <script>
-
   import { mapState } from 'vuex'
   import axios from 'axios'
 
