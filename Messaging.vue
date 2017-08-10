@@ -15,31 +15,30 @@
   </template>
 
   <script>
+    import { mapState } from 'vuex'
 
-  import { mapState } from 'vuex'
+    export default {
+      data () {
+        return {
+          status: ''
+        }
+      },
+      props: {
+        verbosity: {
+          type: String
+        }
+      },
+      computed: mapState([
+        'errors'
+      ]),
+      methods: {
+        clear () {
+          console.log('clear messages')
+          this.$store.commit('clearErrors')
+        }
+      }
 
-  export default {
-    data () {
-      return {
-        status: ''
-      }
-    },
-    props: {
-      verbosity: {
-        type: String
-      }
-    },
-    computed: mapState([
-      'errors'
-    ]),
-    methods: {
-      clear () {
-        console.log('clear messages')
-        this.$store.commit('clearErrors')
-      }
     }
-
-  }
   </script>
 
 <style>
