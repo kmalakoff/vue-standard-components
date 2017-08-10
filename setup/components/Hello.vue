@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import links from './../../config.js'
+import config from './../config.js'
+var links = config.links || ['Main']
 
 export default {
   name: 'hello',
