@@ -159,7 +159,8 @@
         })
         .catch(function (err) {
           _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
-          _this.$store.commit('setError', err)
+          console.log('set error...')
+          _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: err})
           console.log('axios error: ' + err)
         })
       },
