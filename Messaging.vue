@@ -1,17 +1,18 @@
 <!-- src/components/Messaging.vue -->
 
   <template lang='pug'>
-    div(v-if='errors && errors.length' align='center')
-      div.table.msg-errors.alert-danger(align='center')
-        tr
-          td
-            div(v-for='error in errors')
-              b.msg-errors {{error}}
-          td
-            button(@click.prevent="clear") x
-    div(v-else)
-      b no errors...
-      b {{errors}}
+    div
+      div(v-if='errorCount && errors')
+        h5 {{errorCount}} Error(s) detected:
+        div(v-for='context,key in errors' align='center')
+          b {{key}}:
+          div.table.msg-errors.alert-danger(align='center')
+            tr
+              td
+                div(v-for='error in errors[key]')
+                  b.msg-errors {{error}}
+              td
+                button(@click.prevent="clear(key)") x
   </template>
 
   <script>
@@ -30,12 +31,13 @@
       }
     },
     computed: mapState([
-      'errors'
+      'errors',
+      'errorCount'
     ]),
     methods: {
-      clear () {
-        console.log('clear messages')
-        this.$store.commit('clearErrors')
+      clear (scope) {
+        console.log('clear ' + scope + ' messages')
+        this.$store.commit('clearErrors', scope)
       }
     }
 
