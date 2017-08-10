@@ -13,11 +13,11 @@
 
 <script>
 export default {
-  name: 'user',
   data () {
     return {
       msg: 'User App',
-      alt_msg: 'Another'
+      alt_msg: 'Another',
+      name: 'name of user..'
     }
   }
 }
