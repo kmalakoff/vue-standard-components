@@ -1,16 +1,19 @@
 <!-- src/components/Login.vue -->
 
 <template lang='pug'>
-  div.search-form
-    input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
-    span &nbsp;
-    button.btn.btn-lg.btn-primary(@click.prevent="searchForIt") Search
-    span &nbsp; &nbsp;
-    button.btn.btn-lg.btn-primary(@click.prevent="clearList()") Clear Search
-    DataGrid(:data="currentList" noDataMsg='nothing yet' header='Search' :picked="picked")
-    hr
-    div(v-if='picked && picked.length')
-      DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :addColumn="addAction")
+  div
+    div.search-section
+      div(v-if="title") {{ title }}
+      input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
+      span &nbsp;
+      button.btn.btn-primary(@click.prevent="searchForIt") Search
+      span &nbsp; &nbsp;
+      button.btn.btn-primary(@click.prevent="clearList()") Clear Search
+    div.results-section
+      DataGrid(:data="currentList" :noDataMsg="noDataMsg" header='Search' :picked="picked" :multiSelect="multiSelect")
+      hr
+      div(v-if='picked && picked.length')
+        DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :addColumn="addAction" :multiSelect="multiSelect")
 </template>
 
 <script>
@@ -43,6 +46,9 @@
     },
 
     props: {
+      title: {
+        type: String
+      },
       model: {
         type: String
       },
@@ -85,13 +91,15 @@
       },
       multiSelect: {
         type: Boolean,
-        default: true
+        default: false
       },
       inputList: {
         type: Array,
         default () { return [] }
       },
-      noDataMsg: 'nothing found',
+      noDataMsg: {
+        type: String
+      },
       list: {
         type: Object,
         default () {
@@ -288,5 +296,12 @@
     background-color: #999;
     color: #fff;
   }
+
+  .search-section {
+  }
+  .results-section {
+
+  }
+
 </style>
 
