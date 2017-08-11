@@ -8,9 +8,6 @@
     hr
     div(v-if='picked && picked.length')
       DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true")
-      
-    hr
-    b SEARCH LIST: {{ JSON.stringify(list) }}
 </template>
 
 <script>
