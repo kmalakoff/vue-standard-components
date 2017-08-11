@@ -3,11 +3,14 @@
 <template lang='pug'>
   div.search-form
     input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
-    button.btn.btn-primary(@click.prevent="searchForIt") Search
+    span &nbsp;
+    button.btn.btn-lg.btn-primary(@click.prevent="searchForIt") Search
+    span &nbsp; &nbsp;
+    button.btn.btn-lg.btn-primary(@click.prevent="clearList()") Clear Search
     DataGrid(:data="currentList" noDataMsg='nothing yet' header='Search' :picked="picked")
     hr
     div(v-if='picked && picked.length')
-      DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true")
+      DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :addColumn="addAction")
 </template>
 
 <script>
@@ -105,6 +108,10 @@
       status: {
         type: String,
         default: 'pending'
+      },
+      addAction: {
+        type: Object,
+        default () { return {} }
       }
     },
 
