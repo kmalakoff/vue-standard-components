@@ -4,21 +4,30 @@
   div.search-form
     input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
     button.btn.btn-primary(@click.prevent="searchForIt") Search
+    DataGrid(:data="currentList" noDataMsg='nothing yet' header='Search' :picked="picked")
+    hr
+    div(v-if='picked && picked.length')
+      DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true")
+      
+    hr
+    b SEARCH LIST: {{ JSON.stringify(list) }}
 </template>
 
 <script>
   import axios from 'axios'
   import cors from 'cors'
-  import { mapState } from 'vuex'
+  // import { mapState } from 'vuex'
+  import DataGrid from './DataGrid'
 
   export default {
-
+    components: {
+      DataGrid
+    },
     data () {
       return {
         header: '',
         caseSensitive: false,
         show: [],
-        onPick: '',
         searchString: '',
         selectOne: '',
         foundRecords: 0,
@@ -27,7 +36,9 @@
           methods: ['GET', 'POST'],
           credentials: true,
           maxAge: 3600
-        }
+        },
+        currentList: this.list[this.scope],
+        searchStatus: this.status
       }
     },
 
@@ -58,28 +69,57 @@
       },
       searchParameter: {
         type: String
+      },
+      reference: {
+        type: String,
+        default: 'id'
+      },
+      target: {
+        type: Object,
+        default () {
+          return {
+            name: '',
+            id: 0
+          }
+        }
+      },
+      multiSelect: {
+        type: Boolean,
+        default: true
+      },
+      inputList: {
+        type: Array,
+        default () { return [] }
+      },
+      noDataMsg: 'nothing found',
+      list: {
+        type: Object,
+        default () {
+          var def = {}
+          def[this.scope] = this.inputList
+          return def
+        }
+      },
+      picked: {
+        type: Array,
+        default () { return [] }
+      },
+
+      status: {
+        type: String,
+        default: 'pending'
       }
     },
 
-    computed: mapState([
-      'picked',
-      'searchStatus'
-    ]),
+    computed: {
+    },
 
     methods: {
-      increment () {
-        console.log('Incremented')
-        this.$store.commit('increment')
-      },
       deselect (id) {
-        this.$store.commit('unselectOne', {scope: this.scope, id: id})
+        console.log('unselectOne' + '{scope: this.scope, id: id}')
       },
       searchForIt () {
         console.log('Search for data containing...' + this.searchString)
-
-        this.$store.commit('clearErrors')
-        this.$store.commit('clearSearchResults', {scope: this.scope})
-        this.$store.commit('setSearchStatus', {scope: this.scope, status: 'searching'})
 
         var data = cors(this.corsOptions)
         console.log('CORS: ' + JSON.stringify(cors))
@@ -87,10 +127,9 @@
         data = null
 
         var fullUrl = this.url
-        console.log('** Search : ' + JSON.stringify(data))
 
-        console.log(this.searchParameter + ' = ' + this.searchString)
         if (this.searchParameter && this.searchString) {
+          console.log(this.searchParameter + ' = ' + this.searchString)
           fullUrl += '&' + this.searchParameter + '=' + this.searchString
         }
 
@@ -142,7 +181,7 @@
           if (err) {
             console.log('axios call error')
           }
-          console.log('got results')
+          console.log('got results for ' + _this.model)
 
           var newdata = {}
           if (_this.model && result.data[_this.model]) {
@@ -151,18 +190,53 @@
             newdata = result.data
           }
 
-          _this.$store.commit('stashResults', {scope: _this.scope, data: newdata})
-          _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'complete'})
-          _this.$store.commit('increment')
+          if (_this.multiSelect) {
+            _this.clearList()
+          }
+
+          console.log(JSON.stringify(newdata))
+
+          for (var i = 0; i < newdata.length; i++) {
+            _this.list[_this.scope].push(newdata[i])
+          }
+
+          _this.searchStatus = 'found'
 
           console.log('set results: ' + JSON.stringify(newdata))
         })
         .catch(function (err) {
-          _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
+          // _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
           console.log('set error...')
-          _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: err})
+          // _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: err})
           console.log('axios error: ' + err)
         })
+      },
+
+      clearList () {
+        var _this = this
+        if (_this.list[_this.scope]) {
+          var count = _this.list[_this.scope].length
+          console.log('clear current list of ' + count)
+          for (var j = 0; j < count; j++) {
+            _this.$delete(_this.list[_this.scope], 0)
+            console.log('clear ' + j)
+          }
+        }
+      },
+
+      onPick (index) {
+        console.log('pick ' + index)
+        console.log('MS ? ' + this.multiSelect)
+
+        var item = this.list[this.scope][index]
+        if (this.multiSelect) {
+          this.picked.push(item)
+        } else {
+          this.$set(this.picked, 0, item)
+        }
+        console.log('Picked: ' + JSON.stringify(this.picked) + ' = ' + JSON.stringify(this.list))
+        console.log(JSON.stringify(item))
+        return false
       },
 
       onSelect (evt) {
@@ -192,3 +266,23 @@
 
   }
 </script>
+
+<style scoped>
+.ResultsGrid {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 40px;
+    border: 1px solid black;
+    padding: 10px;
+  }  
+  .result-row {
+    padding:10px;
+  }
+  .result-heading {
+    text-align: center;
+    background-color: #999;
+    color: #fff;
+  }
+</style>
+
