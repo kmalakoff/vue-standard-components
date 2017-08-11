@@ -11,12 +11,17 @@
           th.result-heading(v-for="val, key in data[0]")
             span {{key}}
           th.result-heading(v-if="deSelectable") Remove
+          th.result-heading(v-if="addColumn" v-for="func, key in addColumn")
+            b {{ key }} 
+          
       tbody
         tr.result-row(v-for="record, index in data")
           td.result-cell(v-for="val, key in record")
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} v-on:click="onPick(index)") {{val}}
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X
+          th.result-heading(v-if="addColumn" v-for="func, key in addColumn")
+            button.btn.btn-primary.btn-xs(@click.prevent="func(index)") {{ key }}
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
         tr
@@ -61,6 +66,9 @@
       deSelectable: {
         type: Boolean,
         default: false
+      },
+      addColumn: {
+        type: Object
       }
     },
 
