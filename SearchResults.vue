@@ -2,6 +2,9 @@
 
 <template lang='pug'>
   div.search-results
+    b {{scope}}
+    b found {{JSON.stringify(searchResults)}}
+
     table.ResultsGrid(v-if='searchResults[scope] && searchResults[scope].length')
       thead
         tr
@@ -28,14 +31,15 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
   export default {
 
     data () {
       return {
         fields: '',
         show: [],
-        highlight: ''
+        highlight: '',
+        searchResults: this.list,
+        searchStatus: this.status
       }
     },
 
@@ -48,22 +52,26 @@
       },
       reference: {
         type: String
+      },
+      list: {
+        type: Array,
+        default () { return [] }
+      },
+      picked: {
+        type: Array,
+        default () { return [] }
+      },
+      status: {
+        type: String,
+        default: 'pending'
       }
     },
-
-    computed: mapState([
-      'patient',
-      'selected',
-      'searchResults',
-      'searchStatus',
-      'picked',
-      'count'
-    ]),
 
     methods: {
       onPick (scope, id, label) {
         console.log(scope + ' picked ' + id)
-        this.$store.commit('selectOneMore', {scope: scope, id: id, label: label})
+        // this.$store.commit('selectOneMore', {scope: scope, id: id, label: label})
+        this.picked.push({id: id, label: label})
         return false
       }
     }
