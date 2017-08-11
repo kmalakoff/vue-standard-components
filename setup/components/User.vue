@@ -9,10 +9,9 @@
           li Name: {{picked[0].name}}
           li Email: {{picked[0].email}}
 
-      button(v-on:click="clearUser") new User
+      button.btn.btn-primary(v-on:click="clearUser") change {{role}}
     div(v-if="!picked || !picked.length")
-      Search(scope='user', model='user' url='http://localhost:1234/Record_API/search?table=user', :inputList="list", :picked="picked", :search="search", :target="user", prompt='Find Patient' :status="searchStatus")
-      hr
+      Search(:scope='role' model='user' url='http://localhost:1234/Record_API/search?table=user', :inputList="list", :picked="picked", :search="search", :target="user", :prompt="prompt" :status="searchStatus")
 </template>
 
 <script>
@@ -36,8 +35,7 @@ export default {
     return {
       msg: 'User App',
       alt_msg: 'Another',
-      name: 'name of user..',
-      search: {'user': ['name', 'email']}
+      name: 'name of user..'
     }
   },
   props: {
@@ -56,8 +54,19 @@ export default {
     },
     searchStatus: {
       type: String
+    },
+    search: {
+      type: Object,
+      default () { return { 'user': ['name', 'email'] } }
     }
   },
+
+  computed: {
+    prompt: function () {
+      return 'Find ' + this.role
+    }
+  },
+
   methods: {
     clearUser () {
       if (this.picked && this.picked.length) {
