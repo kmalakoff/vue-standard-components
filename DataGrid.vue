@@ -5,7 +5,7 @@
     table.ResultsGrid(v-if='data && data.length')
       thead
         tr(v-show="header && data && data.length")
-          td(:class="headerClass" :colspan="Object.keys(data[0]).length + 1")
+          td(:class="headerClass" :colspan="columns")
             b {{header}}
         tr
           th.result-heading(v-for="val, key in data[0]")
@@ -26,8 +26,6 @@
       table(align='center' v-if='noDataMsg') 
         tr
           td {{noDataMsg}}
-    hr
-    b Picked: {{ JSON.stringify(data[0]) }}
 </template>
 
 <script>
@@ -67,7 +65,7 @@
       },
       multiSelect: {
         type: Boolean,
-        default: true
+        default: false
       },
       deSelectable: {
         type: Boolean,
@@ -75,6 +73,22 @@
       },
       addColumn: {
         type: Object
+      }
+    },
+
+    computed: {
+      columns: function () {
+        var count = 1
+
+        if (this.data && this.data.length) {
+          count += Object.keys(this.data[0]).length
+        }
+
+        if (this.addColumn) {
+          count += Object.keys(this.addColumn).length
+        }
+
+        return count
       }
     },
 
