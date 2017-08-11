@@ -21,11 +21,13 @@
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X
           th.result-heading(v-if="addColumn" v-for="func, key in addColumn")
-            button.btn.btn-primary.btn-xs(@click.prevent="func(index)") {{ key }}
+            ActionButton(:buttonAction="func" :buttonName="key" :record="data[index]")
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
         tr
           td {{noDataMsg}}
+    hr
+    b Picked: {{ JSON.stringify(data[0]) }}
 </template>
 
 <script>
@@ -33,8 +35,12 @@
   import cors from 'cors'
   // import { mapState } from 'vuex'
 
-  export default {
+  import ActionButton from './ActionButton.vue'
 
+  export default {
+    components: {
+      ActionButton
+    },
     data () {
       return {
       }
