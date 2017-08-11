@@ -1,17 +1,12 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  template: '<App/>',
-  components: { App }
-})
-
 import Vue from 'vue'
 import App from './App'
+import Hdr from './Hdr'
+
 import router from './router'
+import hRouter from './router/hRouter'
 
 import auth from './auth'
 
@@ -38,4 +33,11 @@ new Vue({
       store.commit('log', { message: 'test log' })
     }
   }
+})
+
+new Vue({
+  el: '#header',
+  router: hRouter,
+  template: '<Hdr/>',
+  components: { Hdr }
 })
