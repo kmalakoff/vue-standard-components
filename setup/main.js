@@ -17,7 +17,6 @@ Vue.config.productionTip = false
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-
 import store from './components/myState.js'
 
 /* eslint-disable no-new */

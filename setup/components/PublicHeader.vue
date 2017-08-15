@@ -2,7 +2,7 @@
   div.header
     h3 Public Header
       div.navbar-right
-        Logout
+        b Logout
 </template>
 
 

@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import underscore from 'underscore'
 
 Vue.use(Vuex)
 
@@ -11,7 +10,7 @@ export default new Vuex.Store({
   state: {
     user: {},
 
-    message_contexts: [],
+    messageContexts: [],
     errors: {},
     errorCount: 0,
     logs: []
@@ -24,17 +23,16 @@ export default new Vuex.Store({
     },
 
     setError (state, data) {
-      var context = data.context || 'default';
+      var context = data.context || 'default'
 
       console.log('Error ' + data.context)
       console.log('set Error: ' + data.err)
 
-      if (messageContexts.indexOf(context) === -1) {
-        messageContexts.push(context)
+      if (this.messageContexts.indexOf(context) === -1) {
+        this.messageContexts.push(context)
         state.errors[context] = []
       }
       if (data.err) {
-
         if (data.err.constructor === Error && data.err.message) {
           state.errors[context].push(data.err.message)
         } else if (data.err && data.err.constructor === String) {
