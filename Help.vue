@@ -3,7 +3,7 @@
   <template lang='pug'>
     div
       Modal(v-if="showModal" @close="showModal=false" :modalBody="message")
-      div(v-else)
+      div(v-else v-show="show")
         button.btn.btn-success(id="show-modal" @click="showModal = true")
           div(v-if="demoStep")
             b {{demoStep}}
@@ -36,7 +36,7 @@
     },
     props: {
       demoStep: {
-        type: Number
+        type: String
       },
       name: {
         type: String,
@@ -44,6 +44,9 @@
       },
       message: {
         type: String
+      },
+      show: {
+        type: Boolean
       }
     }
   }
