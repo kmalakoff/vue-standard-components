@@ -3,7 +3,7 @@
 
 import Vue from 'vue'
 import App from './App'
-import Hdr from './Hdr'
+import Hdr from './components/Hdr'
 
 import router from './router'
 import hRouter from './router/hRouter'
