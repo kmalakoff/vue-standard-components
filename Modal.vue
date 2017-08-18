@@ -10,29 +10,56 @@ import Vue from 'vue';
       div.modal-mask
         div.modal-wrapper
           div.modal-container
-
             div.modal-header
-              slot(name="header" v-show="modal-header")
-                b {{modalHeader}}
-
+              slot(name="header")
+                div(v-if="header")
+                  h2 {{header}}
             div.modal-body
               slot(name="body")
-                p {{modalBody}}
+                div(v-if="table")
+                  slot(name="body")
+                    div.modal-body(v-show="loadStatus==='loaded'")
+                      table.table.bordered-table.modal-table
+                        thead
+                          th.table-header
+                            b Field
+                          th.table-header
+                            b Value
+                        tbody
+                          tr(v-for="field in fields")
+                            td {{field.name}}
+                            td
+                              input(type='text' v-model="formData[field.name]" :placeholder="field.type")
+                      hr
+                      div(v-if="modalButton")
+                        button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalClick()") {{modalButton}} 
+
+                    div(v-show="loadStatus !== 'loaded'")
+                      b Loading...
+                      img(src="./../../assets/spinning_wheel.gif" style="height: 100px")
+
+                div(v-else) 
+                  p {{modalBody}}
+                  div(v-if="modalButton")
+                    button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalClick()") {{modalButton}} 
+
             div.modal-footer
               slot(name="footer")
                 b {{modalFooter}}
-                button.modal-default-button(@click="$emit('close')")
-                  b OK
+                button.btn.btn-danger(@click="$emit('close')") Cancel
 </template>
 
 <script>
+  import axios from 'axios'
+
   export default {
     data () {
       return {
         modalVisible: false,
         timeoutID: 0,
         showModal: false,
-        status: 'pending'
+        status: 'pending',
+        formData: {}
       }
     },
     props: {
@@ -40,6 +67,22 @@ import Vue from 'vue';
         type: String,
         default: 'modal'
       },
+
+      table: {
+        type: String,
+        default: 'Equipment'
+      },
+      fields: {
+        type: Array,
+        default () { return [] }
+      },
+      prompt: {
+        type: String
+      },
+      type: {
+        type: String
+      },
+
       modalHeader: {
         type: String,
         default: ''
@@ -51,17 +94,63 @@ import Vue from 'vue';
       modalFooter: {
         type: String,
         default: ''
+      },
+      modalButton: {
+        type: String
+      },
+      modalAction: {
+        type: Function
       }
     },
     computed: {
       loadStatus: function () {
         return this.status
+      },
+      header: function () {
+        if (this.modalHeader) {
+          return this.modalHeader
+        } else if (this.table) {
+          return this.table
+        } else {
+          return 'no header'
+        }
+      }
+    },
+    created: function () {
+      if (this.table) {
+        var DBfieldUrl = 'http://localhost:1234/Record_API/fields'
+        console.log('run : ' + DBfieldUrl)
+
+        var _this = this
+        console.log('status = ' + this.status)
+        console.log('name = ' + this.name)
+        axios.post(DBfieldUrl, { table: this.table })
+        .then(function (result) {
+          console.log('R: ' + JSON.stringify(result))
+          for (var i = 0; i < result.data.length; i++) {
+            _this.$set(_this.fields, i, result.data[i])
+          }
+          _this.status = 'loaded'
+          console.log('now status = ' + _this.status)
+        })
+        .catch(function (err) {
+          if (err) {
+            console.log('Err: ' + err)
+          }
+          _this.DBFields = []
+        })
+      } else {
+        console.log('no table ref')
       }
     },
     methods: {
       showMe () {
         this.modalVisible = true
         clearTimeout(this.timeoutID)
+      },
+      modalClick () {
+        console.log('Form: ' + JSON.stringify(this.formData))
+        this.modalAction()
       },
       oNotification () {
         console.log('on')
@@ -118,13 +207,16 @@ import Vue from 'vue';
   font-family: Helvetica, Arial, sans-serif;
 }
 
-.modal-header h3 {
+.modal-header {
   margin-top: 0;
-  color: #42b983;
+  padding: 0;
+  background-color: #cfc;
+  color: green;
 }
 
 .modal-body {
   margin: 20px 0;
+  color: black;
 }
 
 .modal-default-button {
@@ -152,6 +244,14 @@ import Vue from 'vue';
 
 /** Customized... ***/
 
+.modal-footer {
+  background-color: #666;
+}
+
+.modal-table {
+  color: black
+}
+
 .table-header {
   background-color: #ddd;
   text-align: center;
@@ -160,7 +260,6 @@ import Vue from 'vue';
 .table-prompt {
   text-align: right;
 }
-
 
 </style>
 
