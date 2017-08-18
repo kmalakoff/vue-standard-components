@@ -13,7 +13,7 @@
       DataGrid(:data="currentList" :noDataMsg="noDataMsg" header='Search' :picked="picked" :multiSelect="multiSelect")
       hr
       div(v-if='picked && picked.length')
-        DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :addColumn="addAction" :multiSelect="multiSelect")
+        DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :addColumn="addAction" :multiSelect="multiSelect" :modalButton="modalButton")
 </template>
 
 <script>
@@ -120,6 +120,9 @@
       addAction: {
         type: Object,
         default () { return {} }
+      },
+      modalButton: {
+        type: String
       }
     },
 
