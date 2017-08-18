@@ -21,7 +21,7 @@
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X
           th.result-heading(v-if="addColumn" v-for="func, key in addColumn")
-            ActionButton(:buttonAction="func" :buttonName="key" :record="data[index]")
+              ActionButton(:modalAction="func" :buttonName="key" :record="data[index]" :modalButton="modalButton")
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
         tr
@@ -34,13 +34,16 @@
   // import { mapState } from 'vuex'
 
   import ActionButton from './ActionButton.vue'
+  import dbRecordModal from './dbRecordModal.vue'
 
   export default {
     components: {
-      ActionButton
+      ActionButton,
+      dbRecordModal
     },
     data () {
       return {
+        showModal: false
       }
     },
 
@@ -73,6 +76,9 @@
       },
       addColumn: {
         type: Object
+      },
+      modalButton: {
+        type: String
       }
     },
 
@@ -98,6 +104,12 @@
         if (this.onPick) {
           this.onPick(index)
         }
+      },
+      showM () {
+        this.showModal = true
+      },
+      hideM () {
+        this.showModal = false
       },
       searchForIt () {
         console.log('Search for data containing...' + this.searchString)
