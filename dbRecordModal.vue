@@ -18,9 +18,9 @@ import Vue from 'vue';
             div.modal-body
               slot(name="body")
                 div(v-show="loadStatus==='loaded'")
-                  b {{table}}
+                  h3 {{table}}
                   hr
-                  table.table.bordered-table
+                  table.table.bordered-table.modal-table
                     thead
                       th.table-header
                         b Field
@@ -28,9 +28,9 @@ import Vue from 'vue';
                         b Value
                     tbody
                       tr(v-for="field in fields")
-                        td.table-prompt {{field.name}}
+                        td {{field.name}}
                         td
-                          input.input-lg(type='text' :placeholder="field.type")
+                          input(type='text' :placeholder="field.type")
                   hr
                   button.btn.btn-primary(v-if="type==='append'") Save 
 
@@ -40,8 +40,8 @@ import Vue from 'vue';
             div.modal-footer
               slot(name="footer")
                 b {{modalFooter}}
-                button.modal-default-button(@click="$emit('close')")
-                  b OK
+                button.modal-default-button.btn-danger(@click="$emit('close')")
+                  b Cancel
 </template>
 
 <script>
@@ -80,6 +80,12 @@ import Vue from 'vue';
       modalBody: {
         type: String,
         default: 'Content...'
+      },
+      modalButton: {
+        type: String
+      },
+      modalAction: {
+        type: Function
       }
     },
     computed: {
@@ -174,7 +180,6 @@ import Vue from 'vue';
 
 .modal-container {
   width: 300px;
-  background-color: #ffffff !important;
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.2) !important;
   -webkit-flex: 1 !important;
   -ms-flex: 1 !important;
@@ -182,7 +187,7 @@ import Vue from 'vue';
   width: 100% !important;
   margin: 100px auto;
   padding: 20px 30px;
-  background-color: #fff;
+  background-color: #eee;
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
   transition: all .3s ease;
@@ -196,6 +201,7 @@ import Vue from 'vue';
 
 .modal-body {
   margin: 20px 0;
+  color: #333;
 }
 
 .modal-default-button {
@@ -222,6 +228,10 @@ import Vue from 'vue';
 }
 
 /** Customized... ***/
+
+.modal-table {
+  color: black
+}
 
 .table-header {
   background-color: #ddd;
