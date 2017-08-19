@@ -19,8 +19,11 @@
 <script>
   import axios from 'axios'
   import cors from 'cors'
-  // import { mapState } from 'vuex'
   import DataGrid from './DataGrid'
+
+  // import store from './../myStore.js'
+
+  // import { mapState } from 'vuex'
 
   export default {
     components: {
@@ -125,10 +128,6 @@
         type: String
       }
     },
-
-    computed: {
-    },
-
     methods: {
       deselect (id) {
         console.log('unselectOne' + '{scope: this.scope, id: id}')
@@ -220,9 +219,12 @@
           console.log('set results: ' + JSON.stringify(newdata))
         })
         .catch(function (err) {
+          console.log('test store..')
+          // _this.$store.commit('increment')
           // _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
-          console.log('set error...')
-          // _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: err})
+          console.log('set error...' + _this.$store.state.count)
+          _this.$store.commit('increment')
+          _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: err})
           console.log('axios error: ' + err)
         })
       },
