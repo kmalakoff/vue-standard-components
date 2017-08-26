@@ -1,14 +1,15 @@
 <!-- src/components/Help.vue -->
 
   <template lang='pug'>
-    div
-      Modal(v-if="showModal" @close="showModal=false" :modalBody="message")
-      div(v-else v-show="show")
-        button.btn.btn-success(id="show-modal" @click="showModal = true")
-          div(v-if="demoStep")
+    span
+      Modal(v-if="showModal" @close="showModal=false" :title="title" :name="name" :modalBody="message" close='Close')
+      span(v-else v-show="show")
+        button.btn.btn-danger.btn-xs(id="show-modal" @click="showModal = true")
+          span(v-if="demoStep")
             b {{demoStep}}
-          div(v-else)
+          span(v-else)
             b ?
+        span &nbsp;
 
   </template>
 
@@ -36,6 +37,9 @@
     },
     props: {
       demoStep: {
+        type: String
+      },
+      title: {
         type: String
       },
       name: {
