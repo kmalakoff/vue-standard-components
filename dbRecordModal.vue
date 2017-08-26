@@ -32,7 +32,8 @@ import Vue from 'vue';
                         td
                           input(type='text' :placeholder="field.type")
                   hr
-                  button.btn.btn-primary(v-if="type==='append'") Save 
+                  div(v-if="modalButton")
+                    button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalAction()") {{modalButton}} 
 
                 div(v-show="loadStatus !== 'loaded'")
                   b Loading...
@@ -95,7 +96,7 @@ import Vue from 'vue';
     },
     created: function () {
       var DBfieldUrl = 'http://localhost:1234/Record_API/fields'
-      console.log('run : ' + DBfieldUrl)
+      console.log('DB run : ' + DBfieldUrl)
 
       var _this = this
       console.log('status = ' + this.status)
