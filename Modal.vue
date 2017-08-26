@@ -14,6 +14,7 @@ import Vue from 'vue';
               slot(name="header")
                 div(v-if="header")
                   h2 {{header}}
+
             div.modal-body
               slot(name="body")
                 div(v-if="table")
@@ -39,14 +40,14 @@ import Vue from 'vue';
                       img(src="./../../assets/spinning_wheel.gif" style="height: 100px")
 
                 div(v-else) 
-                  p {{modalBody}}
+                  div(v-html="modalBody")
                   div(v-if="modalButton")
                     button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalClick()") {{modalButton}} 
 
             div.modal-footer
               slot(name="footer")
                 b {{modalFooter}}
-                button.btn.btn-danger(@click="$emit('close')") Cancel
+                button.btn.btn-danger(@click="$emit('close')") {{closeButton}}
 </template>
 
 <script>
@@ -67,10 +68,12 @@ import Vue from 'vue';
         type: String,
         default: 'modal'
       },
-
-      table: {
+      title: {
         type: String,
-        default: 'Equipment'
+        default: ''
+      },
+      table: {
+        type: String
       },
       fields: {
         type: Array,
@@ -100,6 +103,9 @@ import Vue from 'vue';
       },
       modalAction: {
         type: Function
+      },
+      close: {
+        type: String
       }
     },
     computed: {
@@ -109,21 +115,32 @@ import Vue from 'vue';
       header: function () {
         if (this.modalHeader) {
           return this.modalHeader
+        } else if (this.title) {
+          return this.title
         } else if (this.table) {
           return this.table
         } else {
-          return 'no header'
+          return ''
+        }
+      },
+      closeButton: function () {
+        if (this.close) {
+          return this.close
+        } else {
+          return 'Cancel'
         }
       }
     },
     created: function () {
       if (this.table) {
         var DBfieldUrl = 'http://localhost:1234/Record_API/fields'
-        console.log('run : ' + DBfieldUrl)
+        console.log('Modal run : ' + DBfieldUrl)
 
         var _this = this
         console.log('status = ' + this.status)
         console.log('name = ' + this.name)
+        console.log('table = ' + this.table)
+
         axios.post(DBfieldUrl, { table: this.table })
         .then(function (result) {
           console.log('R: ' + JSON.stringify(result))
@@ -210,7 +227,7 @@ import Vue from 'vue';
 .modal-header {
   margin-top: 0;
   padding: 0;
-  background-color: #cfc;
+  /*background-color: #cfc;*/
   color: green;
 }
 
@@ -245,7 +262,7 @@ import Vue from 'vue';
 /** Customized... ***/
 
 .modal-footer {
-  background-color: #666;
+  // background-color: #666;
 }
 
 .modal-table {
