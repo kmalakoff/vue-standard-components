@@ -6,9 +6,9 @@
   div
     div(v-if='modalButton')
       div(v-if="showModal")
-        Modal(v-if="showModal" table='user' type='append' @close="hideM" :modalAction="runModalEvent" :modalButton="modalButton" :modalBody="modalBody" :modalFooter="modalFooter")
+        Modal(v-if="showModal" :table='modalTable' type='append' @close="hideM" :modalAction="runModalEvent" :modalButton="modalButton" :modalBody="modalBody" :modalFooter="modalFooter")
       div(v-else)
-        button.btn.btn-success(id="show-modal" @click.prevent="showM") M= {{buttonName}}
+        button.btn.btn-success(id="show-modal" @click.prevent="showM") {{buttonName}}
     div(v-else)
       button.btn.btn-success(@click.prevent="runEvent()") {{buttonName}}
 </template>
@@ -33,6 +33,9 @@ export default {
     },
     buttonAction: {
       type: Function
+    },
+    modalTable: {
+      type: String
     },
     modalButton: {
       type: String
