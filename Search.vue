@@ -1,19 +1,20 @@
 <!-- src/components/Login.vue -->
 
 <template lang='pug'>
-  div
-    div.search-section
-      div(v-if="title") {{ title }}
-      input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
-      span &nbsp;
-      button.btn.btn-primary(@click.prevent="searchForIt") Search
-      span &nbsp; &nbsp;
-      button.btn.btn-primary(@click.prevent="clearList()") Clear Search
-    div.results-section
-      DataGrid(:data="currentList" :noDataMsg="noDataMsg" header='Search' :picked="picked" :multiSelect="multiSelect")
-      hr
-      div(v-if='picked && picked.length')
-        DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :addColumn="addAction" :multiSelect="multiSelect" :modalButton="modalButton")
+  span
+    span.search-section
+      h3(v-if="title") {{ title }}
+      div(v-if='picked && picked.length && multiSelect')
+        DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :target="target" :addColumn="addAction" :multiSelect="multiSelect" :modalButton="modalButton" :modalTable="modalTable")
+        hr
+      span
+        input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
+        span &nbsp;
+        button.btn.btn-primary(@click.prevent="searchForIt") Search
+        span &nbsp; &nbsp;
+        button.btn.btn-primary(v-if="searchString" @click.prevent="clearList(1)") Clear Search
+    span.results-section(v-if="1 || currentList.length || picked.length")
+      DataGrid(:data="currentList" :noDataMsg="noDataMsg" :header="chooseTitle" :picked="picked" :multiSelect="multiSelect" :onPick="searchPick")
 </template>
 
 <script>
@@ -126,14 +127,37 @@
       },
       modalButton: {
         type: String
+      },
+      modalTable: {
+        type: String
+      },
+      onPick: {
+        type: Function
+      },
+      testPick: {
+        type: Function
+      }
+    },
+    computed: {
+      chooseTitle: function () {
+        return 'Select ' + this.scope
       }
     },
     methods: {
+      searchPick (data) {
+        console.log('search pick')
+        if (this.onPick) {
+          this.onPick(data)
+          this.clearList()
+        } else { console.log('no onPick') }
+      },
       deselect (id) {
         console.log('unselectOne' + '{scope: this.scope, id: id}')
       },
       searchForIt () {
-        console.log('Search for data containing...' + this.searchString)
+        console.log('Search for ' + this.model + 'data containing...' + this.searchString)
+
+        this.clearList()
 
         var data = cors(this.corsOptions)
         console.log('CORS: ' + JSON.stringify(cors))
@@ -204,6 +228,11 @@
             newdata = result.data
           }
 
+          if (!newdata.length) {
+            var msg = 'no ' + _this.scope + ' record(s) found matching \'' + _this.searchString + '\''
+            _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: msg})
+          }
+
           if (_this.multiSelect) {
             _this.clearList()
           }
@@ -211,6 +240,10 @@
           console.log(JSON.stringify(newdata))
 
           for (var i = 0; i < newdata.length; i++) {
+            if (!_this.list[_this.scope]) {
+              _this.list[_this.scope] = []
+            }
+
             _this.list[_this.scope].push(newdata[i])
           }
 
@@ -219,7 +252,6 @@
           console.log('set results: ' + JSON.stringify(newdata))
         })
         .catch(function (err) {
-          console.log('test store..')
           // _this.$store.commit('increment')
           // _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
           console.log('set error...' + _this.$store.state.count)
@@ -229,7 +261,7 @@
         })
       },
 
-      clearList () {
+      clearList (clearsearch) {
         var _this = this
         if (_this.list[_this.scope]) {
           var count = _this.list[_this.scope].length
@@ -239,45 +271,10 @@
             console.log('clear ' + j)
           }
         }
-      },
 
-      onPick (index) {
-        console.log('pick ' + index)
-        console.log('MS ? ' + this.multiSelect)
-
-        var item = this.list[this.scope][index]
-        if (this.multiSelect) {
-          this.picked.push(item)
-        } else {
-          this.$set(this.picked, 0, item)
+        if (clearsearch) {
+          _this.searchString = ''
         }
-        console.log('Picked: ' + JSON.stringify(this.picked) + ' = ' + JSON.stringify(this.list))
-        console.log(JSON.stringify(item))
-        return false
-      },
-
-      onSelect (evt) {
-        // id, name, record) {
-
-        var picked = {}
-
-        if (evt && evt.target) {
-          picked = evt.target
-          console.log('Picked: ' + picked.id + ' : ' + picked.name)
-        }
-
-        this.selectOne.id = picked.id
-        this.selectOne.name = picked.name
-        this.selectOne.label = {}
-        this.selectOne.status = 'picked'
-        this.selectOne.subject = { id: picked.id, name: picked.name }
-
-        console.log('Call ? ' + this.onPick)
-        if (this.onPick) {
-          this.onPick(evt)
-        }
-
-        return false
       }
     }
 
