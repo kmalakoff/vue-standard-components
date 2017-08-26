@@ -2,12 +2,10 @@
 
 <template lang='pug'>
   div.message-block
-    h3 {{count}} Messages: {{errorCount}} errors 
     div(v-if='errorCount')
-      h5 {{errorCount}} Error(s) detected:
       div(v-for='context,key in errors' align='center')
-        b {{key}}:
-        div.table.msg-errors.alert-danger(align='center')
+        h4 {{errors[key].length}} Error(s) detected {{key}}:
+        div.table.msg-errors.alert-danger(v-if="errors[key].length" align='center')
           tr
             td
               div(v-for='error in errors[key]')
@@ -53,7 +51,7 @@
 
 <style>
   .message-block {
-    border: 1px solid black
+    /*border: 1px solid black*/
   }
 
   .msg-errors {
