@@ -17,11 +17,11 @@
       tbody
         tr.result-row(v-for="record, index in data")
           td.result-cell(v-for="val, key in record")
-            a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} v-on:click="onPick(index)") {{val}}
+            a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} v-on:click="pickOne(index)") {{val}}
           td.result-cell(v-if="deSelectable") 
-            button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X
+            button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X 
           th.result-heading(v-if="addColumn" v-for="func, key in addColumn")
-              ActionButton(:modalAction="func" :buttonName="key" :record="data[index]" :modalButton="modalButton")
+              ActionButton(:modalAction="func" :buttonName="key" :record="data[index]" :modalButton="modalButton" :modalTable="modalTable")
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
         tr
@@ -29,8 +29,6 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import cors from 'cors'
   // import { mapState } from 'vuex'
 
   import ActionButton from './ActionButton.vue'
@@ -58,6 +56,15 @@
       data: {
         type: Array
       },
+      target: {
+        type: Object,
+        default () {
+          return {
+            name: '',
+            id: 0
+          }
+        }
+      },
       noDataMsg: {
         type: String,
         default: ''
@@ -65,6 +72,9 @@
       picked: {
         type: Array,
         default () { return [] }
+      },
+      onPick: {
+        type: Function
       },
       multiSelect: {
         type: Boolean,
@@ -78,6 +88,9 @@
         type: Object
       },
       modalButton: {
+        type: String
+      },
+      modalTable: {
         type: String
       }
     },
@@ -99,125 +112,14 @@
     },
 
     methods: {
-      onSelect (index) {
-        console.log('picked ' + index)
-        if (this.onPick) {
-          this.onPick(index)
-        }
-      },
       showM () {
         this.showModal = true
       },
       hideM () {
         this.showModal = false
       },
-      searchForIt () {
-        console.log('Search for data containing...' + this.searchString)
 
-        var data = cors(this.corsOptions)
-        console.log('CORS: ' + JSON.stringify(cors))
-
-        data = null
-
-        var fullUrl = this.url
-
-        if (this.searchParameter && this.searchString) {
-          console.log(this.searchParameter + ' = ' + this.searchString)
-          fullUrl += '&' + this.searchParameter + '=' + this.searchString
-        }
-
-        var method = this.method || 'post'
-        console.log('method = ' + method)
-
-        if (method === 'post') {
-          data = {}
-
-          data.scope = this.search
-          var conditions = this.conditions || [1]
-
-          var searchConditions = []
-
-          var fields = []
-          if (this.search && this.model && this.search[this.model]) {
-            fields = this.search[this.model]
-          } else {
-            fields = this.fields || []
-          }
-          console.log('got fields: ' + fields + ' from ' + JSON.stringify(this.search) + ' && ' + this.scope)
-
-          for (var i = 0; i < fields.length; i++) {
-            searchConditions.push(fields[i] + ' LIKE "%' + this.searchString + '%"')
-            console.log('include ' + fields[i])
-          }
-
-          var addCondition
-          if (searchConditions.length) {
-            console.log('add ' + searchConditions.length + ' conditions')
-            addCondition = '(' + searchConditions.join(' OR ') + ')'
-          }
-
-          var allConditions = conditions.join(' AND ')
-          if (addCondition) { allConditions += ' AND ' + addCondition }
-
-          data.condition = allConditions
-        }
-
-        console.log('axios ' + method + ': ' + fullUrl)
-        console.log('data: ' + JSON.stringify(data))
-
-        var _this = this
-        axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-
-        axios({url: fullUrl, method: method, data: data})
-        .then(function (result, err) {
-          console.log('axios returned value(s): ' + JSON.stringify(result))
-          if (err) {
-            console.log('axios call error')
-          }
-          console.log('got results for ' + _this.model)
-
-          var newdata = {}
-          if (_this.model && result.data[_this.model]) {
-            newdata = result.data[_this.model]
-          } else {
-            newdata = result.data
-          }
-
-          if (_this.multiSelect) {
-            _this.clearList()
-          }
-
-          console.log(JSON.stringify(newdata))
-
-          for (var i = 0; i < newdata.length; i++) {
-            _this.list[_this.scope].push(newdata[i])
-          }
-
-          _this.searchStatus = 'found'
-
-          console.log('set results: ' + JSON.stringify(newdata))
-        })
-        .catch(function (err) {
-          // _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
-          console.log('set error...')
-          // _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: err})
-          console.log('axios error: ' + err)
-        })
-      },
-
-      clearList () {
-        var _this = this
-        if (_this.list[_this.scope]) {
-          var count = _this.list[_this.scope].length
-          console.log('clear current list of ' + count)
-          for (var j = 0; j < count; j++) {
-            _this.$delete(_this.list[_this.scope], 0)
-            console.log('clear ' + j)
-          }
-        }
-      },
-
-      onPick (index) {
+      pickOne (index) {
         console.log('pick ' + index)
         console.log('MS ? ' + this.multiSelect)
 
@@ -226,14 +128,19 @@
         console.log('item: ' + JSON.stringify(item))
 
         if (this.multiSelect) {
-          console.log('pickit')
           this.picked.push(item)
         } else {
-          console.log('nopick')
+          console.log('reset pick')
           this.$set(this.picked, 0, item)
         }
-        console.log('Picked: ' + JSON.stringify(this.picked))
-        console.log(JSON.stringify(item))
+
+        console.log('pick = ' + this.onPick)
+        if (this.onPick) {
+          this.onPick(this.picked)
+        } else {
+          console.log('no onpick for DG')
+        }
+
         return false
       }
     }
