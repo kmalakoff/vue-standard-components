@@ -12,8 +12,8 @@ import Vue from 'vue';
           div.modal-container
             div.modal-header
               slot(name="header")
-                div(v-if="header")
-                  h2 {{header}}
+                div(v-if="myheader")
+                  h2 {{myheader}}
 
             div.modal-body
               slot(name="body")
@@ -32,8 +32,8 @@ import Vue from 'vue';
                             td
                               input(type='text' v-model="formData[field.name]" :placeholder="field.type")
                       hr
-                      div(v-if="modalButton")
-                        button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalClick()") {{modalButton}} 
+                      div(v-if="button")
+                        button.btn.btn-primary(@click.prevent="modalClick()") {{button}} 
 
                     div(v-show="loadStatus !== 'loaded'")
                       b Loading...
@@ -41,26 +41,54 @@ import Vue from 'vue';
 
                 div(v-else) 
                   div(v-html="modalBody")
-                  div(v-if="modalButton")
-                    button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalClick()") {{modalButton}} 
+                  div(v-if="button")
+                    button.btn.btn-primary(@click.prevent="modalClick()") {{button}} 
 
             div.modal-footer
               slot(name="footer")
-                b {{modalFooter}}
-                button.btn.btn-danger(@click="$emit('close')") {{closeButton}}
+                b {{footer}}
+                button.btn.btn-danger(@click="$emit('close')") {{close}}
 </template>
 
 <script>
   import axios from 'axios'
+  /*
+
+  Usage:
+
+  div(v-if='modal')
+        div(v-if="showModal")
+          Modal(v-if="showModal" @close="hideM" :name="name")
+        div(v-else)
+          button.btn.btn-success(id="show-modal" @click.prevent="showM") {{name}}
+      div(v-else)
+        button.btn.btn-success(@click.prevent="runEvent()") {{name}}
+
+  Input:
+    name - name of modal (should be distinct if multiple modals used)
+
+  Advanced Options:
+
+    record - data record to pass to modal for secondary action
+    table - table to autoload fields for (allows for easy generation of modal for adding / editing database records in a table)
+    button - name of button for secondary action
+    function - function to execute upon clicking of button above
+    url - url to generate content of modal
+    urlData - data to pass to url (post) (may include tags replaced by record data ( eg urlData = {id: '<foundId>'} where the record supplied includes the 'foundId' attribute))
+
+  */
 
   export default {
     data () {
       return {
-        modalVisible: false,
+        isVisible: false,
         timeoutID: 0,
         showModal: false,
         status: 'pending',
-        formData: {}
+        formData: {},
+        generated: {
+          body: ''
+        }
       }
     },
     props: {
@@ -85,36 +113,48 @@ import Vue from 'vue';
       type: {
         type: String
       },
-
-      modalHeader: {
+      header: {
         type: String,
         default: ''
       },
-      modalBody: {
+      body: {
         type: String,
-        default: 'body'
+        default: 'default body'
       },
-      modalFooter: {
+      footer: {
         type: String,
         default: ''
       },
-      modalButton: {
+      button: {
         type: String
       },
-      modalAction: {
+      action: {
+        type: Function
+      },
+      url: {
+        type: String
+      },
+      urlData: {
+        type: Object
+      },
+      function: {
         type: Function
       },
       close: {
-        type: String
+        type: String,
+        default: 'Cancel'
+      },
+      record: {
+        type: Object
       }
     },
     computed: {
       loadStatus: function () {
         return this.status
       },
-      header: function () {
-        if (this.modalHeader) {
-          return this.modalHeader
+      myheader: function () {
+        if (this.header) {
+          return this.header
         } else if (this.title) {
           return this.title
         } else if (this.table) {
@@ -129,21 +169,34 @@ import Vue from 'vue';
         } else {
           return 'Cancel'
         }
+      },
+      modalBody: function () {
+        if (this.generated && this.generated.body) {
+          return this.generated.body
+        } else if (this.body) {
+          return this.body
+        }
       }
     },
     created: function () {
-      if (this.table) {
-        var DBfieldUrl = 'http://localhost:1234/Record_API/fields'
-        console.log('Modal run : ' + DBfieldUrl)
+      var table = this.table
+      var url = 'http://localhost:1234/Record_API/fields'
+      var _this = this
 
-        var _this = this
+      console.log('Record: ' + JSON.stringify(this.record))
+
+      if (this.url) { url = this.url }
+
+      if (this.table) {
+        console.log('Modal run : ' + url)
+
         console.log('status = ' + this.status)
         console.log('name = ' + this.name)
         console.log('table = ' + this.table)
 
-        axios.post(DBfieldUrl, { table: this.table })
+        axios.post(url, { table: table })
         .then(function (result) {
-          console.log('R: ' + JSON.stringify(result))
+          console.log('R: ' + JSON.stringify(result.data))
           for (var i = 0; i < result.data.length; i++) {
             _this.$set(_this.fields, i, result.data[i])
           }
@@ -156,18 +209,63 @@ import Vue from 'vue';
           }
           _this.DBFields = []
         })
+      } else if (this.url) {
+        this.status = 'loaded'
+
+        var urlData = this.urlData
+        console.log('Record2: ' + JSON.stringify(this.record))
+        if (urlData && this.record) {
+          var keys = Object.keys(urlData)
+          var fields = Object.keys(this.record)
+
+          for (var i = 0; i < keys.length; i++) {
+            for (var j = 0; j < fields.length; j++) {
+              var tag = '<' + fields[j] + '>'
+              console.log('check ' + urlData[keys[i]] + ' VS ' + tag)
+              if (urlData[keys[i]] === tag) {
+                console.log('FOUND ' + keys[i] + ' = ' + this.record[fields[j]])
+                this.$set(this.urlData, keys[i], this.record[fields[j]])
+              }
+            }
+          }
+        }
+        console.log('urlData: ' + JSON.stringify(this.urlData))
+
+        axios.post(url, this.urlData)
+        .then(function (result) {
+          if (result.data && result.data.constructor === String) {
+            _this.$set(_this.generated, 'body', result.data)
+          } else {
+            _this.$set(_this.generated, 'body', JSON.stringify(result))
+          }
+          _this.status = 'loaded'
+          console.log('now status = ' + _this.status)
+        })
+        .catch(function (err) {
+          if (err) {
+            console.log('Err: ' + err)
+          }
+          _this.results = []
+        })
+        console.log('results')
+      } else if (this.body) {
+        this.status = 'loaded'
+        console.log('body')
       } else {
-        console.log('no table ref')
+        this.status = 'loaded'
+        console.log('no body')
       }
     },
     methods: {
       showMe () {
-        this.modalVisible = true
+        this.isVisible = true
         clearTimeout(this.timeoutID)
       },
-      modalClick () {
+      modalClick (data) {
         console.log('Form: ' + JSON.stringify(this.formData))
-        this.modalAction()
+        if (this.function) {
+          this.function()
+        }
       },
       oNotification () {
         console.log('on')
@@ -262,7 +360,7 @@ import Vue from 'vue';
 /** Customized... ***/
 
 .modal-footer {
-  // background-color: #666;
+  background-color: #666;
 }
 
 .modal-table {
