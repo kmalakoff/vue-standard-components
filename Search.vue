@@ -5,7 +5,7 @@
     span.search-section
       h3(v-if="title") {{ title }}
       div(v-if='picked && picked.length && multiSelect')
-        DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :target="target" :addColumn="addAction" :multiSelect="multiSelect" :modalButton="modalButton" :modalTable="modalTable")
+        DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :target="target" :addLinks="addLinks" :multiSelect="multiSelect")
         hr
       span
         input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
@@ -21,11 +21,27 @@
   import axios from 'axios'
   import cors from 'cors'
   import DataGrid from './DataGrid'
+  /* Usage example:
 
-  // import store from './../myStore.js'
+      Search(:id='sampleString' model='sample' title='Schedule Immunizations' scope='sample' method='get' url='https://vids-siv.phac-aspc.gc.ca/api/sample.php?' searchParameter='product_name' prompt='Search Disease/Vaccines' :multiSelect="true" :addLinks="addLinks")
 
-  // import { mapState } from 'vuex'
+  Optional Properties of 'addLinks':
+    name: name of button to link to function or modal generation
+    function: optional function called when button (labelled with name above) is clicked
 
+    modal: generates modal when button is clicked, with additional options eg modal: { button: 'Register', function: 'RegisterMe' }
+    {
+      button - button name within modal
+      function - function to execute if button pressed
+      close - label for 'Close/Cancel' button on footer of modal
+      url - url used to generate content
+        * if json is retrieved, it MUST be a form descriptor with fields, field_types...
+        * otherwise, modal simply displays string returned as the modal body.
+      urlData - optional data to include in url post call above (may include record data when fields surrounded by tags - eg {id: '<xid>'}
+    }
+
+    function: function
+  */
   export default {
     components: {
       DataGrid
@@ -136,6 +152,9 @@
       },
       testPick: {
         type: Function
+      },
+      addLinks: {
+        type: Array
       }
     },
     computed: {
