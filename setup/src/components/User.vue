@@ -1,17 +1,14 @@
 <template lang='pug'>
-  div.user
+  span.user
     <!-- Messaging -->
-    div(v-if='picked && picked.length && picked[0].id')
-      h3 {{ picked[0].name }} &nbsp; &nbsp;
-        button.btn.btn-sm(v-tooltip="{html: 'userTooltip'}") ?
-      div#userTooltip
-        ul
-          li Name: {{picked[0].name}}
-          li Email: {{picked[0].email}}
-
+    span(v-if='user && user.id')
+      button.btn.btn-sm(v-tooltip="{html: 'userTooltip'}")
+        b  {{ user.name }} [{{user.id}}]
+      span#userTooltip(v-html="tip")
+      span &nbsp;
       button.btn.btn-primary(v-on:click="clearUser") change {{role}}
-    div(v-if="!picked || !picked.length")
-      Search(:scope='role' model='user' url='http://localhost:1234/Record_API/search?table=user', :inputList="list", :picked="picked", :search="search", :target="user", :prompt="prompt" :status="searchStatus")
+    span(v-if="!user || !user.id")
+      Search(:scope='role' model='user' :url="url", :inputList="list", :picked="picked", :search="search", :target="user", :prompt="prompt" :status="searchStatus" :onPick="onPick" :tables="tables" :conditions="conditions")
 </template>
 
 <script>
@@ -42,7 +39,7 @@ export default {
     user: {},
     role: {
       type: String,
-      default: 'user'
+      default: 'emp'
     },
     picked: {
       type: Array,
@@ -58,22 +55,57 @@ export default {
     search: {
       type: Object,
       default () { return { 'user': ['name', 'email'] } }
+    },
+    onPick: {
+      type: Function
+    },
+    onClear: {
+      type: Function
+    },
+    include: {
+      type: String
     }
   },
 
   computed: {
+    tables: function () {
+      if (this.include) {
+        return ['user', this.include]
+      }
+    },
+    url: function () {
+      var baseUrl = 'http://localhost:1234/Record_API/search?table=user'
+      if (this.include) { baseUrl += '&link=' + this.include + '&condition=user.id=' + this.include + '.user_id' }
+      console.log('built ur: ' + baseUrl)
+      return baseUrl
+    },
+    conditions: function () {
+      if (this.include) {
+        var cond = this.include + '.user_id=user.id'
+        return [cond]
+      }
+    },
     prompt: function () {
-      return 'Find ' + this.role
+      return 'Load ' + this.role
+    },
+    tip: function () {
+      if (this.user) {
+        return '<ul> ' +
+          '<li> Name: ' + this.user.name + '</li>' +
+          '<li> Email: ' + this.user.email + '</li>' +
+          '<li> Role: ' + this.user.role + '</li>' +
+          '</ul>'
+      } else {
+        return 'TBD'
+      }
     }
   },
 
   methods: {
     clearUser () {
-      if (this.picked && this.picked.length) {
-        console.log(' deleting: ' + JSON.stringify(this.picked))
-        this.picked.splice(0, 1)
-        console.log(' deleted: ' + JSON.stringify(this.picked))
-      }
+      if (this.onClear) {
+        this.onClear()
+      } else { console.log('no clear function') }
     }
   }
 }
