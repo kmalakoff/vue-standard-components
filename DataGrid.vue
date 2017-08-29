@@ -11,8 +11,8 @@
           th.result-heading(v-for="val, key in data[0]")
             span {{key}}
           th.result-heading(v-if="deSelectable") Remove
-          th.result-heading(v-if="addColumn" v-for="func, key in addColumn")
-            b {{ key }} 
+          th.result-heading(v-if="addLinks" v-for="func, key in addLinks")
+            span &nbsp; 
           
       tbody
         tr.result-row(v-for="record, index in data")
@@ -20,8 +20,8 @@
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} v-on:click="pickOne(index)") {{val}}
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X 
-          th.result-heading(v-if="addColumn" v-for="func, key in addColumn")
-              ActionButton(:modalAction="func" :buttonName="key" :record="data[index]" :modalButton="modalButton" :modalTable="modalTable")
+          th.result-heading(v-if="addLinks" v-for="link in addLinks")
+              ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link")
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
         tr
@@ -92,6 +92,12 @@
       },
       modalTable: {
         type: String
+      },
+      modalURL: {
+        type: String
+      },
+      addLinks: {
+        type: Array
       }
     },
 
@@ -103,8 +109,8 @@
           count += Object.keys(this.data[0]).length
         }
 
-        if (this.addColumn) {
-          count += Object.keys(this.addColumn).length
+        if (this.addLinks) {
+          count += Object.keys(this.addLinks).length
         }
 
         return count
