@@ -72,6 +72,12 @@
       model: {
         type: String
       },
+      tables: {
+        type: Array
+      },
+      conditions: {
+        type: Array
+      },
       fields: {
         type: Array
       },
@@ -132,25 +138,11 @@
         type: Array,
         default () { return [] }
       },
-
       status: {
         type: String,
         default: 'pending'
       },
-      addAction: {
-        type: Object,
-        default () { return {} }
-      },
-      modalButton: {
-        type: String
-      },
-      modalTable: {
-        type: String
-      },
       onPick: {
-        type: Function
-      },
-      testPick: {
         type: Function
       },
       addLinks: {
@@ -174,7 +166,7 @@
         console.log('unselectOne' + '{scope: this.scope, id: id}')
       },
       searchForIt () {
-        console.log('Search for ' + this.model + 'data containing...' + this.searchString)
+        console.log('Search for ' + this.model + ' data containing...' + this.searchString)
 
         this.clearList()
 
@@ -200,10 +192,12 @@
           var conditions = this.conditions || [1]
 
           var searchConditions = []
-
           var fields = []
-          if (this.search && this.model && this.search[this.model]) {
-            fields = this.search[this.model]
+
+          var table = this.model
+
+          if (this.search && table && this.search[table]) {
+            fields = this.search[table]
           } else {
             fields = this.fields || []
           }
@@ -238,11 +232,11 @@
           if (err) {
             console.log('axios call error')
           }
-          console.log('got results for ' + _this.model)
+          console.log('got results for ' + table)
 
           var newdata = {}
-          if (_this.model && result.data[_this.model]) {
-            newdata = result.data[_this.model]
+          if (table && result.data[table]) {
+            newdata = result.data[table]
           } else {
             newdata = result.data
           }
