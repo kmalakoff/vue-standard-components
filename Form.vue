@@ -16,12 +16,13 @@
 
 <script>
   import axios from 'axios'
+  import config from '@/config.js'
 
   export default {
 
     data () {
       return {
-        url: 'http://localhost:1234/Record_API/fields',
+        url: config.dbUrl,
         DBfields: []
       }
     },
