@@ -1,9 +1,10 @@
 // src/auth/index.js
 
 import router from '../router/index.js'
+import config from '@/config.js'
 
 // URL and endpoint constants
-const API_URL = 'http://localhost:3001/'
+const API_URL = config.apiUrl
 const LOGIN_URL = API_URL + 'sessions/create/'
 const SIGNUP_URL = API_URL + 'users/'
 

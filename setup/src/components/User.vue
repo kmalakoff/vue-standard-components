@@ -1,14 +1,7 @@
 <template lang='pug'>
   span.user
     <!-- Messaging -->
-    span(v-if='user && user.id')
-      button.btn.btn-sm(v-tooltip="{html: 'userTooltip'}")
-        b  {{ user.name }} [{{user.id}}]
-      span#userTooltip(v-html="tip")
-      span &nbsp;
-      button.btn.btn-primary(v-on:click="clearUser") change {{role}}
-    span(v-if="!user || !user.id")
-      Search(:scope='role' model='user' :url="url", :inputList="list", :picked="picked", :search="search", :target="user", :prompt="prompt" :status="searchStatus" :onPick="onPick" :tables="tables" :conditions="conditions")
+    Search(:scope='role' model='user' :url="url", :inputList="list", :picked="picked", :search="search", :target="user", :prompt="prompt" :status="searchStatus" :onPick="onPick" :tables="tables" :conditions="conditions" :fields="fields" :globalSearch="globalSearch" :tooltip="tip" :title="role")
 </template>
 
 <script>
@@ -19,6 +12,7 @@ import SearchResults from './Standard/SearchResults.vue'
 import Tooltip from 'vue-directive-tooltip'
 import 'vue-directive-tooltip/css/index.css'
 import Vue from 'vue'
+import config from '@/config.js'
 
 Vue.use(Tooltip)
 
@@ -32,7 +26,9 @@ export default {
     return {
       msg: 'User App',
       alt_msg: 'Another',
-      name: 'name of user..'
+      name: 'name of user..',
+      search: { 'user': ['name', 'email'] },
+      userURL: config.userURL
     }
   },
   props: {
@@ -52,10 +48,6 @@ export default {
     searchStatus: {
       type: String
     },
-    search: {
-      type: Object,
-      default () { return { 'user': ['name', 'email'] } }
-    },
     onPick: {
       type: Function
     },
@@ -64,6 +56,13 @@ export default {
     },
     include: {
       type: String
+    },
+    globalSearch: {
+      type: Boolean,
+      default: false
+    },
+    fields: {
+      type: Array
     }
   },
 
@@ -74,10 +73,10 @@ export default {
       }
     },
     url: function () {
-      var baseUrl = 'http://localhost:1234/Record_API/search?table=user'
-      if (this.include) { baseUrl += '&link=' + this.include + '&condition=user.id=' + this.include + '.user_id' }
-      console.log('built ur: ' + baseUrl)
-      return baseUrl
+      var returnUrl = this.userURL
+      if (this.include) { returnUrl += '&link=' + this.include + '&condition=user.id=' + this.include + '.user_id' }
+      console.log('built url: ' + returnUrl)
+      return returnUrl
     },
     conditions: function () {
       if (this.include) {
@@ -93,7 +92,7 @@ export default {
         return '<ul> ' +
           '<li> Name: ' + this.user.name + '</li>' +
           '<li> Email: ' + this.user.email + '</li>' +
-          '<li> Role: ' + this.user.role + '</li>' +
+          '<li> Role: ' + this.role + '</li>' +
           '</ul>'
       } else {
         return 'TBD'
