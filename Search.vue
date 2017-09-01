@@ -2,17 +2,41 @@
 
 <template lang='pug'>
   span
-    span.search-section
-      h3(v-if="title") {{ title }}
-      div(v-if='picked && picked.length && multiSelect')
-        DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :target="target" :addLinks="addLinks" :multiSelect="multiSelect")
-        hr
-      span
-        input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
+    span.pre-search-section
+      span(v-if='target && target.id')
+        button.btn.btn-sm(v-if='tooltip' v-tooltip="{html: tipID}")
+          b  {{target.name }} [{{target.id}}]
+        span(:id="tipID" v-html="tooltip")
         span &nbsp;
-        button.btn.btn-primary(@click.prevent="searchForIt") Search
-        span &nbsp; &nbsp;
-        button.btn.btn-primary(v-if="searchString" @click.prevent="clearList(1)") Clear Search
+        button.btn.btn-primary(v-if="!isOpen" v-on:click="clearTarget; searchOpen=true") change {{title}}
+      span(v-else)
+        span(v-if="!isOpen")
+          button.btn.btn-primary(v-on:click="searchOpen=true") Load {{title}}
+      span.search-section
+        div(v-if='picked && picked.length && multiSelect')
+          DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :target="target" :addLinks="addLinks" :multiSelect="multiSelect")
+          hr
+        span()
+          span(v-if="globalSearch && isOpen")
+            input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
+            span &nbsp;
+            button.btn.btn-primary(@click.prevent="searchForIt") Search
+            span &nbsp; &nbsp;
+            button.btn.btn-primary(v-if="searchString" @click.prevent="clearList(1)") Clear Search
+          span(v-if="!globalSearch")
+            span(v-if='isOpen')
+              div.search-section
+                table.table
+                  tr
+                    th(v-for="field in fields")
+                      b {{field}}
+                  tr
+                    td(v-for="field in fields")
+                      input.input-lg(v-model="searchStrings[field]")
+                hr
+                button.btn.btn-primary(@click.prevent="searchForIt") Search {{scope}} record(s)
+                span &nbsp; &nbsp;
+                button.btn.btn-primary(@click.prevent="clearList(1); openSearch") Clear Search
     span.results-section(v-if="1 || currentList.length || picked.length")
       DataGrid(:data="currentList" :noDataMsg="noDataMsg" :header="chooseTitle" :picked="picked" :multiSelect="multiSelect" :onPick="searchPick")
 </template>
@@ -52,6 +76,7 @@
         caseSensitive: false,
         show: [],
         searchString: '',
+        searchStrings: [],
         selectOne: '',
         foundRecords: 0,
         corsOptions: {
@@ -61,13 +86,19 @@
           maxAge: 3600
         },
         currentList: this.list[this.scope],
-        searchStatus: this.status
+        searchStatus: this.status,
+        searchOpen: false
       }
     },
 
     props: {
+      globalSearch: {
+        type: Boolean,
+        default: true
+      },
       title: {
-        type: String
+        type: String,
+        default: 'item'
       },
       model: {
         type: String
@@ -107,13 +138,10 @@
         default: 'id'
       },
       target: {
-        type: Object,
-        default () {
-          return {
-            name: '',
-            id: 0
-          }
-        }
+        type: Object
+      },
+      targets: {
+        type: Array
       },
       multiSelect: {
         type: Boolean,
@@ -147,28 +175,80 @@
       },
       addLinks: {
         type: Array
+      },
+      onClear: {
+        type: Function
+      },
+      tooltip: {
+        type: String
       }
     },
     computed: {
+      tooltip_link: function () {
+        return '{html:' + this.tipID + '}'
+      },
+      tipID: function () {
+        return 'searchTipFor' + this.title
+      },
       chooseTitle: function () {
         return 'Select ' + this.scope
+      },
+      isOpen: function () {
+        return this.searchOpen
       }
     },
     methods: {
+      openSearch (data) {
+        this.searchOpen = true
+      },
       searchPick (data) {
         console.log('search pick')
-        if (this.onPick) {
-          this.onPick(data)
+        if (this.pickTarget) {
+          this.pickTarget(data)
           this.clearList()
         } else { console.log('no onPick') }
       },
       deselect (id) {
         console.log('unselectOne' + '{scope: this.scope, id: id}')
       },
+      clearTarget () {
+        if (this.target) {
+          var keys = Object.keys(this.target)
+          for (var j = 0; j < keys.length; j++) {
+            this.$delete(this.target, keys[j])
+          }
+        } else { console.log('target already empty') }
+      },
+      pickTarget (data) {
+        console.log('set ' + this.title)
+        console.log(JSON.stringify(data))
+
+        var keys = Object.keys(data[0])
+        for (var i = 0; i < keys.length; i++) {
+          this.$set(this.target, keys[i], data[0][keys[i]])
+          console.log('set target ' + keys[i] + ' to ' + data[0][keys[i]])
+        }
+        this.searchOpen = false
+        console.log(JSON.stringify(this.target))
+      },
       searchForIt () {
         console.log('Search for ' + this.model + ' data containing...' + this.searchString)
+        console.log('in ' + this.url)
 
         this.clearList()
+        var orConditions = []
+        var andConditions = []
+        var fields = []
+
+        var conditions = this.conditions || [1]
+        var table = this.model
+
+        if (this.search && table && this.search[table]) {
+          fields = this.search[table]
+        } else {
+          fields = this.fields || []
+        }
+        console.log('got fields: ' + fields + ' from ' + JSON.stringify(this.search) + ' && ' + this.scope)
 
         var data = cors(this.corsOptions)
         console.log('CORS: ' + JSON.stringify(cors))
@@ -178,8 +258,22 @@
         var fullUrl = this.url
 
         if (this.searchParameter && this.searchString) {
+          // global search
           console.log(this.searchParameter + ' = ' + this.searchString)
           fullUrl += '&' + this.searchParameter + '=' + this.searchString
+
+          for (var i = 0; i < fields.length; i++) {
+            orConditions.push(fields[i] + ' LIKE "%' + this.searchString + '%"')
+            console.log('include ' + fields[i])
+          }
+        } else if (!this.globalSearch && this.searchStrings) {
+          // fields specific search
+          var check = Object.keys(this.searchStrings)
+          for (var j = 0; j < check.length; j++) {
+            var test = this.searchStrings[check[j]]
+            console.log('look for ' + check[j] + ' like ' + test)
+            andConditions.push(check[j] + ' LIKE \'' + test + '%\'')
+          }
         }
 
         var method = this.method || 'post'
@@ -189,29 +283,16 @@
           data = {}
 
           data.scope = this.search
-          var conditions = this.conditions || [1]
-
-          var searchConditions = []
-          var fields = []
-
-          var table = this.model
-
-          if (this.search && table && this.search[table]) {
-            fields = this.search[table]
-          } else {
-            fields = this.fields || []
-          }
-          console.log('got fields: ' + fields + ' from ' + JSON.stringify(this.search) + ' && ' + this.scope)
-
-          for (var i = 0; i < fields.length; i++) {
-            searchConditions.push(fields[i] + ' LIKE "%' + this.searchString + '%"')
-            console.log('include ' + fields[i])
-          }
 
           var addCondition
-          if (searchConditions.length) {
-            console.log('add ' + searchConditions.length + ' conditions')
-            addCondition = '(' + searchConditions.join(' OR ') + ')'
+          if (orConditions.length) {
+            console.log('add ' + orConditions.length + ' OR conditions')
+            addCondition = '(' + orConditions.join(' OR ') + ')'
+          }
+
+          if (andConditions.length) {
+            console.log('add ' + andConditions.length + ' AND conditions')
+            addCondition = '(' + andConditions.join(' AND ') + ')'
           }
 
           var allConditions = conditions.join(' AND ')
@@ -285,6 +366,8 @@
           }
         }
 
+        this.searchOpen = false
+
         if (clearsearch) {
           _this.searchString = ''
         }
@@ -313,9 +396,17 @@
   }
 
   .search-section {
+    /*background-color: #cdd;*/
+    padding: 5px;
   }
   .results-section {
 
+  }
+
+  .tooltip {
+    .tooltip-inner {
+      background-color: #faa !important;
+    }
   }
 
 </style>
