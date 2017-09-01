@@ -52,6 +52,8 @@ import Vue from 'vue';
 
 <script>
   import axios from 'axios'
+  import config from '@/config.js'
+
   /*
 
   Usage:
@@ -88,7 +90,8 @@ import Vue from 'vue';
         formData: {},
         generated: {
           body: ''
-        }
+        },
+        dbURL: config.dbURL
       }
     },
     props: {
@@ -180,7 +183,7 @@ import Vue from 'vue';
     },
     created: function () {
       var table = this.table
-      var url = 'http://localhost:1234/Record_API/fields'
+      var url = this.dbURL
       var _this = this
 
       console.log('Record: ' + JSON.stringify(this.record))

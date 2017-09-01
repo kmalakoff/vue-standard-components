@@ -47,6 +47,7 @@ import Vue from 'vue';
 
 <script>
   import axios from 'axios'
+  import config from '@/config'
 
   export default {
     data () {
@@ -54,7 +55,8 @@ import Vue from 'vue';
         modalVisible: false,
         timeoutID: 0,
         showModal: false,
-        status: 'pending'
+        status: 'pending',
+        dbURL: config.dbURL
       }
     },
     props: {
@@ -95,7 +97,7 @@ import Vue from 'vue';
       }
     },
     created: function () {
-      var DBfieldUrl = 'http://localhost:1234/Record_API/fields'
+      var DBfieldUrl = this.dbURL
       console.log('DB run : ' + DBfieldUrl)
 
       var _this = this
@@ -119,7 +121,7 @@ import Vue from 'vue';
 
     methods: {
       loadTable () {
-        var DBfieldUrl = 'http://localhost:1234/Record_API/fields'
+        var DBfieldUrl = this.dbURL
         console.log('run : ' + DBfieldUrl)
 
         var _this = this
