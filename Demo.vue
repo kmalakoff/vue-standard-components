@@ -1,4 +1,7 @@
 <template lang='pug'>
+  <!-- Usage: 
+    Demo (name="example1" :demo="demo")
+  -->
   span 
     Help(:show="demo" :demoStep="docs.step" :title='docs.title' :message="docs.message" name='docs.name')
 </template>
@@ -44,6 +47,7 @@
           return this.documentation[this.name]
         } else {
           console.log('no documentation for ' + this.name)
+          return {}
         }
       }
     },
