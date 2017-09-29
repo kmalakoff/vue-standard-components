@@ -2,14 +2,7 @@
 
   <template lang='pug'>
     span
-      Modal(v-if="showModal" @close="showModal=false" :title="title" :name="name" :modalBody="message" close='Close')
-      span(v-else v-show="show")
-        button.btn.btn-danger.btn-xs(id="show-modal" @click="showModal = true")
-          span(v-if="demoStep")
-            b {{demoStep}}
-          span(v-else)
-            b ?
-        span &nbsp;
+      Modal(@close="showModal=false" :title="title" :name="name" :buttonName="demoStep" buttonClass='btn btn-xs btn-warning' :modalBody="message" close='Close')
 
   </template>
 
