@@ -21,7 +21,8 @@
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X 
           th.result-heading(v-if="addLinks" v-for="link in addLinks")
-              ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link")
+            b {{link}}
+            ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link")
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
         tr
@@ -56,14 +57,13 @@
       data: {
         type: Array
       },
+      data_options: {
+        type: Object,
+        default: () => {}
+      },
       target: {
         type: Object,
-        default () {
-          return {
-            name: '',
-            id: 0
-          }
-        }
+        default: () => {}
       },
       noDataMsg: {
         type: String,
@@ -71,7 +71,7 @@
       },
       picked: {
         type: Array,
-        default () { return [] }
+        default: () => []
       },
       onPick: {
         type: Function
@@ -95,13 +95,16 @@
       },
       modalURL: {
         type: String
-      },
-      addLinks: {
-        type: Array
       }
     },
-
     computed: {
+      addLinks: function () {
+        if (this.data_options && this.data_options.addLinks && this.data_options.addLinks.length) {
+          return this.data_options.addLinks
+        } else {
+          return
+        }
+      },
       columns: function () {
         var count = 1
 
@@ -138,9 +141,15 @@
         } else {
           console.log('reset pick')
           this.$set(this.picked, 0, item)
+
+          var keys = Object.keys(item)
+          for (var i = 0; i < keys.length; i++) {
+            this.$set(this.target, keys[i], item[keys[i]])
+          }
+
+          console.log('TARGET = ' + JSON.stringify(this.target))
         }
 
-        console.log('pick = ' + this.onPick)
         if (this.onPick) {
           this.onPick(this.picked)
         } else {
@@ -156,12 +165,13 @@
 
 <style scoped>
 .ResultsGrid {
-    width: 80%;
+    width: 90%;
     margin-left: 10%;
     margin-right: 10%;
     margin-top: 40px;
     border: 1px solid black;
     padding: 10px;
+    background-color: lightgreen;
   }  
 
   .result-heading {
@@ -180,7 +190,8 @@
 
   .GridHeader {
     text-align: center;
-    background-color: #Cff;
+    background-color: darkgreen;
+    color: white;
   }
 
   .GridHeader2 {
