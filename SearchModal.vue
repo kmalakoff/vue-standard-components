@@ -16,7 +16,13 @@
                   div(v-if="1")
                     slot(name="body")
                       div.modal-body()
-                        h2(v-if="invalid && invalid.length")
+                        Messaging
+                        hr
+                        span(v-if="errs && errs.length")
+                          ul
+                            li(v-for='err in errs')
+                              alert.alert-danger {{err}}
+                        h2(v-if="invalid && invalid.length") 
                           div.alert.alert-danger Invalid search options:
                             ul
                               li(v-for='problem in invalid') {{problem}}
@@ -56,12 +62,12 @@
                 slot(name="footer")
                   b {{footer}}
                   button.btn.btn-danger(@click="closeModal()") {{close}}
-    span(v-if="0")
+    span(v-if="!visible && openButton")
       span(v-if='picked && picked.length')
-        span &nbsp;
+        span &nbsp; 
         button.btn.btn-primary(v-if="!visible" v-on:click="clearTarget; showMe()") change {{search_options.scope}}
       span(v-else)
-        button.btn.btn-primary(v-on:click="showMe()") Load {{search_options.scope}}
+        button.btn.btn-primary(v-on:click="showMe()") {{openButton}}
     
       <!-- button.modal-btn(:class='buttonClass' id="show-modal" @click="showMe()") {{buttonName}} -->
 
@@ -74,6 +80,7 @@
 
   import config from '@/config.js'
   import DataGrid from './DataGrid'
+  import Messaging from './Messaging.vue'
 
   /*
 
@@ -103,7 +110,8 @@
 
   export default {
     components: {
-      DataGrid
+      DataGrid,
+      Messaging
     },
     data () {
       return {
@@ -128,7 +136,8 @@
           maxAge: 3600
         },
         list: [],
-        searchStatus: this.status
+        searchStatus: this.status,
+        errs: []
       }
     },
     props: {
@@ -137,15 +146,16 @@
         default: false
       },
       search_options: {
-        type: Object
+        type: Object,
+        default () { return {} }
       },
       name: {
         type: String,
         default: 'modal'
       },
-      buttonName: {
+      openButton: {
         type: String,
-        default: 'open ?'
+        default: ''
       },
       buttonClass: {
         type: String,
@@ -495,13 +505,16 @@
         axios({url: fullUrl, method: method, data: data})
         .then(function (result, err) {
           console.log('axios returned value(s): ' + JSON.stringify(result))
+
           if (err) {
             console.log('axios call error')
           }
-          console.log('got results for ' + _this.scope)
 
           var newdata = {}
           var model = _this.search_options.model || _this.scope
+
+          console.log('got results for ' + _this.scope + ' : ' + model)
+
           if (model && result.data[model]) {
             console.log('found ' + model + ' results ')
             newdata = result.data[model]
@@ -510,7 +523,9 @@
             newdata = result.data
           }
 
-          if (!newdata.length) {
+          if (result.data && result.data.error) {
+            _this.$store.commit('setError', {context: 'remote searching ' + _this.scope, err: result.data.error})
+          } else if (!newdata.length) {
             var msg = 'no ' + _this.scope + ' record(s) found matching \'' + _this.searchString + '\''
             _this.$store.commit('setError', {context: 'Searching for ' + _this.scope, err: msg})
           }
