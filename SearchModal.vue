@@ -68,7 +68,6 @@
         button.btn.btn-primary(v-if="!visible" v-on:click="clearTarget; showMe()") change {{search_options.scope}}
       span(v-else)
         button.btn.btn-primary(v-on:click="showMe()") {{openButton}}
-    
       <!-- button.modal-btn(:class='buttonClass' id="show-modal" @click="showMe()") {{buttonName}} -->
 
 </template>

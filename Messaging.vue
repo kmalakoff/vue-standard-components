@@ -44,7 +44,6 @@
         console.log('clear ' + scope + ' messages')
         this.$store.commit('clearErrors', scope)
       }
-    }
 
   }
 </script>
