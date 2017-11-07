@@ -5,66 +5,37 @@
 import Vue from 'vue';
 
 <template id="modal-template" lang='pug'>
-  div
-    transition(:name="name") 
-      div.modal-mask
-        div.modal-wrapper
-          div.modal-container
-            div.modal-header
-              slot(name="header")
-                div(v-if="myheader")
-                  h2 {{myheader}}
+  span
+    span(v-show="!isVisible")
+      button(type='button' @click.prevent='showMe()') {{openButton}} 
+    span(v-show='isVisible')
+      b v: {{isVisible}}
+      transition(:name="name") 
+        div.modal-mask
+          div.modal-wrapper
+            div.modal-container
+              div.modal-header
+                slot(name="header")
+                  div(v-if="myheader")
+                    h2 {{myheader}}
 
-            div.modal-body
-              slot(name="body")
-                div(v-if="table")
-                  slot(name="body")
-                    div.modal-body(v-show="loadStatus==='loaded'")
-                      table.table.bordered-table.modal-table
-                        thead
-                          th.table-header
-                            b Field
-                          th.table-header
-                            b Value
-                        tbody
-                          tr(v-for="field in fields")
-                            td {{field.name}}
-                            td
-                              input(type='text' v-model="formData[field.name]" :placeholder="field.type")
-                      hr
-                      div(v-if="button")
-                        button.btn.btn-primary(@click.prevent="modalClick()") {{button}} 
+              div.modal-body
+                slot(name="body")
+        
+                    div(v-html="modalBody")
 
-                    div(v-show="loadStatus !== 'loaded'")
-                      b Loading...
-                      img(src="./../../assets/spinning_wheel.gif" style="height: 100px")
-
-                div(v-else) 
-                  div(v-html="modalBody")
-                  div(v-if="button")
-                    button.btn.btn-primary(@click.prevent="modalClick()") {{button}} 
-
-            div.modal-footer
-              slot(name="footer")
-                b {{footer}}
-                button.btn.btn-danger(@click="$emit('close')") {{close}}
+              div.modal-footer
+                slot(name="footer")
+                  b {{footer}}
+                  button.btn.btn-danger(type='button' @click.prevent='hideMe()') {{close}}
 </template>
 
 <script>
-  import axios from 'axios'
-  import config from '@/config.js'
-
   /*
 
   Usage:
 
-  div(v-if='modal')
-        div(v-if="showModal")
-          Modal(v-if="showModal" @close="hideM" :name="name")
-        div(v-else)
-          button.btn.btn-success(id="show-modal" @click.prevent="showM") {{name}}
-      div(v-else)
-        button.btn.btn-success(@click.prevent="runEvent()") {{name}}
+    Modal(title='Modal Title' body='Modal Content' footer='Modal footer')
 
   Input:
     name - name of modal (should be distinct if multiple modals used)
@@ -90,8 +61,7 @@ import Vue from 'vue';
         formData: {},
         generated: {
           body: ''
-        },
-        dbURL: config.dbURL
+        }
       }
     },
     props: {
@@ -122,13 +92,13 @@ import Vue from 'vue';
       },
       body: {
         type: String,
-        default: 'default body'
+        default: ''
       },
       footer: {
         type: String,
         default: ''
       },
-      button: {
+      openButton: {
         type: String
       },
       action: {
@@ -181,98 +151,21 @@ import Vue from 'vue';
         }
       }
     },
-    created: function () {
-      var table = this.table
-      var url = this.dbURL
-      var _this = this
-
-      console.log('Record: ' + JSON.stringify(this.record))
-
-      if (this.url) { url = this.url }
-
-      if (this.table) {
-        console.log('Modal run : ' + url)
-
-        console.log('status = ' + this.status)
-        console.log('name = ' + this.name)
-        console.log('table = ' + this.table)
-
-        axios.post(url, { table: table })
-        .then(function (result) {
-          console.log('R: ' + JSON.stringify(result.data))
-          for (var i = 0; i < result.data.length; i++) {
-            _this.$set(_this.fields, i, result.data[i])
-          }
-          _this.status = 'loaded'
-          console.log('now status = ' + _this.status)
-        })
-        .catch(function (err) {
-          if (err) {
-            console.log('Err: ' + err)
-          }
-          _this.DBFields = []
-        })
-      } else if (this.url) {
-        this.status = 'loaded'
-
-        var urlData = this.urlData
-        console.log('Record2: ' + JSON.stringify(this.record))
-        if (urlData && this.record) {
-          var keys = Object.keys(urlData)
-          var fields = Object.keys(this.record)
-
-          for (var i = 0; i < keys.length; i++) {
-            for (var j = 0; j < fields.length; j++) {
-              var tag = '<' + fields[j] + '>'
-              console.log('check ' + urlData[keys[i]] + ' VS ' + tag)
-              if (urlData[keys[i]] === tag) {
-                console.log('FOUND ' + keys[i] + ' = ' + this.record[fields[j]])
-                this.$set(this.urlData, keys[i], this.record[fields[j]])
-              }
-            }
-          }
-        }
-        console.log('urlData: ' + JSON.stringify(this.urlData))
-
-        axios.post(url, this.urlData)
-        .then(function (result) {
-          if (result.data && result.data.constructor === String) {
-            _this.$set(_this.generated, 'body', result.data)
-          } else {
-            _this.$set(_this.generated, 'body', JSON.stringify(result))
-          }
-          _this.status = 'loaded'
-          console.log('now status = ' + _this.status)
-        })
-        .catch(function (err) {
-          if (err) {
-            console.log('Err: ' + err)
-          }
-          _this.results = []
-        })
-        console.log('results')
-      } else if (this.body) {
-        this.status = 'loaded'
-        console.log('body')
-      } else {
-        this.status = 'loaded'
-        console.log('no body')
-      }
-    },
     methods: {
       showMe () {
         this.isVisible = true
         clearTimeout(this.timeoutID)
       },
-      modalClick (data) {
-        console.log('Form: ' + JSON.stringify(this.formData))
-        if (this.function) {
-          this.function()
-        }
-      },
-      oNotification () {
-        console.log('on')
+      hideMe () {
+        this.isVisible = false
+        clearTimeout(this.timeoutID)
       }
+      // modalClick (data) {
+      //   console.log('Form: ' + JSON.stringify(this.formData))
+      //   if (this.function) {
+      //     this.function()
+      //   }
+      // }
     }
   }
 </script>
