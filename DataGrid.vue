@@ -33,12 +33,10 @@
   // import { mapState } from 'vuex'
 
   import ActionButton from './ActionButton.vue'
-  import dbRecordModal from './dbRecordModal.vue'
 
   export default {
     components: {
-      ActionButton,
-      dbRecordModal
+      ActionButton
     },
     data () {
       return {
