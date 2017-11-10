@@ -1,10 +1,32 @@
 <!-- src/components/Messaging.vue -->
 
+<!-- 
+  Usage:
+
+    1. include Messaging component in script block and component list:
+
+      import Messaging from './Messaging.vue'
+      ...
+      components: {
+        Messaging
+      }
+
+      this.$store.commit('setError'
+
+    2. Generate errors or clear errors as required:
+
+      this.$store.commit('setError', {context: 'update', err: 'could not update data'})
+
+      this.$store.commit('clearErrors')
+
+!-->
+
+
 <template lang='pug'>
   div.message-block
     div(v-if='errorCount')
       div(v-for='context,key in errors' align='center')
-        h4 {{errors[key].length}} Error(s) detected {{key}}:
+        h4 {{errors[key].length}} {{key} Error(s) detected:
         div.table.msg-errors.alert-danger(v-if="errors[key].length" align='center')
           tr
             td
