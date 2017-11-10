@@ -29,20 +29,22 @@ one of:
           DataGrid(:data="data" :header="data_title" :data_options="data_options")
         div(v-else)
           div(v-if="alt")
-            EditableText(:content="alt" :onClose="editText" :editable="editable") 
+            EditableText(:content="alt" :onClose="editText" :editable="editable" scope='alt') 
           div(v-if="content")
-            EditableText(:content="content" :onClose="editText" :editable="editable")  
+            EditableText(:content="content" :onClose="editText" :editable="editable" scope='content')  
       div.block-footer(v-html="footer")
   </template>
 
   <script>
   import DataGrid from './DataGrid'
   import EditableText from './EditableText'
+  import Messaging from './Messaging.vue'
 
   export default {
     components: {
       DataGrid,
-      EditableText
+      EditableText,
+      Messaging
     },
     data () {
       return {
@@ -100,12 +102,19 @@ one of:
           console.log('no trigger')
         }
       },
-      editText (newContent) {
+      editText (newContent, scope) {
+        if (!scope) { scope = 'content' }
+
         if (this.updateContent) {
           console.log('update content based on input prop function')
           this.updateContent(newContent)
+        } else if (newContent === this[scope]) {
+          console.log('no changes detected in ' + scope)
         } else {
-          console.log('require input prop functio updateContent to update content')
+          console.log(this[scope] + ' vs ' + newContent)
+          console.log('require input prop function updateContent to update content')
+
+          this.$store.commit('setError', {context: 'update', err: 'no update function supplied to affect content', clear: true})
         }
       }
     }
