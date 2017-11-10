@@ -28,17 +28,21 @@ one of:
         div(v-if="data && data.length")
           DataGrid(:data="data" :header="data_title" :data_options="data_options")
         div(v-else)
-          div(v-if="alt" v-html="alt")
-          div(v-if="content" v-html="content")
-            span B: {{content}}  
+          div(v-if="alt")
+            EditableText(:content="alt" :onClose="editText" :editable="editable") 
+          div(v-if="content")
+            EditableText(:content="content" :onClose="editText" :editable="editable")  
       div.block-footer(v-html="footer")
   </template>
 
   <script>
   import DataGrid from './DataGrid'
+  import EditableText from './EditableText'
+
   export default {
     components: {
-      DataGrid
+      DataGrid,
+      EditableText
     },
     data () {
       return {
@@ -72,6 +76,13 @@ one of:
       },
       alt: {
         type: String
+      },
+      updateContent: {
+        type: Function
+      },
+      editable: {
+        type: Boolean,
+        default: false
       }
     },
     computed: {
@@ -87,6 +98,14 @@ one of:
           console.log('ok')
         } else {
           console.log('no trigger')
+        }
+      },
+      editText (newContent) {
+        if (this.updateContent) {
+          console.log('update content based on input prop function')
+          this.updateContent(newContent)
+        } else {
+          console.log('require input prop functio updateContent to update content')
         }
       }
     }
