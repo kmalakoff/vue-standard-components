@@ -53,6 +53,10 @@ one of:
       },
       onClose: {
         type: Function
+      },
+      scope: {
+        type: String,
+        default: 'content'
       }
     },
     computed: {
@@ -69,7 +73,7 @@ one of:
 
         if (this.onClose) {
           console.log('executing external function onClose...')
-          this.onClose(this.new_content)
+          this.onClose(this.new_content, this.scope)
         } else { console.log('content not updated external to component') }
       },
       cancelEditor: function () {
