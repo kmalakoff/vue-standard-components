@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-print "Installing OVID\n";
+print "Installing Default Standard\n";
 
 
 my $files = `find setup -type f`;
