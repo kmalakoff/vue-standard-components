@@ -1,8 +1,5 @@
 export default {
-  links: ['Visit', 'User', 'Stats'],
+  links: ['Public', 'Main', 'User', 'Login'],
 
-  vaccineURL: 'https://vaccineURL',
-  userURL: 'https://test-api.herokuapp.com/Record_API/search?table=user',
-  dbURL: 'https://test-api.herokuapp.com/Record_API/fields',
   apiUrl: 'http://apiURL/'
 }
