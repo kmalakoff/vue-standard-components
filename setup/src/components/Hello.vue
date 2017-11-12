@@ -1,5 +1,6 @@
 <template lang='pug'>
   div.hello
+    h1 Default Public Page
     h3 Links:
     ul
       li(v-for="link in links")
