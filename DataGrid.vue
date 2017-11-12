@@ -100,7 +100,7 @@
         if (this.data_options && this.data_options.addLinks && this.data_options.addLinks.length) {
           return this.data_options.addLinks
         } else {
-          return
+          return null
         }
       },
       columns: function () {
