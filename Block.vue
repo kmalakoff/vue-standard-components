@@ -124,7 +124,7 @@ one of:
 <style>
   .block {
     padding: 0px;
-    border: 1px solid black;
+    /*border: 1px solid black;*/
     min-height: 200px;
   }
 
