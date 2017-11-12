@@ -1,8 +1,10 @@
 <template lang='pug'>
-  div.header
-    h3 Public Header
+  div.publicHeader
+
+    h2 Public Header (Default)
       div.navbar-right
-        b Logout
+        button.btn.btn-default
+          router-link(:to="{name: 'Login'}") Log In 
 </template>
 
 
@@ -14,21 +16,32 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
+  .publicHeader {
+    padding: 10px 30px;
+    background-color: #ccc;
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+  }
 
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
+  h1, h2 {
+    font-weight: normal;
+  }
 
-a {
-  color: #42b983;
-}
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+
+  a {
+    color: #42b983;
+  }
 </style>
