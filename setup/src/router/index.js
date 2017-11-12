@@ -12,21 +12,25 @@ Vue.use(Router)
 var router = new Router({
   routes: [
     {
+      // Public Intro Page
       path: '/',
-      name: 'Hello',
+      name: 'Public',
       component: Hello
     },
     {
+      // Main Default Page (with user logged in)
       path: '/main',
       name: 'Main',
       component: Main
     },
     {
+      // User Page (Profile or Login)
       path: '/user',
       name: 'User',
       component: User
     },
     {
+      // Login Page
       path: '/login',
       name: 'Login',
       component: Login
