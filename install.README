@@ -1,0 +1,26 @@
+## instructions for installing standard projects into Vue boilerplate from scratch ##
+
+# (requires global npm install of vue)
+
+> vue init webpack myproject
+
+> cd myproject
+
+> npm install
+
+> npm install -S vuex axios cors bootstrap bootstrap-vue vue-form-generator vue-directive-tooltip
+
+> npm install -D pug vue-awesome
+
+> cd src/components
+
+> git clone https://github.com/ran-guin/vue-standard-components Standard
+
+> git clone https://github.com/ran-guin/vue-ovid ovid
+
+> cd ovid
+
+> add icons required to webpack.base file ?  ... (eg 'fa-close'); import in .vue file somewhere ... (eg import 'vue-awesome/icons/home')
+
+> source .install
+
