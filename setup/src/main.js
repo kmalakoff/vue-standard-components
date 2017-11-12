@@ -8,20 +8,19 @@ import App from './App'
 import router from './router'
 // import hRouter from './router/hRouter'
 
+import BootstrapVue from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+import Icon from 'vue-awesome/components/Icon'
+import store from './components/myState.js'
+
 import auth from './auth'
 
 // Check the users auth status when the app starts
 auth.checkAuth()
 
 Vue.config.productionTip = false
-
-import BootstrapVue from 'bootstrap-vue'
-
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-
-import Icon from 'vue-awesome/components/Icon'
-import store from './components/myState.js'
 
 Vue.use(BootstrapVue)
 
