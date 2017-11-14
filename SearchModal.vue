@@ -422,6 +422,8 @@
         var tagtest = /<(.+)>/
         var tags = fullUrl.match(tagtest)
 
+        var method = this.search_options.method || 'post'
+
         if (this.search_options.field && this.searchString) {
           // global search
           console.log(this.search_options.field + ' = ' + this.searchString)
@@ -470,7 +472,6 @@
           console.log('searcn N: ' + JSON.stringify(this.searchStrings))
         }
 
-        var method = this.search_options.method || 'post'
         console.log('method = ' + method)
 
         if (method === 'post') {
