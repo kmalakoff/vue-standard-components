@@ -1,7 +1,7 @@
 <!-- src/components/Help.vue -->
 
   <template lang='pug'>
-    span
+    span(v-if="show")
       Modal(@close="showModal=false" :title="title" :name="name" :openButton="demoStep" buttonClass='btn btn-xs btn-warning' :modalBody="message" close='Close')
 
   </template>
