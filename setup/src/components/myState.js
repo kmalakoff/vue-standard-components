@@ -53,7 +53,6 @@ export default new Vuex.Store({
       } else {
         state.errors = {}
       }
-
       state.errorCount = 0
     },
 
@@ -62,6 +61,4 @@ export default new Vuex.Store({
       state.logs.push(data)
     }
   }
-
 })
-
