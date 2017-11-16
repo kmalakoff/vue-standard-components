@@ -14,7 +14,7 @@
           button.btn.btn-primary(v-on:click="searchOpen=true") Load {{title}}
       span.search-section
         div(v-if='picked && picked.length && multiSelect')
-          DataGrid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :target="target" :addLinks="addLinks" :multiSelect="multiSelect")
+          DataGrid.search-grid(:data="picked" header='Selected' headerClass='GridHeader3' :deSelectable="true" :target="target" :addLinks="addLinks" :multiSelect="multiSelect")
           hr
         span()
           span(v-if="globalSearch && isOpen")
@@ -38,7 +38,7 @@
                 span &nbsp; &nbsp;
                 button.btn.btn-primary(@click.prevent="clearList(1); openSearch") Clear Search
     span.results-section(v-if="1 || currentList.length || picked.length")
-      DataGrid(:data="currentList" :noDataMsg="noDataMsg" :header="chooseTitle" :picked="picked" :multiSelect="multiSelect" :onPick="searchPick")
+      DataGrid.search-grid(:data="currentList" :noDataMsg="noDataMsg" :header="chooseTitle" :picked="picked" :multiSelect="multiSelect" :onPick="searchPick")
 </template>
 
 <script>
