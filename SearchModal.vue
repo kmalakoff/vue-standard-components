@@ -1,8 +1,8 @@
 
-<template id="modal-template" lang='pug'>
+<template id=this.id lang='pug'>
   span
-    span(v-if="visible")
-      transition(:name="name") 
+    span.m-fadeOut(:id="id")
+      transition(name="modal") 
         div.modal-mask
           div.modal-wrapper
             div.modal-container
@@ -10,7 +10,6 @@
                 slot(name="header")
                   div(v-if="myheader")
                     h2 {{myheader}}
- 
               div.modal-body
                 slot(name="body")
                   div(v-if="1")
@@ -62,14 +61,18 @@
                 slot(name="footer")
                   b {{footer}}
                   button.btn.btn-danger(@click="closeModal()") {{close}}
-    span(v-if="!visible && openButton")
-      span(v-if='picked && picked.length')
-        span &nbsp; 
-        button.btn.btn-primary(v-if="!visible" v-on:click="clearTarget; showMe()") change {{search_options.scope}}
-      span(v-else)
+    span
+      span(v-if='openButton')
+        span &nbsp;
         button.btn.btn-primary(v-on:click="showMe()") {{openButton}}
-      <!-- button.modal-btn(:class='buttonClass' id="show-modal" @click="showMe()") {{buttonName}} -->
-
+      span(v-else)
+        span &nbsp; &nbsp; 
+        button.btn.btn-primary(v-on:click="clearTarget; showMe()") 
+          span(v-if="search_options.multiSelect")
+            span + 
+          span(v-if="picked && picked.length && !search_options.multiSelect")
+            span change
+          span {{search_options.scope}}
 </template>
 
 
@@ -140,6 +143,10 @@
       }
     },
     props: {
+      id: {
+        type: String,
+        default: 'search-modal'
+      },
       toggle: {
         type: Boolean,
         default: false
@@ -207,6 +214,25 @@
       picked: {
         type: Array,
         default: () => []
+      }
+    },
+    created: function () {
+      // this.closeModal()
+      this.status = 'loaded'
+      console.log('body')
+
+      var fields = this.search_options.fields
+
+      if (fields && fields.length) {
+        for (var i = 0; i < this.search_options.fields.length; i++) {
+          var f = this.search_options.fields[i]
+          this.searchStrings[f] = ''
+        }
+      }
+
+      if (this.invalid) {
+        console.log('validation failed:')
+        console.log(this.invalid.join('; '))
       }
     },
     computed: {
@@ -307,27 +333,13 @@
         return fail
       }
     },
-    created: function () {
-      this.status = 'loaded'
-      console.log('body')
-
-      var fields = this.search_options.fields
-
-      if (fields && fields.length) {
-        for (var i = 0; i < this.search_options.fields.length; i++) {
-          var f = this.search_options.fields[i]
-          this.searchStrings[f] = ''
-        }
-      }
-
-      if (this.invalid) {
-        console.log('validation failed:')
-        console.log(this.invalid.join('; '))
-      }
-    },
     methods: {
       showMe () {
-        this.isVisible = !this.toggle
+        console.log('open modal...')
+        console.log('and fade in')
+        document.getElementById(this.id).classList.toggle('m-fadeIn')
+        document.getElementById(this.id).classList.toggle('m-fadeOut')
+
 
         clearTimeout(this.timeoutID)
       },
@@ -349,7 +361,10 @@
       },
       closeModal: function () {
         console.log('close modal...')
-        this.isVisible = this.toggle
+        console.log('fade out')
+        document.getElementById(this.id).classList.toggle('m-fadeOut')
+        document.getElementById(this.id).classList.toggle('m-fadeIn')
+
       },
       searchPick (data) {
         console.log('search pick')
@@ -604,8 +619,8 @@
   display: -moz-box !important;
   display: -ms-flexbox !important;
   display: -webkit-flex !important;
-  display: flex !important;
-  transition: opacity .3s ease;
+  display: flex !important;  
+  transition: all opacity 1s ease;
 }
 
 .modal-wrapper {
@@ -615,13 +630,12 @@
   display: -webkit-flex !important;
   display: flex !important;
   margin: auto !important;
-  max-width: 760px !important;
-  padding: 64px !important;
+  /*max-width: 760px !important;*/
+  padding: 6px !important;
   width: 100% !important;
 }
 
 .modal-container {
-  width: 300px;
   background-color: #ffffff !important;
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.2) !important;
   -webkit-flex: 1 !important;
@@ -694,6 +708,32 @@
 
 .modal-btn {
   margin: 5px;
+}
+
+.m-fadeOut {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 1000ms, opacity 1000ms;
+}
+.m-fadeIn {
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s linear 0s, opacity 1000ms;
+}
+
+.modal-enter {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.modal-leave-active {
+  opacity: 0;
+}
+
+.modal-enter .modal-container,
+.modal-leave-active .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
 }
 </style>
 
