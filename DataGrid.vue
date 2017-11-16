@@ -4,15 +4,15 @@
   div.data-grid
     table.ResultsGrid(v-if='data && data.length')
       thead
-        tr(v-show="header && data && data.length")
+        tr(v-show="data_header")
           td(:class="headerClass" :colspan="columns")
-            b {{header}}
-        tr
-          th.result-heading(v-for="val, key in data[0]")
-            span {{key}}
-          th.result-heading(v-if="deSelectable") Remove
-          th.result-heading(v-if="addLinks" v-for="func, key in addLinks")
-            span &nbsp; 
+            b {{data_header}}
+      tr
+        th.result-heading(v-for="val, key in data[0]")
+          span {{key}}
+        th.result-heading(v-if="deSelectable") Remove
+        th.result-heading(v-if="addLinks" v-for="func, key in addLinks")
+          span &nbsp; 
           
       tbody
         tr.result-row(v-for="record, index in data")
@@ -96,6 +96,13 @@
       }
     },
     computed: {
+      data_header: function () {
+        if (this.header) {
+          return this.header
+        } else if (this.data_options && this.data_options.title) {
+          return this.data_options.title
+        }
+      },
       addLinks: function () {
         if (this.data_options && this.data_options.addLinks && this.data_options.addLinks.length) {
           return this.data_options.addLinks
@@ -163,12 +170,9 @@
 
 <style scoped>
 .ResultsGrid {
-    width: 90%;
-    margin-left: 10%;
-    margin-right: 10%;
-    margin-top: 40px;
+    width: 100%;
     border: 1px solid black;
-    padding: 10px;
+    padding: 5px;
     background-color: lightgreen;
   }  
 
