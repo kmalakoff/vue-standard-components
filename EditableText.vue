@@ -35,6 +35,10 @@ one of:
   </template>
 
   <script>
+  import 'vue-awesome/icons/edit'
+  import 'vue-awesome/icons/close'
+  import 'vue-awesome/icons/check'
+
   export default {
     data () {
       return {
