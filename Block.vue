@@ -26,7 +26,7 @@ one of:
       div.block-subheader(v-if='subheader' v-html="subheader")
       div.block-body
         div(v-if="data && data.length")
-          DataGrid(:data="data" :header="data_title" :data_options="data_options")
+          DataGrid.block-grid(:data="data" :data_options="data_options")
         div(v-else)
           div(v-if="alt")
             EditableText(:content="alt" :onClose="editText" :editable="editable" scope='alt') 
