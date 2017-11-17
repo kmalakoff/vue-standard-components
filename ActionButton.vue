@@ -5,12 +5,10 @@
 <template lang='pug'>
   div
     div(v-if='modal')
-      div(v-if="showModal")
-        Modal(v-if="showModal" @close="hideM" :record="record" :name="name" :table="modal.table" :button="modal.button" :body="modal.body" :function="modal.function" :url="modal.url" :urlData="modal.urlData")
-      div(v-else)
-        button.btn.btn-success(id="show-modal" @click.prevent="showM") {{name}}
+      b SM {{modal}}
+      SearchModal(:id='name' @close="hideM" openButton='open' :record="record" :name="name" :table="modal.table" :button="modal.button" :body="modal.body" :function="modal.function" :url="modal.url" :urlData="modal.urlData" :search_options="modal")
     div(v-else)
-      button.btn.btn-success(@click.prevent="runEvent()") {{name}}
+      button.btn.btn-success(@click.prevent="runEvent()") E={{name}}
 </template>
 
 <script>
@@ -52,6 +50,9 @@ export default {
       type: Object
     },
     record: {
+      type: Object
+    },
+    modal_options: {
       type: Object
     }
   },
