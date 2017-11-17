@@ -1,16 +1,14 @@
-<!-- src/components/dbRecordModal.vue -->
-// Webpack CSS import
-
-// JS import
-import Vue from 'vue';
-
-<template id="modal-template" lang='pug'>
+<template id=this.id lang='pug'>
   span
-    span(v-show="!isVisible")
-      button(type='button' @click.prevent='showMe()') {{openButton}} 
-    span(v-show='isVisible')
-      b v: {{isVisible}}
-      transition(:name="name") 
+    span.modal-anchor
+      span(v-if='openButton')
+        span &nbsp;
+        button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
+      span(v-else)
+        span &nbsp; &nbsp; 
+        button.btn.btn-primary(v-on:click="clearTarget; openModal()") +
+    span.m-fadeOut(:id="id")
+      transition(name="modal") 
         div.modal-mask
           div.modal-wrapper
             div.modal-container
@@ -18,23 +16,26 @@ import Vue from 'vue';
                 slot(name="header")
                   div(v-if="myheader")
                     h2 {{myheader}}
-
               div.modal-body
                 slot(name="body")
-        
-                    div(v-html="modalBody")
-
+                  div(v-if="1")
+                    slot(name="body")
+                      div.modal-body()
+                        <!-- Body -->
+                        div(v-if="type==='search'")
+                          SearchBlock(:search_options="options")
+                        div(v-else)
+                          b non-search Body...
               div.modal-footer
                 slot(name="footer")
                   b {{footer}}
-                  button.btn.btn-danger(type='button' @click.prevent='hideMe()') {{close}}
+                  button.btn.btn-danger(@click="closeModal()") {{close}}
 </template>
 
 <script>
   /*
 
   Usage:
-
     Modal(title='Modal Title' body='Modal Content' footer='Modal footer')
 
   Input:
@@ -42,29 +43,64 @@ import Vue from 'vue';
 
   Advanced Options:
 
-    record - data record to pass to modal for secondary action
-    table - table to autoload fields for (allows for easy generation of modal for adding / editing database records in a table)
-    button - name of button for secondary action
-    function - function to execute upon clicking of button above
-    url - url to generate content of modal
-    urlData - data to pass to url (post) (may include tags replaced by record data ( eg urlData = {id: '<foundId>'} where the record supplied includes the 'foundId' attribute))
+    type - [standard (default), search, dbRecord]
+      search
+        - options (hash input including the following optional attributes)
+          record - data record to pass to modal for secondary action
+          table - table to autoload fields for (allows for easy generation of modal for adding / editing database records in a table)
+          button - name of button for secondary action
+          function - function to execute upon clicking of button above
+          url - url to generate content of modal
+          urlData - data to pass to url (post) (may include tags replaced by record data ( eg urlData = {id: '<foundId>'} where the record supplied includes the 'foundId' attribute))
 
   */
 
+  import SearchBlock from './SearchBlock'
+
   export default {
+    name: 'Modal',
+    components: {
+      SearchBlock
+    },
     data () {
       return {
         isVisible: false,
         timeoutID: 0,
         showModal: false,
         status: 'pending',
-        formData: {},
         generated: {
           body: ''
         }
       }
     },
     props: {
+      id: {
+        type: String,
+        default: 'default-modal_id'
+      },
+      type: {
+        type: String,
+        default: 'standard'
+      },
+      header: {
+        type: String,
+        default: ''
+      },
+      body: {
+        type: String,
+        default: ''
+      },
+      footer: {
+        type: String,
+        default: ''
+      },
+      openButton: {
+        type: String
+      },
+      options: {
+        type: Object
+      },
+
       name: {
         type: String,
         default: 'modal'
@@ -81,24 +117,6 @@ import Vue from 'vue';
         default () { return [] }
       },
       prompt: {
-        type: String
-      },
-      type: {
-        type: String
-      },
-      header: {
-        type: String,
-        default: ''
-      },
-      body: {
-        type: String,
-        default: ''
-      },
-      footer: {
-        type: String,
-        default: ''
-      },
-      openButton: {
         type: String
       },
       action: {
@@ -128,17 +146,17 @@ import Vue from 'vue';
       myheader: function () {
         if (this.header) {
           return this.header
-        } else if (this.title) {
-          return this.title
-        } else if (this.table) {
-          return this.table
+        } else if (this.options && this.options.header) {
+          return this.options.header
+        } else if (this.options && this.options.model) {
+          return this.options.model
         } else {
           return ''
         }
       },
       closeButton: function () {
-        if (this.close) {
-          return this.close
+        if (this.options && this.options.closeButton) {
+          return this.options.closeButton
         } else {
           return 'Cancel'
         }
@@ -159,13 +177,21 @@ import Vue from 'vue';
       hideMe () {
         this.isVisible = false
         clearTimeout(this.timeoutID)
+      },
+      openModal () {
+        console.log('open modal...')
+        console.log('and fade in')
+        document.getElementById(this.id).classList.toggle('m-fadeIn')
+        document.getElementById(this.id).classList.toggle('m-fadeOut')
+
+        clearTimeout(this.timeoutID)
+      },
+      closeModal: function () {
+        console.log('close modal...')
+        console.log('fade out')
+        document.getElementById(this.id).classList.toggle('m-fadeOut')
+        document.getElementById(this.id).classList.toggle('m-fadeIn')
       }
-      // modalClick (data) {
-      //   console.log('Form: ' + JSON.stringify(this.formData))
-      //   if (this.function) {
-      //     this.function()
-      //   }
-      // }
     }
   }
 </script>
@@ -186,7 +212,7 @@ import Vue from 'vue';
   display: -ms-flexbox !important;
   display: -webkit-flex !important;
   display: flex !important;
-  transition: opacity .3s ease;
+  transition: opacity 1s ease;
 }
 
 .modal-wrapper {
@@ -196,7 +222,7 @@ import Vue from 'vue';
   display: -webkit-flex !important;
   display: flex !important;
   margin: auto !important;
-  max-width: 760px !important;
+  max-width: 980px !important;
   padding: 64px !important;
   width: 100% !important;
 }
@@ -270,6 +296,17 @@ import Vue from 'vue';
 
 .table-prompt {
   text-align: right;
+}
+
+.m-fadeOut {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 1000ms, opacity 1000ms;
+}
+.m-fadeIn {
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s linear 0s, opacity 1000ms;
 }
 
 </style>
