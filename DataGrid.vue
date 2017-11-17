@@ -12,7 +12,7 @@
           span {{key}}
         th.result-heading(v-if="deSelectable") Remove
         th.result-heading(v-if="addLinks" v-for="func, key in addLinks")
-          span &nbsp; 
+          span &nbsp; <!-- add empty column headers -->
           
       tbody
         tr.result-row(v-for="record, index in data")
@@ -20,8 +20,7 @@
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} v-on:click="pickOne(index)") {{val}}
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X 
-          th.result-heading(v-if="addLinks" v-for="link in addLinks")
-            b {{link}}
+          td.result-cell(v-if="addLinks" v-for="link in addLinks")
             ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link")
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
@@ -35,6 +34,7 @@
   import ActionButton from './ActionButton.vue'
 
   export default {
+    name: 'data-grid',
     components: {
       ActionButton
     },
@@ -43,8 +43,11 @@
         showModal: false
       }
     },
-
     props: {
+      name: {
+        type: String,
+        default: 'data-grid'
+      },
       header: {
         type: String
       },
@@ -85,6 +88,9 @@
       addColumn: {
         type: Object
       },
+      modal_options: {
+        type: Object
+      },
       modalButton: {
         type: String
       },
@@ -94,6 +100,9 @@
       modalURL: {
         type: String
       }
+    },
+    created: function () {
+      console.log('created DataGrid...')
     },
     computed: {
       data_header: function () {
