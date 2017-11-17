@@ -47,9 +47,7 @@
             span &nbsp; &nbsp;
             button.btn.btn-primary(@click.prevent="clearList(1); openModal()") Clear Search
       span.results-section(v-if="currentList.length")
-        b {{currentList}}
-
-
+        DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" header="Selected" :picked="picked" :multiSelect="multiSelect" :onPick="onPick")
 </template>
 
 <script>
