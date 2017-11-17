@@ -29,14 +29,14 @@
                         span(v-if='multiSelect && picked && picked.length')
                           DataGrid.results.overlay(:data="picked" header='Current Selection' headerClass='GridHeader3' :deSelectable="true")
                           p &nbsp;
-                        span.search-overlay(v-if="globalSearch && visible")
+                        span.search-overlay(v-if="globalSearch && 1")
                           input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
                           span &nbsp;
                           button.btn.btn-primary(@click.prevent="searchForIt") Search
                           span &nbsp; &nbsp;
                           button.btn.btn-primary(v-if="searchString" @click.prevent="clearList(1)") Clear Search
-                        span.search-overlay(v-if="visible && !globalSearch")
-                          span(v-if='visible')
+                        span.search-overlay(v-if="1 && !globalSearch")
+                          span(v-if='1')
                             div.search-section
                               table.table
                                 tr
@@ -49,7 +49,7 @@
                               hr
                               button.btn.btn-primary(@click.prevent="searchForIt") Search {{scope}} record(s)
                               span &nbsp; &nbsp;
-                              button.btn.btn-primary(@click.prevent="clearList(1); showMe()") Clear Search
+                              button.btn.btn-primary(@click.prevent="clearList(1); openModal()") Clear Search
                         span.results-section(v-if="currentList.length")
                           DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" :header="chooseTitle" :picked="picked" :multiSelect="multiSelect" :onPick="onPick")
 
@@ -64,10 +64,10 @@
     span
       span(v-if='openButton')
         span &nbsp;
-        button.btn.btn-primary(v-on:click="showMe()") {{openButton}}
+        button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
       span(v-else)
         span &nbsp; &nbsp; 
-        button.btn.btn-primary(v-on:click="clearTarget; showMe()") 
+        button.btn.btn-primary(v-on:click="clearTarget; openModal()") 
           span(v-if="search_options.multiSelect")
             span + 
           span(v-if="picked && picked.length && !search_options.multiSelect")
@@ -161,7 +161,7 @@
       },
       openButton: {
         type: String,
-        default: ''
+        default: '+'
       },
       buttonClass: {
         type: String,
@@ -334,12 +334,11 @@
       }
     },
     methods: {
-      showMe () {
+      openModal () {
         console.log('open modal...')
         console.log('and fade in')
         document.getElementById(this.id).classList.toggle('m-fadeIn')
         document.getElementById(this.id).classList.toggle('m-fadeOut')
-
 
         clearTimeout(this.timeoutID)
       },
@@ -364,7 +363,6 @@
         console.log('fade out')
         document.getElementById(this.id).classList.toggle('m-fadeOut')
         document.getElementById(this.id).classList.toggle('m-fadeIn')
-
       },
       searchPick (data) {
         console.log('search pick')
@@ -632,7 +630,7 @@
   margin: auto !important;
   /*max-width: 760px !important;*/
   padding: 6px !important;
-  width: 100% !important;
+  width: 90% !important;
 }
 
 .modal-container {
