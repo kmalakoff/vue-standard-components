@@ -6,7 +6,9 @@
   div
     div(v-if='modal')
       b SM {{modal}}
-      SearchModal(:id='name' @close="hideM" openButton='open' :record="record" :name="name" :table="modal.table" :button="modal.button" :body="modal.body" :function="modal.function" :url="modal.url" :urlData="modal.urlData" :search_options="modal")
+      <!-- Modal(:id='name' @close="hideM" openButton='open' :record="record" :name="name" :table="modal.table" :button="modal.button" :body="modal.body" :function="modal.function" :url="modal.url" :urlData="modal.urlData" :search_options="modal") -->
+      <!-- Modal(id='cov-modal' type='search' :options="search_options" :picked="coverage" close="Finished adding Coverage") -->
+      Modal(:id='name' @close="hideM" :openButton='modal.openButton' :onPick="modal.onPick" :record="record" :name="name" :body="modal.body" :search="modal.search" :data="modal.data")
     div(v-else)
       button.btn.btn-success(@click.prevent="runEvent()") E={{name}}
 </template>
@@ -42,6 +44,9 @@ export default {
   props: {
     name: {
       type: String
+    },
+    function: {
+      type: Function
     },
     modal: {
       type: Object
