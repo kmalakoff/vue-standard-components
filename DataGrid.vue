@@ -8,7 +8,7 @@
           td(:class="headerClass" :colspan="columns")
             b {{data_header}}
       tr
-        th.result-heading(v-for="val, key in data[0]")
+        th.result-heading(v-for="key in data_fields")
           span {{key}}
         th.result-heading(v-if="deSelectable") Remove
         th.result-heading(v-if="addLinks" v-for="func, key in addLinks")
@@ -16,8 +16,8 @@
           
       tbody
         tr.result-row(v-for="record, index in data")
-          td.result-cell(v-for="val, key in record")
-            a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} v-on:click="pickOne(index)") {{val}}
+          td.result-cell(v-for="key in data_fields")
+            a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X 
           td.result-cell(v-if="addLinks" v-for="link in addLinks")
@@ -58,14 +58,17 @@
       data: {
         type: Array
       },
-      data_options: {
+      fields: {
+        type: Array
+      },
+      options: {
         type: Object,
         default: () => {}
       },
-      target: {
-        type: Object,
-        default: () => {}
+      search_options: {
+        type: Object
       },
+
       noDataMsg: {
         type: String,
         default: ''
@@ -105,16 +108,32 @@
       console.log('created DataGrid...')
     },
     computed: {
+      data_fields: function () {
+        if (this.search_options && this.search_options.search_fields) {
+          return this.search_options.search_fields
+        } else if (this.options.fields) {
+          return this.options.fields
+        } else {
+          var keys = Object.keys(this.data[0])
+          console.log('defaulting to keys from first record since no fields specified')
+          return keys
+        }
+      },
+      target: function () {
+        if (this.options && this.options.target) {
+          return this.options.target
+        }
+      },
       data_header: function () {
         if (this.header) {
           return this.header
-        } else if (this.data_options && this.data_options.title) {
-          return this.data_options.title
+        } else if (this.options && this.options.title) {
+          return this.options.title
         }
       },
       addLinks: function () {
-        if (this.data_options && this.data_options.addLinks && this.data_options.addLinks.length) {
-          return this.data_options.addLinks
+        if (this.options && this.options.addLinks && this.options.addLinks.length) {
+          return this.options.addLinks
         } else {
           return null
         }
@@ -146,29 +165,43 @@
         console.log('pick ' + index)
         console.log('MS ? ' + this.multiSelect)
 
+        console.log('picked: ' + JSON.stringify(this.picked))
         console.log('data: ' + JSON.stringify(this.data))
         var item = this.data[index]
         console.log('item: ' + JSON.stringify(item))
+        console.log('options: ' + JSON.stringify(this.options))
+
+        var target = this.search_options.target
+
+        var record = {}
+        var keys = Object.keys(item)
+        for (var i = 0; i < keys.length; i++) {
+          // this.$set(this.target, keys[i], item[keys[i]])
+          record[keys[i]] = item[keys[i]]
+        }
 
         if (this.multiSelect) {
-          this.picked.push(item)
+          console.log(target + ' appended with: ' + JSON.stringify(this.picked))
+
+          if (target) {
+            console.log('Add record: ' + JSON.stringify(record))
+            this.$store.commit('squeezeHash', {key: target, record: record})
+          }
+          console.log(target + ' TARGET ->  ' + JSON.stringify(this.$store.getters.getHash(target)))
         } else {
           console.log('reset pick')
           this.$set(this.picked, 0, item)
 
-          var keys = Object.keys(item)
-          for (var i = 0; i < keys.length; i++) {
-            this.$set(this.target, keys[i], item[keys[i]])
-          }
-
-          console.log('TARGET = ' + JSON.stringify(this.target))
+          console.log('TARGET2 = ' + JSON.stringify(this.picked))
         }
 
         if (this.onPick) {
+          console.log('onPick defined')
           this.onPick(this.picked)
         } else {
           console.log('no onpick for DG')
         }
+        this.$store.getters.getHash('updates')
 
         return false
       }
