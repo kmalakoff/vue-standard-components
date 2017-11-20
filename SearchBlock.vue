@@ -1,16 +1,12 @@
 <!-- src/components/Standard/SearchBlock.vue -->
-<!-- 
-  DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" header="Selected" :picked="picked" :multiSelect="multiSelect" :onPick="onPick")
--->
+
 <template lang='pug'>
   div  
     Messaging
-    hr
     div(v-if="0 && loadStatus === 'pending'")
       b Loading...
       img(src="./../../assets/spinning_wheel.gif" style="height: 100px")
     div(v-else)
-      b status: {{loadStatus}}
       span(v-if="errs && errs.length")
         ul
           li(v-for='err in errs')
@@ -20,9 +16,8 @@
           ul
             li(v-for='problem in invalid') {{problem}}
         hr
-      
       span(v-if='multiSelect && picked && picked.length')
-        DataGrid.results.overlay(:data="picked" header='Current Selection' headerClass='GridHeader3' :deSelectable="true")
+        DataGrid.results.overlay(:data="picked" header='Current Selection' headerClass='GridHeader3' :deSelectable="true" :options="data_options")
         p &nbsp;
       span.search-overlay(v-if="globalSearch && 1")
         input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
@@ -47,7 +42,7 @@
             span &nbsp; &nbsp;
             button.btn.btn-primary(@click.prevent="clearList(1); openModal()") Clear Search
       span.results-section(v-if="currentList.length")
-        DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" header="Selected" :picked="picked" :multiSelect="multiSelect" :onPick="onPick")
+        DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" header="Selected" :picked="picked" :multiSelect="multiSelect" :onPick="pickMe" :options="data_options" :search_options="search_options")
 </template>
 
 <script>
@@ -55,12 +50,14 @@ import axios from 'axios'
 import cors from 'cors'
 
 import Messaging from './Messaging'
+// import DataGrid from './DataGrid'
 import DataGrid from './DataGrid'
 
 export default {
   name: 'searchBlock',
   components: {
     Messaging,
+    // DataGrid,
     DataGrid
   },
   data () {
@@ -95,8 +92,14 @@ export default {
     search_options: {
       type: Object
     },
+    data_options: {
+      type: Object
+    },
     onPick: {
       type: Function
+    },
+    picked: {
+      type: Array
     }
   },
   created: function () {
@@ -104,11 +107,11 @@ export default {
     this.status = 'loaded'
     console.log('body')
 
-    var fields = this.search_options.fields
+    var fields = this.search_options.search_fields
 
     if (fields && fields.length) {
-      for (var i = 0; i < this.search_options.fields.length; i++) {
-        var f = this.search_options.fields[i]
+      for (var i = 0; i < this.search_options.search_fields.length; i++) {
+        var f = this.search_options.search_fields[i]
         this.searchStrings[f] = ''
       }
     }
@@ -119,6 +122,18 @@ export default {
     }
   },
   computed: {
+    search_result_options: function () {
+      if (this.search_options && this.search_options.search_fields) {
+        var dataOptions = {}
+        if (this.data_options) {
+          dataOptions = this.data_options
+        }
+        // dataOptions.fields = this.search_options.search_fields
+        return dataOptions
+      } else {
+        return this.data_options
+      }
+    },
     url: function () {
       return this.search_options.url
     },
@@ -135,7 +150,7 @@ export default {
       return this.search_options.globalSearch || 1
     },
     fields: function () {
-      return this.search_options.fields
+      return this.search_options.search_fields
     },
     multiSelect: function () {
       return this.search_options.multiSelect
@@ -145,9 +160,6 @@ export default {
     },
     prompt: function () {
       return this.search_options.prompt || ' ? '
-    },
-    picked: function () {
-      return this.search_options.picked || []
     },
 
     currentList: function () {
@@ -185,6 +197,23 @@ export default {
     }
   },
   methods: {
+    pickMe (record) {
+      var target = this.search_options.target
+      console.log('PICK ME NOW')
+      if (this.search_options.multiSelect) {
+        console.log(target + ' appended with: ' + JSON.stringify(record))
+
+        if (target) {
+          console.log(target + ' appended: ' + JSON.stringify(record))
+          this.$store.commit('squeezeHash', {key: target, record: record})
+        }
+        console.log(JSON.stringify(this.$store.getters.getHash(target)))
+      } else {
+        console.log('reset pick')
+        this.$set(this.picked, 0, record)
+      }
+      this.clearList()
+    },
     searchPick (data) {
       console.log('search pick')
       if (this.pickTarget) {
@@ -257,15 +286,15 @@ export default {
 
       var method = this.search_options.method || 'post'
 
-      if (this.search_options.field && this.searchString) {
+      if (this.search_options.search_field && this.searchString) {
         // global search
-        console.log(this.search_options.field + ' = ' + this.searchString)
+        console.log(this.search_options.search_field + ' = ' + this.searchString)
         if (tags && tags.length) {
           var tag = new RegExp('<' + tags[1] + '>')
           fullUrl = fullUrl.replace(tag, this.searchString)
           console.log('replaced ' + tag + ' tag with ' + this.searchString)
         } else {
-          fullUrl += '&' + this.search_options.field + '=' + this.searchString
+          fullUrl += '&' + this.search_options.search_field + '=' + this.searchString
         }
 
         for (var i = 0; i < fields.length; i++) {
@@ -301,7 +330,7 @@ export default {
       } else {
         console.log('no search criteria')
         console.log('global: ' + this.globalSearch)
-        console.log('search 1: ' + this.searchString + ' in ' + this.search_options.field)
+        console.log('search 1: ' + this.searchString + ' in ' + this.search_options.search_field)
         console.log('searcn N: ' + JSON.stringify(this.searchStrings))
       }
 
