@@ -1,3 +1,38 @@
+<!-- Stanard/Modal.vue
+
+  Usage:
+
+Options (for all modal types)
+  - id (unique id) - not necessary if only one modal on page
+  - header
+  - body
+  - footer
+  - openButton (name of button used to open modal)
+  - 
+
+  Three primary types along with associated input props:
+
+  Standard: 
+    - data (array of links triggering function or another modal)
+
+  Search Modal: (provides search field(s) that enable search via specified api)
+    - search (hash with the following options)
+      - options (hash input including the following search options)
+        record - data record to pass to modal for secondary action
+        table - table to autoload fields for (allows for easy generation of modal for adding / editing database records in a table)
+        button - name of button for secondary action
+        function - function to execute upon clicking of button above
+        url - url to generate content of modal
+        urlData - data to pass to url (post) (may include tags replaced by record data ( eg urlData = {id: '<foundId>'} where the record supplied includes the 'foundId' attribute))
+  
+  Record Modal: (provides access to record-based modal form)
+    - record (hash with the following options)
+      - table
+      - model
+      - access_type (view, edit, search, append)
+
+-->
+
 <template id=this.id lang='pug'>
   span
     span.modal-anchor
@@ -6,45 +41,48 @@
         button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
       span(v-else)
         span &nbsp; &nbsp; 
-        button.btn.btn-primary(v-on:click="clearTarget; openModal()") +
+        button.btn.btn-primary(v-on:click="openModal()") +
     span.m-fadeOut(:id="id")
       transition(name="modal") 
-        div.modal-mask
-          div.modal-wrapper
-            div.modal-container
-              div.modal-header
-                slot(name="header")
-                  div(v-if="myheader")
-                    h2 {{myheader}}
-              div.modal-body
+        div.my-modal-mask
+          div.my-modal-wrapper
+            div.my-modal-container
+              div.my-modal-header
+                div.container
+                  slot(name="header")
+                    div(v-if="myheader")
+                      b {{myheader}}
+                        div.navbar-right
+                          button.btn.btn-danger.btn-xs(@click="closeModal()")
+                            icon(name='close')
+              div.my-modal-body
                 slot(name="body")
                   div(v-if="1")
                     slot(name="body")
-                      div.modal-body()
-                        <!-- Body -->
-                        div(v-if="type==='search'")
-                          SearchBlock(:search_options="options")
-                        div(v-else)
-                          b non-search Body...
-              div.modal-footer
+                      <!-- Body -->
+                      div(v-if="search")
+                        SearchBlock(:search_options="search" :data_options="data" :picked="picked")
+                      div(v-else)
+                        b non-search Body...
+              div.my-modal-footer
                 slot(name="footer")
-                  b {{footer}}
-                  button.btn.btn-danger(@click="closeModal()") {{close}}
+                  b {{footer}} &nbsp;
+                  span.navbar-right
+                    button.btn.btn-danger.btn-xs(@click="closeModal()") {{closeBtn}}
 </template>
 
 <script>
   /*
 
-  Usage:
-    Modal(title='Modal Title' body='Modal Content' footer='Modal footer')
+  Usage examples:
+    Modal(header='Modal Title' body='Modal Content')
 
   Input:
     name - name of modal (should be distinct if multiple modals used)
 
   Advanced Options:
 
-    type - [standard (default), search, dbRecord]
-      search
+      - search (hash with the following options)
         - options (hash input including the following optional attributes)
           record - data record to pass to modal for secondary action
           table - table to autoload fields for (allows for easy generation of modal for adding / editing database records in a table)
@@ -97,47 +135,59 @@
       openButton: {
         type: String
       },
-      options: {
-        type: Object
+      closeButton: {
+        type: String
       },
 
-      name: {
-        type: String,
-        default: 'modal'
-      },
-      title: {
-        type: String,
-        default: ''
-      },
-      table: {
-        type: String
-      },
-      fields: {
-        type: Array,
-        default () { return [] }
-      },
-      prompt: {
-        type: String
-      },
-      action: {
-        type: Function
-      },
-      url: {
-        type: String
-      },
-      urlData: {
+      data: {
         type: Object
       },
-      function: {
-        type: Function
-      },
-      close: {
-        type: String,
-        default: 'Cancel'
+      search: {
+        type: Object
       },
       record: {
         type: Object
+      },
+      picked: {
+        type: Array
+      },
+
+      options: {
+        type: Object
       }
+      // title: {
+      //   type: String,
+      //   default: ''
+      // },
+      // table: {
+      //   type: String
+      // },
+      // fields: {
+      //   type: Array,
+      //   default () { return [] }
+      // },
+      // prompt: {
+      //   type: String
+      // },
+      // action: {
+      //   type: Function
+      // },
+      // url: {
+      //   type: String
+      // },
+      // urlData: {
+      //   type: Object
+      // },
+      // function: {
+      //   type: Function
+      // },
+      // close: {
+      //   type: String,
+      //   default: 'Cancel'
+      // },
+      // record: {
+      //   type: Object
+      // },
     },
     computed: {
       loadStatus: function () {
@@ -151,12 +201,12 @@
         } else if (this.options && this.options.model) {
           return this.options.model
         } else {
-          return ''
+          return 'Title'
         }
       },
-      closeButton: function () {
-        if (this.options && this.options.closeButton) {
-          return this.options.closeButton
+      closeBtn: function () {
+        if (this.closeButton) {
+          return this.closeButton
         } else {
           return 'Cancel'
         }
@@ -197,7 +247,7 @@
 </script>
 
 <style scoped>
-.modal-mask {
+.my-modal-mask {
   position: fixed !important;
   z-index: 2000 !important;
   top: 0px !important;
@@ -215,7 +265,7 @@
   transition: opacity 1s ease;
 }
 
-.modal-wrapper {
+.my-modal-wrapper {
   display: -webkit-box !important;
   display: -moz-box !important;
   display: -ms-flexbox !important;
@@ -227,7 +277,7 @@
   width: 100% !important;
 }
 
-.modal-container {
+.my-modal-container {
   width: 300px;
   background-color: #ffffff !important;
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.2) !important;
@@ -235,24 +285,30 @@
   -ms-flex: 1 !important;
   flex: 1 !important;
   width: 100% !important;
-  margin: 100px auto;
-  padding: 20px 30px;
+  margin: auto;
+  /*padding: 20px 30px;*/
   background-color: #fff;
-  border-radius: 2px;
+  /*border-radius: 2px;*/
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
   transition: all .3s ease;
   font-family: Helvetica, Arial, sans-serif;
+  overflow:hidden;
 }
 
-.modal-header {
+.my-modal-header {
   margin-top: 0;
-  padding: 0;
-  /*background-color: #cfc;*/
-  color: green;
+  padding: 20px;
+  background-color: #666;
+  color: white;
 }
 
-.modal-body {
-  margin: 20px 0;
+.my-modal-body {
+  padding: 40px;
+}
+
+.my-modal-footer {
+  padding: 30px;
+  background-color: #aaa;
   color: black;
 }
 
@@ -281,9 +337,12 @@
 
 /** Customized... ***/
 
+.modal-header {
+  background-color: #666;  
+}
 .modal-footer {
   background-color: #666;
-}
+}  
 
 .modal-table {
   color: black
