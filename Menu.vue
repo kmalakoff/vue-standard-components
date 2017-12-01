@@ -2,26 +2,27 @@
 
 <template lang='pug'>
   div.menu
-    ul
-      li.dropdown(v-for="link in links")         
-        span(v-if="link.constructor === Object")
-          span(v-for="url,label in link")
-            span(v-if="url.constructor === Array")
-              <!-- Multi-level menus only ...  -->
-              a.dropbtn(href="javascript:void(0)") {{label}} 
-              div.dropdown-content
-                span(v-for="urlN,index in url")
-                  span(v-if="urlN.constructor === Object")
-                    span(v-for="subUrl,subLabel in urlN")
-                        a(:href="subUrl") {{subLabel}}
-                  span(v-else)
-                    router-link(:to="{name: urlN}") {{urlN}} 
-            span(v-else)
-              <!-- Standard array of key:value pairs (name: url)  -->
-              a(:href="url" target="_blank") {{label}}
-        span(v-else)
-          <!-- Internal links do not need keys -->
-          router-link(:to="{name: link}") {{link}} 
+    div.navbar-center
+      ul
+        li.dropdown(v-for="link in links")         
+          span(v-if="link.constructor === Object")
+            span(v-for="url,label in link")
+              span(v-if="url.constructor === Array")
+                <!-- Multi-level menus only ...  -->
+                a.dropbtn(href="javascript:void(0)") {{label}} 
+                div.dropdown-content
+                  span(v-for="urlN,index in url")
+                    span(v-if="urlN.constructor === Object")
+                      span(v-for="subUrl,subLabel in urlN")
+                          a(:href="subUrl") {{subLabel}}
+                    span(v-else)
+                      router-link(:to="{name: urlN}") {{urlN}} 
+              span(v-else)
+                <!-- Standard array of key:value pairs (name: url)  -->
+                a(:href="url" target="_blank") {{label}}
+          span(v-else)
+            <!-- Internal links do not need keys -->
+            router-link(:to="{name: link}") {{link}} 
 
 </template>
 
@@ -49,31 +50,39 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="sass?outputStyle=expanded">
+
+  $menu-background-colour: transparent;
+  $menu-colour: #333;
+
+  .menu {
+
+  }
+
   ul {
+      background-color: $menu-background-colour;
       list-style-type: none;
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #333;
   }
 
   li {
-      float: left;
+      /*float: left;*/
   }
 
   /*Format dropdown menu for multi-level menu.  ... (not yet set up) */
 
   li a, .dropbtn {
       display: inline-block;
-      color: white;
+      color: $menu-colour;
       text-align: center;
       padding: 14px 16px;
       text-decoration: none;
   }
 
   li a:hover, .dropdown:hover .dropbtn {
-      background-color: red;
+      font-weight: bold;
   }
 
   li.dropdown {
@@ -102,4 +111,15 @@
   .dropdown:hover .dropdown-content {
       display: block;
   }
+
+  .navbar-center
+  {
+      position: absolute;
+      width: 100%;
+      left: 0;
+      text-align: center;
+      margin:0 auto;
+  }
+
+
 </style>
