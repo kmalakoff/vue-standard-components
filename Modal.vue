@@ -36,39 +36,43 @@ Options (for all modal types)
 <template id=this.id lang='pug'>
   span
     span.modal-anchor
-      span(v-if='openButton')
-        span &nbsp;
-        button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
-      span(v-else)
-        span &nbsp; &nbsp; 
-        button.btn.btn-primary(v-on:click="openModal()") +
+      span(v-if='type')
+        span(v-if='openButton')
+          span &nbsp;
+          button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
+        span(v-else)
+          span &nbsp; &nbsp; 
+          button.btn.btn-primary(v-on:click="openModal()") +
     span.m-fadeOut(:id="id")
       transition(name="modal") 
         div.my-modal-mask
           div.my-modal-wrapper
             div.my-modal-container
               div.my-modal-header
-                div.container
-                  slot(name="header")
-                    div(v-if="myheader")
-                      b {{myheader}}
-                        div.navbar-right
-                          button.btn.btn-danger.btn-xs(@click="closeModal()")
-                            icon(name='close')
+                slot(name="header")
+                  b {{myheader}}
+                    span.navbar-right
+                      button.btn.btn-danger.btn-xs(@click="closeModal")
+                        icon(name='close')
               div.my-modal-body
                 slot(name="body")
-                  div(v-if="1")
-                    slot(name="body")
-                      <!-- Body -->
-                      div(v-if="search")
-                        SearchBlock(:search_options="search" :data_options="data" :picked="picked")
-                      div(v-else)
-                        b non-search Body...
+                  <!-- Body -->
+                  div(v-if="type==='search'")
+                    SearchBlock(:search_options="search" :links="links" :data_options="modalData" :picked="picked")
+                  div(v-else-if="type==='record'")
+                    b Record Body
+                  div(v-else-if="modalData && modalData.length")
+                    DataGrid(:data="modalData" :options="data_options")
+                  div(v-else-if='content')
+                    b content: {{content}}
+                  div(v-else)
+                    b no data / search / record ... 
+                    hr
               div.my-modal-footer
                 slot(name="footer")
                   b {{footer}} &nbsp;
                   span.navbar-right
-                    button.btn.btn-danger.btn-xs(@click="closeModal()") {{closeBtn}}
+                    button.btn.btn-danger.btn-xs(@click="closeModal") {{closeButton}}
 </template>
 
 <script>
@@ -94,11 +98,13 @@ Options (for all modal types)
   */
 
   import SearchBlock from './SearchBlock'
+  import DataGrid from './DataGrid'
 
   export default {
     name: 'Modal',
     components: {
-      SearchBlock
+      SearchBlock,
+      DataGrid
     },
     data () {
       return {
@@ -108,7 +114,8 @@ Options (for all modal types)
         status: 'pending',
         generated: {
           body: ''
-        }
+        },
+        data_options: {}
       }
     },
     props: {
@@ -118,38 +125,46 @@ Options (for all modal types)
       },
       type: {
         type: String,
-        default: 'standard'
+        default: ''
       },
       header: {
         type: String,
         default: ''
       },
-      body: {
-        type: String,
-        default: ''
+      title: {
+        type: String
+      },
+      picked: {
+        type: Array
       },
       footer: {
         type: String,
         default: ''
       },
-      openButton: {
+      data: {
+        type: Array
+      },
+      content: {
         type: String
       },
-      closeButton: {
-        type: String
+      // links: {
+      //   type: Object
+      // },
+      toggle: {
+        type: Boolean
       },
 
-      data: {
-        type: Object
-      },
-      search: {
-        type: Object
-      },
+      // openButton: {
+      //   type: String
+      // },
+      // closeButton: {
+      //   type: String
+      // },
       record: {
         type: Object
       },
-      picked: {
-        type: Array
+      link: {
+        type: Object
       },
 
       options: {
@@ -190,11 +205,75 @@ Options (for all modal types)
       // },
     },
     computed: {
+      contents: function () {
+        if (this.modalData && this.modalData.length) {
+          return this.modalData.length
+        } else if (this.content) {
+          return this.content
+        }
+      },
+      initClass: function () {
+        if (this.options && this.options.show) {
+          return 'm-fadeIn'
+        } else {
+          return 'm-fadeOut'
+        }
+      },
+      search: function () {
+        if (this.options && this.options.search) {
+          return this.options.search
+        } else { return {} }
+      },
+      body: function () {
+        return this.options.body || ''
+      },
+      modalTitle: function () {
+        if (this.options.title) {
+          return this.options.title
+        } else if (this.title) {
+          return this.title
+        }
+      },
+      modalData: function () {
+        if (this.options.data) {
+          return this.options.data || {}
+        } else if (this.data) {
+          return this.data
+        }
+        // this.$store.getters('modalData')
+      },
+      openButton: function () {
+        if (this.options && this.options.openButton) {
+          return this.options.openButton || 'no'
+        } else { return '+' }
+      },
+      closeButton: function () {
+        if (this.options && this.options.closeButton) {
+          return this.options.closeButton || 'no'
+        } else { return '+' }
+      },
+      // links: function () {
+      //   if (this.options && this.options.links) {
+      //     return this.options.links || {}
+      //   }
+      // },
+      links: function (key) {
+        var L = this.$store.getters.getLinks
+        if (L && L.constructor === Object) {
+          console.log('got link object')
+          return L
+        } else {
+          console.log('got link function ?')
+          return L
+        }
+      },
       loadStatus: function () {
         return this.status
       },
       myheader: function () {
-        if (this.header) {
+        if (this.options && this.options.title) {
+          return this.options.title
+        } else if (this.header) {
           return this.header
         } else if (this.options && this.options.header) {
           return this.options.header
@@ -202,13 +281,6 @@ Options (for all modal types)
           return this.options.model
         } else {
           return 'Title'
-        }
-      },
-      closeBtn: function () {
-        if (this.closeButton) {
-          return this.closeButton
-        } else {
-          return 'Cancel'
         }
       },
       modalBody: function () {
@@ -231,16 +303,23 @@ Options (for all modal types)
       openModal () {
         console.log('open modal...')
         console.log('and fade in')
-        document.getElementById(this.id).classList.toggle('m-fadeIn')
-        document.getElementById(this.id).classList.toggle('m-fadeOut')
+        // document.getElementById(this.id).classList.toggle('m-fadeIn')
+        // document.getElementById(this.id).classList.toggle('m-fadeOut')
+        this.$store.getters.toggleModal(this.id)
 
         clearTimeout(this.timeoutID)
       },
       closeModal: function () {
         console.log('close modal...')
         console.log('fade out')
-        document.getElementById(this.id).classList.toggle('m-fadeOut')
-        document.getElementById(this.id).classList.toggle('m-fadeIn')
+        // document.getElementById(this.id).classList.toggle('m-fadeOut')
+        // document.getElementById(this.id).classList.toggle('m-fadeIn')
+        this.$store.getters.toggleModal(this.id)
+      },
+      watch: {
+        'toggle': function () {
+          console.log('changed body')
+        }
       }
     }
   }
