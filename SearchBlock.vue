@@ -17,7 +17,7 @@
             li(v-for='problem in invalid') {{problem}}
         hr
       span(v-if='multiSelect && picked && picked.length')
-        DataGrid.results.overlay(:data="picked" header='Current Selection' headerClass='GridHeader3' :deSelectable="true" :options="data_options")
+        DataGrid.results.overlay(:data="picked" header='Current Selection' headerClass='GridHeader3' :deSelectable="true" :options="data_options" :links="links")
         p &nbsp;
       span.search-overlay(v-if="globalSearch && 1")
         input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
@@ -42,7 +42,7 @@
             span &nbsp; &nbsp;
             button.btn.btn-primary(@click.prevent="clearList(1); openModal()") Clear Search
       span.results-section(v-if="currentList.length")
-        DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" header="Selected" :picked="picked" :multiSelect="multiSelect" :onPick="pickMe" :options="data_options" :search_options="search_options")
+        DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" header="Selected" :picked="picked" :multiSelect="multiSelect" :onPick="pickMe" :options="data_options" :search_options="search_options" :links="links")
 </template>
 
 <script>
@@ -100,6 +100,9 @@ export default {
     },
     picked: {
       type: Array
+    },
+    links: {
+      type: Object
     }
   },
   created: function () {
@@ -122,6 +125,13 @@ export default {
     }
   },
   computed: {
+    link_keys: function () {
+      if (this.links && this.links.constructor === Object) {
+        return Object.keys(this.links)
+      } else {
+        return ['no links']
+      }
+    },
     search_result_options: function () {
       if (this.search_options && this.search_options.search_fields) {
         var dataOptions = {}
@@ -198,6 +208,9 @@ export default {
   },
   methods: {
     pickMe (record) {
+      console.log('stall')
+    },
+    pickMe2 (record) {
       var target = this.search_options.target
       console.log('PICK ME NOW')
       if (this.search_options.multiSelect) {
@@ -263,17 +276,10 @@ export default {
       this.clearList()
       var orConditions = []
       var andConditions = []
-      var fields = []
+      // var fields = []
 
       var conditions = this.conditions || [1]
-      var table = this.model
-
-      if (this.search && table && this.search[table]) {
-        fields = this.search[table]
-      } else {
-        fields = this.fields || []
-      }
-      console.log('got fields: ' + fields + ' from ' + JSON.stringify(this.search) + ' && ' + this.scope)
+      // var table = this.model
 
       var data = cors(this.corsOptions)
       console.log('CORS: ' + JSON.stringify(cors))
@@ -286,22 +292,28 @@ export default {
 
       var method = this.search_options.method || 'post'
 
-      if (this.search_options.search_field && this.searchString) {
+      console.log('options: ' + JSON.stringify(this.search_options))
+
+      if (this.search_options.search_fields && this.searchString) {
+        method = 'get'
+        var fields = this.search_options.search_fields || []
         // global search
-        console.log(this.search_options.search_field + ' = ' + this.searchString)
+        console.log(this.search_options.search_fields + ' = ' + this.searchString)
         if (tags && tags.length) {
           var tag = new RegExp('<' + tags[1] + '>')
           fullUrl = fullUrl.replace(tag, this.searchString)
           console.log('replaced ' + tag + ' tag with ' + this.searchString)
-        } else {
+        } else if (fields.length === 1) {
           fullUrl += '&' + this.search_options.search_field + '=' + this.searchString
+          console.log('extend url: ' + fullUrl)
+        } else {
+          console.log('check ' + fields.length + fields)
+          for (var i = 0; i < fields.length; i++) {
+            orConditions.push(fields[i] + ' LIKE "%' + this.searchString + '%"')
+            console.log(' .. or ' + fields[i] + ' containing ' + this.searchString)
+          }
+          method = 'post'
         }
-
-        for (var i = 0; i < fields.length; i++) {
-          orConditions.push(fields[i] + ' LIKE "%' + this.searchString + '%"')
-          console.log(' .. or ' + fields[i] + ' containing ' + this.searchString)
-        }
-        method = 'get'
       } else if (!this.globalSearch && this.searchStrings) {
         // fields specific search
         var check = Object.keys(this.searchStrings)
@@ -428,7 +440,6 @@ export default {
         console.log('clear current list of ' + count)
         for (var j = 0; j < count; j++) {
           _this.$delete(_this.list, 0)
-          console.log('clear ' + j)
         }
       }
 
