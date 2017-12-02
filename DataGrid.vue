@@ -11,17 +11,16 @@
         th.result-heading(v-for="key in data_fields")
           span {{key}}
         th.result-heading(v-if="deSelectable") Remove
-        th.result-heading(v-if="addLinks" v-for="func, key in addLinks")
-          span &nbsp; <!-- add empty column headers -->
-          
+        th.result-heading(v-if="options && options.addLinks" v-for="func, key in options.addLinks")
+          span &nbsp; <!-- add empty column headers -->         
       tbody
         tr.result-row(v-for="record, index in data")
           td.result-cell(v-for="key in data_fields")
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X 
-          td.result-cell(v-if="addLinks" v-for="link in addLinks")
-            ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link")
+          td.result-cell(v-if="options && options.addLinks" v-for="link in options.addLinks")
+            ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link" :links="links")
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
         tr
@@ -69,6 +68,9 @@
         type: Object
       },
 
+      links: {
+        type: Object
+      },
       noDataMsg: {
         type: String,
         default: ''
@@ -111,7 +113,7 @@
       data_fields: function () {
         if (this.search_options && this.search_options.search_fields) {
           return this.search_options.search_fields
-        } else if (this.options.fields) {
+        } else if (this.options && this.options.fields) {
           return this.options.fields
         } else {
           var keys = Object.keys(this.data[0])
@@ -122,20 +124,20 @@
       target: function () {
         if (this.options && this.options.target) {
           return this.options.target
-        }
+        } else { return null }
       },
       data_header: function () {
         if (this.header) {
           return this.header
         } else if (this.options && this.options.title) {
           return this.options.title
-        }
+        } else { return '' }
       },
       addLinks: function () {
         if (this.options && this.options.addLinks && this.options.addLinks.length) {
           return this.options.addLinks
         } else {
-          return null
+          return []
         }
       },
       columns: function () {
