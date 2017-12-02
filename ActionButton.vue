@@ -4,17 +4,16 @@
 
 <template lang='pug'>
   div
-    div(v-if='modal')
-      b SM {{modal}}
-      <!-- Modal(:id='name' @close="hideM" openButton='open' :record="record" :name="name" :table="modal.table" :button="modal.button" :body="modal.body" :function="modal.function" :url="modal.url" :urlData="modal.urlData" :search_options="modal") -->
-      <!-- Modal(id='cov-modal' type='search' :options="search_options" :picked="coverage" close="Finished adding Coverage") -->
-      Modal(:id='name' @close="hideM" :openButton='modal.openButton' :onPick="modal.onPick" :record="record" :name="name" :body="modal.body" :search="modal.search" :data="modal.data")
-    div(v-else)
-      button.btn.btn-success(@click.prevent="runEvent()") E={{name}}
+    div(v-if="link && link.modal && link.modal.onPick")
+      button.btn.btn-success(@click.prevent="link.modal.onPick(record)") P:{{name}}
+    div(v-else-if="link && link.function")
+      button.btn.btn-success(@click.prevent="link.function") F:{{name}}
+    div(v-else-if="link && link.url")
+      a(:href='link.url' target='_blank')
+        button.btn.btn-success N:{{link.name}}
 </template>
 
 <script>
-import Modal from './../Standard/Modal.vue'
 /*
 
 Usage:
@@ -39,7 +38,6 @@ export default {
     }
   },
   components: {
-    Modal
   },
   props: {
     name: {
@@ -59,6 +57,9 @@ export default {
     },
     modal_options: {
       type: Object
+    },
+    links: {
+      type: Object
     }
   },
   computed: {
@@ -72,26 +73,6 @@ export default {
     },
     hideM () {
       this.showModal = false
-    },
-    runEvent () {
-      console.log('run event ' + JSON.stringify(this.link))
-      console.log('data: ' + JSON.stringify(this.record))
-      if (this.link.function) {
-        console.log('Action: ' + this.link.function.constructor)
-        this.link.function({ record: this.record })
-      }
-      console.log(JSON.stringify(this.record))
-      return false
-    },
-    runModalEvent () {
-      console.log('run ' + this.buttonName)
-      console.log('data: ' + JSON.stringify(this.record))
-      if (this.buttonAction) {
-        console.log('Action: ' + this.buttonAction.constructor)
-        this.buttonAction({ record: this.record })
-      }
-      console.log(JSON.stringify(this.record))
-      return false
     },
     openModal () {
       console.log('open modal')
