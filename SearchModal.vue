@@ -27,7 +27,7 @@
                               li(v-for='problem in invalid') {{problem}}
                           hr
                         span(v-if='multiSelect && picked && picked.length')
-                          DataGrid.results.overlay(:data="picked" header='Current Selection' headerClass='GridHeader3' :deSelectable="true")
+                          DataGrid.results.overlay(:data="picked" header='Current Selection' headerClass='GridHeader3' :deSelectable="true" :data_options="search_options")
                           p &nbsp;
                         span.search-overlay(v-if="globalSearch && 1")
                           input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
@@ -51,7 +51,7 @@
                               span &nbsp; &nbsp;
                               button.btn.btn-primary(@click.prevent="clearList(1); openModal()") Clear Search
                         span.results-section(v-if="currentList.length")
-                          DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" :header="chooseTitle" :picked="picked" :multiSelect="multiSelect" :onPick="onPick")
+                          DataGrid.results-table(:data="currentList" :target="target" :noDataMsg="search_options.noDataMsg" :header="chooseTitle" :picked="picked" :multiSelect="multiSelect" :onPick="onPick" :data_options="search_options")
 
                       div(v-show="loadStatus !== 'loaded'")
                         b Loading...
