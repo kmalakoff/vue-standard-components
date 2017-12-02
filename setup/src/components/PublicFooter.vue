@@ -1,33 +1,31 @@
 <template lang='pug'>
   div.publicFooter
-    div.footerContent
-      h4 Public Footer (Default)
-        div.navbar-right
-          b final tag..
+    span.navbar-left(v-html="left")
+    span.navbar-centre(v-html="centre")
+    span.navbar-right(v-html="right")
 </template>
 
 
 <script>
 export default {
   // template: require('./main.pug'),
+
+  props: {
+    left: {
+      type: String
+    },
+    right: {
+      type: String
+    },
+    centre: {
+      type: String
+    }
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .publicFooter {
-    padding: 0px;
-    background-color: #ccc;
-  }
-
-  .footerContent {
-    padding: 10px;
-  }
-
-  h1, h2 {
-    font-weight: normal;
-  }
-
   ul {
     list-style-type: none;
     padding: 0;
@@ -35,10 +33,7 @@ export default {
 
   li {
     display: inline-block;
-    margin: 0 10px;
+    /*margin: 0 10px;*/
   }
 
-  a {
-    color: #42b983;
-  }
 </style>
