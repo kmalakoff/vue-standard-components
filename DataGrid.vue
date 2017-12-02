@@ -2,7 +2,7 @@
 
 <template lang='pug'>
   div.data-grid
-    table.ResultsGrid(v-if='data && data.length')
+    table.table-bordered.ResultsGrid(v-if='data && data.length')
       thead
         tr(v-show="data_header")
           td(:class="headerClass" :colspan="columns")
@@ -62,7 +62,7 @@
       },
       options: {
         type: Object,
-        default: () => {}
+        default () { return {} }
       },
       search_options: {
         type: Object
@@ -213,6 +213,7 @@
 </script>
 
 <style scoped>
+
 .ResultsGrid {
     width: 100%;
     border: 1px solid black;
