@@ -7,10 +7,12 @@
     div(v-if="link && link.modal && link.modal.onPick")
       button.btn.btn-success(@click.prevent="link.modal.onPick(record)") P:{{name}}
     div(v-else-if="link && link.function")
-      button.btn.btn-success(@click.prevent="link.function") F:{{name}}
+      button.btn.btn-success(@click.prevent="link.function(record)") F:{{name}}
     div(v-else-if="link && link.url")
       a(:href='link.url' target='_blank')
         button.btn.btn-success N:{{link.name}}
+    div(v-else)
+      b {{link.name}}
 </template>
 
 <script>
