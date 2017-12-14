@@ -5,14 +5,16 @@
 <template lang='pug'>
   div
     div(v-if="link && link.modal && link.modal.onPick")
-      button.btn.btn-success(@click.prevent="link.modal.onPick(record)") P:{{name}}
+      button.btn.btn-primary(@click.prevent="link.modal.onPick(record)") {{name}}
     div(v-else-if="link && link.function")
-      button.btn.btn-success(@click.prevent="link.function(record)") F:{{name}}
+      button.btn.btn-danger(@click.prevent="link.function(record)") {{name}}
     div(v-else-if="link && link.url")
       a(:href='link.url' target='_blank')
         button.btn.btn-success N:{{link.name}}
+    div(v-else-if="link && link.modal && link.modal.record")
+      button.btn.btn-danger(@click.prevent="") {{name}}
     div(v-else)
-      b {{link.name}}
+      b ELSE {{name}}
 </template>
 
 <script>
@@ -31,15 +33,16 @@ Advanced Options:
 
   record - data record to pass to modal for secondary action
 */
+
 export default {
   name: 'immunize',
+  components: {
+  },
   data () {
     return {
       status: 'loaded',
       showModal: false
     }
-  },
-  components: {
   },
   props: {
     name: {
@@ -75,6 +78,9 @@ export default {
     },
     hideM () {
       this.showModal = false
+    },
+    dbRecordModal () {
+      console.log('open dbRecord Modal...')
     },
     openModal () {
       console.log('open modal')
