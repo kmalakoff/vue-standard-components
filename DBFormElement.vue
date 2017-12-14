@@ -1,31 +1,29 @@
 <!-- src/components/Form.vue -->
 
 <template lang='pug'>
-  span
-    b F: {{field}}
-    hr
+  div
+    <!-- b {{field}} : {{field.type}} {{list(field)}} : {{vModel}} = {{vm}} -->
+    b {{form}}
     span(v-if="field.type==='int'")
-      b Num: {{label(field)}}
-      b-form-input(v-model="model" type='number')
+      b-form-input(v-model="vm" v-on:change="saveMe" type='number' :placeholder="placeholder" default='default')
     span(v-else-if="field.type==='varchar'")
-      b Char: {{label(field)}}
-      b-form-input(v-model="model" type='text')
+      b-form-input(v-model="vm" v-on:change="saveMe" type='text' :placeholder="placeholder" default='default')
     span(v-else-if="field.type==='date'")
-      b Date: {{label(field)}}
-      b-form-input(v-model="model" type='date')
+      b-form-input(v-model="vm" v-on:change="saveMe" type='date' :options="list(field)" placeholder="yyyy-mm-dd")
     span(v-else-if="field.type.match(/^enum/)")
-      b ENUM: {{label(field)}}
-      b-form-select(v-model="model" :options="list(field)")
+      <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
+      b-form-select(v-model="vm" :options="list(field)" @change.native="myChange")
     span(v-else-if="field.type==='boolean'")
-      b-form-checkbox(v-model="model")
+      b-form-checkbox(v-model="vm" v-on:change="saveMe")
     span(v-else-if="field.type==='decimal'")
-      b-form-input(type='text' :state="isNumber(field)" v-model="model")
+      b-form-input(type='text' :state="isNumber(field)" v-model="vm" v-on:change="saveMe" :placeholder="placeholder" )
     span(v-else)
       b {{field.type}}?: {{label(field)}}
+
 </template>
 
 <script>
-  import axios from 'axios'
+  // import axios from 'axios'
   // import bFormInput from 'bootstrap-vue/es/components/b-form-input/b-form-input'
   // import bFormInputDirective from 'bootstrap-vue/es/directives/b-form-input/b-form-input'
   
@@ -38,61 +36,36 @@
     // },
     data () {
       return {
+        vm: this.field.default,
+        om: this.vModel
       }
     },
-
     props: {
-      field: { type: Object }
+      field: { type: Object },
+      placeholder: { type: String },
+      vModel: { type: String },
+      form: { type: Object }
+    },
+    created: function () {
+      // var keys = _.pluck(this.field.default)
+      this.$set(this.form, this.om, this.field.default)
+      console.log(this.field.name + ' found default: ' + this.field.default)
     },
     computed: {
       type: function () { return this.field.type },
-      name: function () { return this.field.name }
+      name: function () { return this.field.name },
+      mval: function (model) { return this[model] },
+      default: function () { return this.field.default || '' }
     },
     methods: {
-      loadTest () {
-        this.DBfields = [
-          {prompt: 'name', type: 'varchar'},
-          {name: 'email', type: 'varchar', format: '.+@.+'},
-          {prompt: 'B/date', name: 'birthdate', type: 'date'},
-          {name: 'gender', type: "enum('M','F')"},
-          {name: 'height', type: 'decimal'},
-          {name: 'kids', type: 'int'},
-          {name: 'mother', type: 'int', reference: 'person'}
-        ]
+      saveMe (val) {
+        this.$set(this.form, this.om, this.vm)
       },
-      loadTable () {
-        var DBfieldUrl = this.url
-
-        var _this = this
-        axios.post(DBfieldUrl, { table: this.table })
-        .then(function (result) {
-          console.log('R: ' + JSON.stringify(result))
-          _this.DBfields = result.data
-        })
-        .catch(function (err) {
-          if (err) {
-            console.log('Err: ' + err)
-          }
-          _this.DBFields = []
-        })
+      myChange (evt) {
+        this.$set(this.form, this.om, evt.target.value)
       },
-
       validate (evt) {
         console.log('validate ' + JSON.stringify(evt.target))
-      },
-      label: function (field) {
-        if (!field) {
-          return null
-        } else if (field.prompt) {
-          return field.prompt
-        } else { return field.name }
-      },
-      model: function (field) {
-        if (!field) {
-          return null
-        } else if (field.model) {
-          return field.model
-        } else { return field.model }
       },
       // type: function (field) {
       //   if (!field) {
@@ -116,7 +89,7 @@
         } else { return ['A', 'B', 'C'] }
       },
       isNumber: function (field) {
-        var name = this.model(field)
+        var name = this.model
         console.log('name: ' + name)
         return 'ok'
         // return this[name].length > 2
