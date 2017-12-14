@@ -1,17 +1,21 @@
 <!-- src/components/Form.vue -->
 
 <template lang='pug'>
-  div.table-form
-    h1 Table: {{table}}
+  div.table-form.container
+    h1 {{table}} : {{model}}
     hr
-    ul
-      li(v-for="field in DBfields")
-        b {{label(field)}}: 
-        DBFormElement(:field="field")
+    table.table
+      tr(v-for="field in DBfields")
+        td(style='width: 10%')
+          b {{label(field)}}:
+        td(style='width: 80%')
+          DBFormElement(:form="form" :field="field" :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)")
+        td(style='width:10%')
+          b &nbsp;
     hr
-    button(@click.prevent="loadTest()") Load Test Form
-    hr
-    b DB: {{DBfields}}
+    button(v-if="DBfields.length === 0" @click.prevent="loadTest()") Load Test Form
+    div(v-else)
+      b Form Data: {{form}}
 </template>
 
 <script>
@@ -25,7 +29,8 @@
     data () {
       return {
         url: config.dbUrl,
-        DBfields: []
+        DBfields: [],
+        form: {}
       }
     },
     components: {
@@ -34,19 +39,32 @@
     props: {
       table: {
         type: String
+      },
+      model: {
+        type: String
+      },
+      addLinks: {
+        type: Object
       }
     },
     computed: {
     },
     methods: {
+      label (field) {
+        if (!field) {
+          return null
+        } else if (field.prompt) {
+          return field.prompt
+        } else { return field.name }
+      },
       loadTest () {
         this.DBfields = [
-          {prompt: 'name', type: 'varchar'},
+          {prompt: 'name', type: 'varchar', default: 'Joe'},
           {name: 'email', type: 'varchar', format: '.+@.+'},
-          {prompt: 'B/date', name: 'birthdate', type: 'date'},
-          {name: 'gender', type: "enum('M','F')"},
+          {prompt: 'B/date', name: 'birthdate', type: 'date', default: '2017-09-05'},
+          {name: 'gender', type: "enum('M','F')", default: 'M'},
           {name: 'height', type: 'decimal'},
-          {name: 'kids', type: 'int'},
+          {name: 'kids', type: 'int', default: 5},
           {name: 'mother', type: 'int', reference: 'person'}
         ]
       },
@@ -70,13 +88,6 @@
       validate (evt) {
         console.log('validate ' + JSON.stringify(evt.target))
       },
-      label: function (field) {
-        if (!field) {
-          return null
-        } else if (field.prompt) {
-          return field.prompt
-        } else { return field.name }
-      },
       type: function (field) {
         if (!field) {
           return null
@@ -88,8 +99,17 @@
         } else if (field.type.match(/^int/i)) {
           return
         }
+      },
+      vModel: function (field) {
+        console.log('parse model from ' + JSON.stringify(this.field))
+        if (!field) {
+          return null
+        } else if (field.name) {
+          return field.name
+        } else if (field.prompt) {
+          return field.prompt
+        } else { return null }
       }
-
     }
 
   }
