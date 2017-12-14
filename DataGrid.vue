@@ -14,7 +14,7 @@
         th.result-heading(v-if="options && options.addLinks" v-for="func, key in options.addLinks")
           span &nbsp; <!-- add empty column headers -->         
       tbody
-        tr.result-row(v-for="record, index in data")
+        tr.result-row(:class="dynamicClass(record)" v-for="record, index in data")
           td.result-cell(v-for="key in data_fields")
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
           td.result-cell(v-if="deSelectable") 
@@ -103,6 +103,12 @@
         type: String
       },
       modalURL: {
+        type: String
+      },
+      baseClass: {
+        type: String
+      },
+      fieldClass: {
         type: String
       }
     },
@@ -206,9 +212,15 @@
         this.$store.getters.getHash('updates')
 
         return false
+      },
+      dynamicClass: function (record) {
+        if (this.fieldClass && record[this.fieldClass]) {
+          return this.baseClass + ' ' + record[this.fieldClass]
+        } else {
+          return this.baseClass
+        }
       }
     }
-
   }
 </script>
 
@@ -218,7 +230,7 @@
     width: 100%;
     border: 1px solid black;
     padding: 5px;
-    background-color: lightgreen;
+    /*background-color: lightgreen;*/
   }  
 
   .result-heading {
@@ -233,6 +245,7 @@
 
   .result-cell {
     padding:5px;
+    vertical-align: top;
   }
 
   .GridHeader {
