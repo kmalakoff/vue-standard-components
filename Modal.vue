@@ -36,13 +36,8 @@ Options (for all modal types)
 <template id=this.id lang='pug'>
   span
     span.modal-anchor
-      span(v-if='type')
-        span(v-if='openButton')
-          span &nbsp;
-          button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
-        span(v-else)
-          span &nbsp; &nbsp; 
-          button.btn.btn-primary(v-on:click="openModal()") +
+    span(v-if='openButton')
+      button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
     span.m-fadeOut(:id="id")
       transition(name="modal") 
         div.my-modal-mask
@@ -245,12 +240,12 @@ Options (for all modal types)
       openButton: function () {
         if (this.options && this.options.openButton) {
           return this.options.openButton || 'no'
-        } else { return '+' }
+        } else { return '' }
       },
       closeButton: function () {
         if (this.options && this.options.closeButton) {
           return this.options.closeButton || 'no'
-        } else { return '+' }
+        } else { return 'Close' }
       },
       // links: function () {
       //   if (this.options && this.options.links) {
@@ -325,7 +320,7 @@ Options (for all modal types)
   }
 </script>
 
-<style scoped>
+<style>
 .my-modal-mask {
   position: fixed !important;
   z-index: 2000 !important;
