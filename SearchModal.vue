@@ -510,11 +510,12 @@
         }
 
         console.log('axios ' + method + ': ' + fullUrl)
-        console.log('data: ' + JSON.stringify(data))
+        console.log('searchModal data: ' + JSON.stringify(data))
 
         var _this = this
         axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
+        console.log('call...')
         axios({url: fullUrl, method: method, data: data})
         .then(function (result, err) {
           console.log('axios returned value(s): ' + JSON.stringify(result))
@@ -539,7 +540,7 @@
           if (result.data && result.data.error) {
             _this.$store.commit('setError', {context: 'remote searching ' + _this.scope, err: result.data.error})
           } else if (!newdata.length) {
-            var msg = 'no ' + _this.scope + ' record(s) found matching \'' + _this.searchString + '\''
+            var msg = 'no ' + _this.scope + ' Record(s) found matching \'' + _this.searchString + '\''
             _this.$store.commit('setError', {context: 'Searching for ' + _this.scope, err: msg})
           }
 
@@ -565,7 +566,7 @@
         .catch(function (err) {
           // _this.$store.commit('increment')
           // _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
-          console.log('set error...' + _this.$store.state.count)
+          console.log('set error...')
           _this.$store.commit('increment')
           _this.$store.commit('setError', {context: 'Searching For ' + _this.scope, err: err})
           console.log('axios error: ' + err)
