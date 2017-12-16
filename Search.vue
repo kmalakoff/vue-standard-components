@@ -302,7 +302,7 @@
         }
 
         console.log('axios ' + method + ': ' + fullUrl)
-        console.log('data: ' + JSON.stringify(data))
+        console.log('search data: ' + JSON.stringify(data))
 
         var _this = this
         axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -323,7 +323,7 @@
           }
 
           if (!newdata.length) {
-            var msg = 'no ' + _this.scope + ' record(s) found matching \'' + _this.searchString + '\''
+            var msg = 'no ' + _this.scope + ' record(s) found matching: \'' + _this.searchString + '\''
             _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: msg})
           }
 
