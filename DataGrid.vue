@@ -1,5 +1,20 @@
 <!-- src/components/Login.vue -->
 
+<!-- 
+Usage:
+
+  DataGrid(:data="data" :type="link.type" :modal="link.modal" :record="data[index]" :link="link")
+
+Input:
+
+  name - name of modal (should be distinct if multiple modals used)
+  type - button / modal
+
+Advanced Options:
+
+  record - data record to pass to modal for secondary action
+-->
+
 <template lang='pug'>
   div.data-grid
     table.table-bordered.ResultsGrid(v-if='data && data.length')
@@ -28,8 +43,6 @@
 </template>
 
 <script>
-  // import { mapState } from 'vuex'
-
   import ActionButton from './ActionButton.vue'
 
   export default {
@@ -214,10 +227,12 @@
         return false
       },
       dynamicClass: function (record) {
-        if (this.fieldClass && record[this.fieldClass]) {
-          return this.baseClass + ' ' + record[this.fieldClass]
+        if (this.options && this.options.fieldClass && record[this.options.fieldClass]) {
+          return this.options.baseClass + ' ' + record[this.options.fieldClass]
+        } else if (this.options && this.options.baseClass) {
+          return this.options.baseClass
         } else {
-          return this.baseClass
+          return ''
         }
       }
     }
