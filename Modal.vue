@@ -55,7 +55,7 @@ Options (for all modal types)
                   div(v-if="type==='search'")
                     SearchBlock(:search_options="search" :links="links" :data_options="modalData" :picked="picked")
                   div(v-else-if="type==='record'")
-                    b Record Body
+                    DBForm(table='immunize' :onSave='save')
                   div(v-else-if="modalData && modalData.length")
                     DataGrid(:data="modalData" :options="data_options")
                   div(v-else-if='content')
@@ -94,12 +94,14 @@ Options (for all modal types)
 
   import SearchBlock from './SearchBlock'
   import DataGrid from './DataGrid'
+  import DBForm from './DBForm'
 
   export default {
     name: 'Modal',
     components: {
       SearchBlock,
-      DataGrid
+      DataGrid,
+      DBForm
     },
     data () {
       return {
@@ -107,6 +109,7 @@ Options (for all modal types)
         timeoutID: 0,
         showModal: false,
         status: 'pending',
+        fieldData: [],
         generated: {
           body: ''
         },
@@ -199,7 +202,17 @@ Options (for all modal types)
       //   type: Object
       // },
     },
+    created: function () {
+    },
     computed: {
+      recordTable: function () {
+        if (this.options.table) {
+          return this.options.table
+        } else {
+          console.log('no table defined')
+          return
+        }
+      },
       contents: function () {
         if (this.modalData && this.modalData.length) {
           return this.modalData.length
@@ -310,6 +323,15 @@ Options (for all modal types)
         // document.getElementById(this.id).classList.toggle('m-fadeOut')
         // document.getElementById(this.id).classList.toggle('m-fadeIn')
         this.$store.getters.toggleModal(this.id)
+      },
+      save: function (form) {
+        if (this.options.onSave) {
+          console.log('save form: ' + JSON.stringify(form))
+          this.options.onSave(form)
+          this.closeModal()
+        } else {
+          console.log('save function not supplied')
+        }
       },
       watch: {
         'toggle': function () {
