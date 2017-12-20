@@ -1,4 +1,12 @@
 <!-- src/components/Form.vue -->
+<!--
+Usage: 
+  DBForm(table='widget' :onSave='save' :append='append'))
+
+  Options:
+    append: array of addiitional field hashes... (each element MUST include keys; 'name' and 'type')
+        eg (append = [ { name: 'user', type: 'string', default: 'Joe'}, { name: 'SIN', type: 'hidden', default: '123456789'}])
+-->
 
 <template lang='pug'>
   div.table-form
@@ -17,13 +25,19 @@
           span &nbsp;
           a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)") 
             icon(name='question-circle' color='black' scale='2')
-          b &nbsp;  
-    hr
-    button(v-if="onSave" @click.prevent="onSave(form)") Save
-    br
-    button(v-if="DBfields.length === 0" @click.prevent="loadTest()") Load Test Form
-    hr
-    b {{form}}
+          b &nbsp; 
+      tr(v-for="r in include.visible")
+        td.prompt-column
+          b {{label(r)}}: &nbsp;
+        td.data-column
+          DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
+    span(v-for='r in include.hidden')
+      DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
+
+      hr
+      button.btn.btn-primary(v-if="onSave" @click.prevent="onSave(form)") Save
+      hr
+      b Form: {{form}}"
 </template>
 
 <script>
@@ -60,16 +74,24 @@
       },
       onSave: {
         type: Function
+      },
+      append: {
+        type: Array
+      },
+      fields: {
+        type: Array
       }
     },
     created: function () {
       var DBfields = []
+
       if (this.table === 'immunize') {
-        var vaccine = 'tbd'
+        // load fields dynamically from table..
+        // Construction
         DBfields = [
-          {name: 'patient', type: 'reference', reference: 'patient'},
-          {name: 'vaccine', type: 'reference', reference: 'vaccine', default: vaccine},
-          {name: 'vaccinator', type: 'reference', reference: 'staff'},
+          // {name: 'patient', type: 'reference', reference: 'patient'},
+          // {name: 'vaccine', type: 'reference', reference: 'vaccine', default: vaccine},
+          // {name: 'vaccinator', type: 'reference', reference: 'staff'},
           {name: 'route', type: "enum('IM - Intramuscular','SC - Subcutaneous','ID - Intradermal','IN - Intranasal','PO - Oral')"},
           {name: 'site', type: "enum('LA - Left Arm','RA - Right Arm','LT - Left Thigh','RT - Right Thigh')"},
           {name: 'applied', type: 'date', default: 'now()'},
@@ -78,7 +100,10 @@
           {name: 'reactionLevel', type: "enum('None','Mild','Strong')"},
           {name: 'notes', type: 'string'}
         ]
+      } else if (this.fields) {
+        DBfields = this.fields
       } else {
+        // Test Data ...
         DBfields = [
           {prompt: 'name', type: 'varchar', default: 'Joe'},
           {name: 'email', type: 'varchar', format: '.+@.+'},
@@ -101,6 +126,20 @@
           console.log('camel case = ' + camel)
           return camel
         } else { return 'Form' }
+      },
+      include: function () {
+        var visible = []
+        var hidden = []
+        if (this.append) {
+          for (var i = 0; i < this.append.length; i++) {
+            if (this.append[i].type === 'hidden') {
+              hidden.push(this.append[i])
+            } else {
+              visible.push(this.append[i])
+            }
+          }
+        }
+        return {visible: visible, hidden: hidden}
       }
     },
     methods: {
@@ -109,9 +148,9 @@
         if (!field) {
           return ''
         } else if (field.prompt) {
-          return 'form.' + field.prompt
+          return field.prompt
         } else if (field.name) {
-          return 'form.' + field.name
+          return field.name
         } else {
           console.log('no label supplied for ' + JSON.stringify(field))
           return ''
@@ -167,17 +206,11 @@
         }
       },
       vModel: function (field) {
-        console.log('parse model from ' + JSON.stringify(field))
-        if (!field) {
-          return null
-        } else if (field.name) {
-          return field.name
-        } else if (field.prompt) {
-          return field.prompt
-        } else { return null }
+        var label = this.label(field)
+        var vModel = label
+        return vModel
       }
     }
-
   }
 </script>
 
@@ -188,6 +221,10 @@
 
   .form-table {
     bacground-color: red;
+  }
+
+  table tr td {
+    padding: 5px;
   }
 
   table tr td.prompt-column {
