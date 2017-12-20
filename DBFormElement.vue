@@ -23,6 +23,8 @@
       b-form-input.input-lg(type='text' v-model="vm" :placeholder="placeholder" disabled)
     span(v-else-if="field.type==='reference'")
       b-form-input(type='text' v-model="vm" :placeholder="placeholder" disabled)
+    span(v-else-if="field.type==='hidden'")
+      b-form-input(type='hidden' v-model="vm" :placeholder="placeholder" disabled)
     span(v-else)
       b {{field.type}}?: {{field}}
 
