@@ -55,7 +55,7 @@ Options (for all modal types)
                   div(v-if="type==='search'")
                     SearchBlock(:search_options="search" :links="links" :data_options="modalData" :picked="picked")
                   div(v-else-if="type==='record'")
-                    DBForm(table='immunize' :onSave='save')
+                    DBForm(table='immunize' :onSave='save' :append='append')
                   div(v-else-if="modalData && modalData.length")
                     DataGrid(:data="modalData" :options="data_options")
                   div(v-else-if='content')
@@ -167,6 +167,9 @@ Options (for all modal types)
       options: {
         type: Object,
         default () { return {} }
+      },
+      append: {
+        type: Array
       }
       // title: {
       //   type: String,
