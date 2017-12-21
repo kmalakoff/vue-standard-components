@@ -35,7 +35,15 @@ Advanced Options:
           td.result-cell(v-if="deSelectable") 
             button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X 
           td.result-cell(v-if="options && options.addLinks" v-for="link in options.addLinks")
-            ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link" :links="links")
+            span(v-if="link.type === 'button'")
+              ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link" :links="links")
+            span(v-if="link.type === 'icon'")
+              span(v-if="link.modal")
+                a(href="#" onclick='return false' @click.prevent="link.modal.onPick(record)" :record="data[index]")
+                  icon(:name='link.name' :color='link.colour' :scale='link.scale')
+              span(v-else)
+                icon(:name='link.name' :color='link.colour' :scale='link.scale')
+
     div(v-if='!data || !data.length')
       table(align='center' v-if='noDataMsg') 
         tr
