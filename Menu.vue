@@ -1,4 +1,39 @@
-<!-- src/components/Standard/Menu.vue -->
+<!-- src/components/Standard/Menu.vue 
+
+  Usage:
+
+  Modes of operation:
+
+  type = 'url'. (links point to url .. more flexible, but slower)
+  *************
+  links: [ goHere: '/goHere', maps: 'https/maps.google.ca']
+  eg Menu(:links="links")
+
+
+  type = 'onClick' ... execute onClick (eg switch layers on tab clicks)
+  *****************
+  
+  predefine:
+
+  links: [ A: 'Acomponent', B: 'Bcomponent'],
+  active_block: 'A',
+
+  methods: {
+    activate (layer) {
+      console.log('activate ' + layer)
+      this.active_block = layer
+    }
+  },
+
+  template:
+  
+  Menu(:links="links" :onClick='activate' :active="active_block")
+
+  div(v-for='link in links')
+    div(v-if="active_block==='A'")
+      AComponent()
+
+-->
 
 <template lang='pug'>
   div.menu
@@ -6,23 +41,28 @@
       ul
         li.dropdown(v-for="link in links")         
           span(v-if="link.constructor === Object")
-            span(v-for="url,label in link")
-              span(v-if="url.constructor === Array")
+            span(v-for="target,label in link")
+              span(v-if="target.constructor === Array && type==='url'")
                 <!-- Multi-level menus only ...  -->
                 a.dropbtn(href="javascript:void(0)") {{label}} 
                 div.dropdown-content
-                  span(v-for="urlN,index in url")
-                    span(v-if="urlN.constructor === Object")
-                      span(v-for="subUrl,subLabel in urlN")
+                  span(v-for="targetN,index in target")
+                    span(v-if="targetN.constructor === Object")
+                      span(v-for="subUrl,subLabel in targetN")
                           a(:href="subUrl") {{subLabel}}
                     span(v-else)
-                      router-link(:to="{name: urlN}") {{urlN}} 
+                      router-link(:to="{name: targetN}") {{targetN}} 
+              span(v-else-if="type==='url'")
+                <!-- Standard array of key:value pairs (name: target)  -->
+                a(:href="target" target="_blank") {{label}}
+              span(v-else-if="onClick")
+                span(v-if="active===target")
+                  a.active(href='#' v-on:click='activate(target)') {{label}}
+                span(v-else)
+                  a.inactive(href='#' v-on:click='activate(target)') {{label}}
               span(v-else)
-                <!-- Standard array of key:value pairs (name: url)  -->
-                a(:href="url" target="_blank") {{label}}
-          span(v-else)
-            <!-- Internal links do not need keys -->
-            router-link(:to="{name: link}") {{link}} 
+                <!-- Internal links do not need keys -->
+                router-link(:to="{name: link}") {{link}} 
 
 </template>
 
@@ -31,6 +71,7 @@
 
     data () {
       return {
+        active_block: ''
       }
     },
 
@@ -45,6 +86,30 @@
       type: {
         type: String,
         default: 'url'
+      },
+      default: {
+        type: String
+      },
+      onClick: {
+        type: Function
+      },
+      active: {
+        type: String
+      }
+    },
+    computed: {
+    //   active: onClick () {
+    //     if (this.active_block) {
+    //       return this.active_block
+    //     } else {
+    //       return this.default
+    //     }
+    //   }
+    },
+    methods: {
+      activate: function (layer) {
+        console.log('activate ' + layer)
+        this.onClick(layer)
       }
     }
   }
@@ -121,5 +186,13 @@
       margin:0 auto;
   }
 
+  a.active {
+    font-weight: bold;
+    color: black;
+  }
+  a.inactive {
+    font-weight: normal;
+    color: grey;
+  }
 
 </style>
