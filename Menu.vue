@@ -37,8 +37,11 @@
 
 <template lang='pug'>
   div.menu
+    span.rel
     div.navbar-center
+      span
       ul
+        span(v-html='prefix') &nbsp; &nbsp;
         li.dropdown(v-for="link in links")         
           span(v-if="link.constructor === Object")
             span(v-for="target,label in link")
@@ -79,13 +82,12 @@
       links: {
         type: Array
       },
-      target: {
-        type: String,
-        default: 'internal'
-      },
       type: {
         type: String,
         default: 'url'
+      },
+      prefix: {
+        type: String
       },
       default: {
         type: String
@@ -93,22 +95,18 @@
       onClick: {
         type: Function
       },
-      active: {
-        type: String
+      options: {
+        type: Object,
+        default () { return {} }
       }
     },
     computed: {
-    //   active: onClick () {
-    //     if (this.active_block) {
-    //       return this.active_block
-    //     } else {
-    //       return this.default
-    //     }
-    //   }
+      active: function () { return this.active_block || this.options.default }
     },
     methods: {
       activate: function (layer) {
-        console.log('activate ' + layer)
+        this.active_block = layer
+        console.log('activated ' + this.active_block)
         this.onClick(layer)
       }
     }
@@ -118,7 +116,10 @@
 <style scoped lang="sass?outputStyle=expanded">
 
   $menu-background-colour: transparent;
-  $menu-colour: #333;
+  $menu-colour: #000;
+  $hover-colour: #F00;
+  $active-colour: #F00;
+  $active-colour: #F00;
 
   .menu {
 
@@ -148,6 +149,7 @@
 
   li a:hover, .dropdown:hover .dropbtn {
       font-weight: bold;
+      color: $hover-colour;
   }
 
   li.dropdown {
@@ -188,11 +190,11 @@
 
   a.active {
     font-weight: bold;
-    color: black;
+    color: $active-colour;
   }
   a.inactive {
     font-weight: normal;
-    color: grey;
+    color: $menu-colour;
   }
 
 </style>
