@@ -2,31 +2,34 @@
 
 <template lang='pug'>
   div
-    <!-- b {{field}} : {{field.type}} {{list(field)}} : {{vModel}} = {{vm}} -->
+    <!-- b {{field}} : {{Ftype}} {{list(field)}} : {{vModel}} = {{vm}} -->
     <!-- b {{form}} -->
-    span(v-if="field.type==='string' || field.type==='text'")
+    
+    span(v-if="access==='read'")
+      b {{field.value}}
+    span(v-else-if="Ftype==='string' || Ftype==='text'")
       b-form-input.input-lg(v-model="vm" v-on:change="saveMe" type='string' :placeholder="placeholder" default='default')
-    span(v-else-if="field.type==='int'")
+    span(v-else-if="Ftype==='int'")
       b-form-input.input-lg(v-model="vm" v-on:change="saveMe" type='number' :placeholder="placeholder" default='default')
-    span(v-else-if="field.type==='varchar'")
+    span(v-else-if="Ftype==='varchar'")
       b-form-input.input-lg(v-model="vm" v-on:change="saveMe" type='text' :placeholder="placeholder" default='default')
-    span(v-else-if="field.type==='date'")
+    span(v-else-if="Ftype==='date'")
       b-form-input.input-lg(v-model="vm" v-on:change="saveMe" type='date' :options="list(field)" placeholder="yyyy-mm-dd")
-    span(v-else-if="field.type.match(/^enum/)")
+    span(v-else-if="Ftype.match(/^enum/)")
       <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
       b-form-select.input-lg(v-model="vm" :options="list(field)" @change.native="myChange")
-    span(v-else-if="field.type==='boolean'")
+    span(v-else-if="Ftype==='boolean'")
       b-form-checkbox.input-lg(v-model="vm" v-on:change="saveMe")
-    span(v-else-if="field.type==='decimal'")
+    span(v-else-if="Ftype==='decimal'")
       b-form-input.input-lg(type='text' :state="isNumber(field)" v-model="vm" v-on:change="saveMe" :placeholder="placeholder" )
-    span(v-else-if="field.type==='fixed'")
+    span(v-else-if="Ftype==='fixed'")
       b-form-input.input-lg(type='text' v-model="vm" :placeholder="placeholder" disabled)
-    span(v-else-if="field.type==='reference'")
+    span(v-else-if="Ftype==='reference'")
       b-form-input(type='text' v-model="vm" :placeholder="placeholder" disabled)
-    span(v-else-if="field.type==='hidden'")
+    span(v-else-if="Ftype==='hidden'")
       b-form-input(type='hidden' v-model="vm" :placeholder="placeholder" disabled)
     span(v-else)
-      b {{field.type}}?: {{field}}
+      b {{Ftype}}?: {{field}}
 
 </template>
 
@@ -53,7 +56,8 @@
       field: { type: Object },
       placeholder: { type: String },
       vModel: { type: String },
-      form: { type: Object }
+      form: { type: Object },
+      access: { type: String }
     },
     created: function () {
       // var keys = _.pluck(this.field.default)
@@ -61,7 +65,7 @@
       console.log(this.field.name + ' found default: ' + this.field.default)
     },
     computed: {
-      type: function () { return this.field.type },
+      Ftype: function () { return this.field.type || '' },
       name: function () { return this.field.name },
       mval: function (model) { return this[model] },
       default: function () { return this.field.default || '' },
@@ -86,19 +90,19 @@
       // type: function (field) {
       //   if (!field) {
       //     return null
-      //   } else { return field.type }
+      //   } else { return Ftype }
       // },
       form_element: function (field) {
         if (!field) {
           return null
-        } else if (field.type.match(/^int/i)) {
+        } else if (this.Ftype.match(/^int/i)) {
           return
         }
       },
 
       list: function (field) {
         var regex = /^enum\(['"]?(.*?)['"]?\)/
-        var list = field.type.match(regex)
+        var list = this.Ftype.match(regex)
         if (list) {
           var elements = list[1].split(/['"],['"]/)
           return elements
