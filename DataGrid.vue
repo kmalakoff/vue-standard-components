@@ -17,7 +17,7 @@ Advanced Options:
 
 <template lang='pug'>
   div.data-grid
-    table.table-bordered.ResultsGrid(v-if='data && data.length')
+    table.table-bordered.ResultsGrid(v-if='dynamicData && dynamicData.length')
       thead
         tr(v-show="data_header")
           td(:class="headerClass" :colspan="columns")
@@ -29,22 +29,22 @@ Advanced Options:
         th.result-heading(v-if="options && options.addLinks" v-for="func, key in options.addLinks")
           span &nbsp; <!-- add empty column headers -->         
       tbody
-        tr.result-row(:class="dynamicClass(record)" v-for="record, index in data")
+        tr.result-row(:class="dynamicClass(record)" v-for="record, index in dynamicData")
           td.result-cell(v-for="key in data_fields")
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
           td.result-cell(v-if="deSelectable") 
-            button.btn.btn-xs.btn-danger(v-on:click="data.splice(index,1)") X 
+            button.btn.btn-xs.btn-danger(v-on:click="remove(index)") x {{index}} 
           td.result-cell(v-if="options && options.addLinks" v-for="link in options.addLinks")
             span(v-if="link.type === 'button'")
-              ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="data[index]" :link="link" :links="links")
+              ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="dynamicData[index]" :link="link" :links="links")
             span(v-if="link.type === 'icon'")
               span(v-if="link.modal")
-                a(href="#" onclick='return false' @click.prevent="link.modal.onPick(record)" :record="data[index]")
+                a(href="#" onclick='return false' @click.prevent="link.modal.onPick(record)" :record="dynamicData[index]")
                   icon(:name='link.name' :color='link.colour' :scale='link.scale')
               span(v-else)
                 icon(:name='link.name' :color='link.colour' :scale='link.scale')
 
-    div(v-if='!data || !data.length')
+    div(v-if='!dynamicData || !dynamicData.length')
       table(align='center' v-if='noDataMsg') 
         tr
           td {{noDataMsg}}
@@ -135,8 +135,24 @@ Advanced Options:
     },
     created: function () {
       console.log('created DataGrid...')
+      // this.metaData = this.data // Slightly dangerous !? This is a reference equation so the original data is changed ? (ie not a clone)
+      if (this.stored) { console.log('stored DataGrid') }
     },
     computed: {
+      dynamicData: function () {
+        console.log('reload data from store...')
+        if (this.data) {
+          console.log('got defined data: ' + JSON.stringify(this.data))
+          return this.data
+        } else if (this.stored) {
+          var storedData = this.$store.getters.getHash(this.stored)
+          console.log('dynamically loaded: ' + JSON.stringify(storedData))
+          return storedData || []
+        } else {
+          console.log('no data supplied for DataGrid')
+          return []
+        }
+      },
       data_fields: function () {
         if (this.search_options && this.search_options.search_fields) {
           return this.search_options.search_fields
@@ -151,6 +167,11 @@ Advanced Options:
       target: function () {
         if (this.options && this.options.target) {
           return this.options.target
+        } else { return null }
+      },
+      stored: function () {
+        if (this.options && this.options.stored) {
+          return this.options.stored
         } else { return null }
       },
       data_header: function () {
@@ -189,7 +210,24 @@ Advanced Options:
       hideM () {
         this.showModal = false
       },
+      remove (index) {
+        console.log('remove item #' + index)
+        console.log(JSON.stringify(this.data))
+        // this.data.splice(index, 1)
+        // console.log(JSON.stringify(this.data))
 
+        // this.$store.commit('removeHashItem', {key: this.stored, index: index})
+
+        if (this.onDelete) {
+          this.onDelete(index)
+        } else if (this.options.onDelete) {
+          this.options.onDelete(index)
+        } else {
+          console.log('requires onDelete function specification')
+        }
+
+        // this.$store.getters.getHash('updates')
+      },
       pickOne (index) {
         console.log('pick ' + index)
         console.log('MS ? ' + this.multiSelect)
@@ -200,7 +238,7 @@ Advanced Options:
         console.log('item: ' + JSON.stringify(item))
         console.log('options: ' + JSON.stringify(this.options))
 
-        var target = this.search_options.target
+        // var target = this.options.target
 
         var record = {}
         var keys = Object.keys(item)
@@ -210,31 +248,32 @@ Advanced Options:
         }
 
         if (this.multiSelect) {
-          console.log(target + ' appended with: ' + JSON.stringify(this.picked))
+          console.log(this.target + ' appended with: ' + JSON.stringify(this.picked))
 
-          if (target) {
-            console.log('Add record: ' + JSON.stringify(record))
-            this.$store.commit('squeezeHash', {key: target, record: record})
+          if (this.stored) {
+            console.log('DYNO - Add record: ' + JSON.stringify(record))
+            this.$store.commit('squeezeHash', {key: this.stored, record: record})
           }
-          console.log(target + ' TARGET ->  ' + JSON.stringify(this.$store.getters.getHash(target)))
+          console.log('target ? ' + this.target)
+          console.log(this.stored + ' TARGET ->  ' + JSON.stringify(this.$store.getters.getHash(this.stored)))
         } else {
           console.log('reset pick')
           this.$set(this.picked, 0, item)
-
           console.log('TARGET2 = ' + JSON.stringify(this.picked))
         }
 
-        if (this.onPick) {
-          console.log('onPick defined')
-          this.onPick(this.picked)
-        } else {
-          console.log('no onpick for DG')
-        }
+        // if (this.onPick) {
+        //   console.log('onPick defined')
+        //   this.onPick(this.picked)
+        // } else {
+        //   console.log('no onpick for DG')
+        // }
         this.$store.getters.getHash('updates')
 
         return false
       },
       dynamicClass: function (record) {
+        // enables control of class for highlighting or hiding records based on specific field values ...
         if (this.options && this.options.fieldClass && record[this.options.fieldClass]) {
           return this.options.baseClass + ' ' + record[this.options.fieldClass]
         } else if (this.options && this.options.baseClass) {
