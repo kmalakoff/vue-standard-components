@@ -1,17 +1,32 @@
 <template lang='pug'>
-  div.cart(v-if='items || 1')
-    div.openCart(v-if='showCart')
-      a(href='#' @click.prevent='closeCart')
-        icon(name='close' color='black' scale='2')
+  div.myCart
+    div.myOpenCart(v-if='showCart')
+      div.navbar-right
+        a(href='#' @click.prevent='closeCart')
+          icon(name='close' color='red  ' scale='2')
+        span &nbsp; &nbsp;
+      b.input-lg {{items}} items: &nbsp; &nbsp;
+      h3
+        u Items in Cart:
+      table.table
+        thead
+          tr
+            th Name
+            th Price
+            th Qty
+            th Sub-total
+        tr(v-for="item in cart")
+          td {{item.name}}
+          td {{item.amount}}
+          td {{item.qty}}
+          td {{item.amount*item.qty}}
       br
-      b ({{items}} items)
-      ul
-        li(v-for="item in cart")
-          b {{item.name}} [ {{item.amount}} x {{item.qty}} ] = {{item.amount*item.qty}}
+      h4 Total: {{total}}
+      hr
       form(action="/process-payment" method="POST") 
         button.btn.btn-primary(:disabled="!items") Checkout
         <!-- stripe-checkout(stripe-key="my-stripe-key" product="product(tea.name, tea.description, tea.price100g)") -->
-    div.closedCart(v-else)
+    div.myClosedCart(v-else)
       a(href='#' @click.prevent="openCart")
         icon(name='shopping-cart' color='black' scale=2)
       b &nbsp; [{{items}}]
@@ -35,7 +50,8 @@ export default {
   },
   data () {
     return {
-      showCart: false
+      showCart: false,
+      total: 0
     }
   },
   props: {
@@ -49,10 +65,15 @@ export default {
     items: function () {
       var ids = Object.keys(this.cart)
       var count = 0
+      var total = 0
       for (var i = 0; i < ids.length; i++) {
         var qty = this.cart[ids[i]].qty || 1
+        var subtotal = this.cart[ids[i]].amount * qty
+        total += subtotal
         count += qty
       }
+
+      this.total = total
       return count
     }
   },
@@ -78,34 +99,32 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="sass?outputStyle=expanded">
 
-.cart {
-  position: fixed;
-  right: 20px;
-  /*margin: 10px;*/
+.myCart {
+  /*position: relative;*/
+  /*right: 20px;*/
+  margin: 10px;
 }
 
-.openCart {
+.myOpenCart {
+  /*position: relative;*/
   background-color: #eee;
   padding: 10px;
   border: 1px solid black;
+  /*width: 100%;*/
+  min-width: 400px;
 }
 
-.closedCart {
+.myClosedCart {
+  /*position: relative;*/
   background-color: #999;
-  padding: 10px;
+  padding: 20px;
+  padding-top: 20px;
   border: 1px solid black;
 }
 
 
 ul {
   list-style-type: none;
-  padding: 0;
-}
-
-li {
-  color: black;
-  /*display: inline-block;*/
-  /*margin: 0 10px;*/
 }
 
 </style>
