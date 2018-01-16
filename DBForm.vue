@@ -20,8 +20,8 @@ Usage:
         td.prompt-column
           b {{label(field)}}: &nbsp;
         td.data-column
-          DBFormElement(:form="form" :field="field" :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)")
-        td.extra-column
+          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='access')
+        td.extra-column(v-if="access !== 'read'")
           span &nbsp;
           a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)") 
             icon(name='question-circle' color='black' scale='2')
@@ -30,7 +30,7 @@ Usage:
         td.prompt-column
           b {{label(r)}}: &nbsp;
         td.data-column
-          DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
+          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='access')
     span(v-for='r in include.hidden')
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
@@ -60,8 +60,8 @@ Usage:
       DBFormElement
     },
     props: {
-      table: {
-        type: String
+      options: {
+        type: Object
       },
       model: {
         type: String
@@ -76,9 +76,6 @@ Usage:
         type: Function
       },
       append: {
-        type: Array
-      },
-      fields: {
         type: Array
       }
     },
@@ -120,6 +117,18 @@ Usage:
       }
     },
     computed: {
+      table: function () {
+        return this.options.table
+      },
+      fields: function () {
+        return this.options.fields
+      },
+      access: function () {
+        this.options.access
+      },
+      record: function () {
+        this.options.record
+      },
       heading: function () {
         if (this.table) {
           var camel = _.capitalize(this.table)
