@@ -36,13 +36,13 @@
 -->
 
 <template lang='pug'>
-  div.menu
-    span.rel
-    div.navbar-center
+  div
+    span
+    <!-- div.navbar-left -->
       span
       ul
         span(v-html='prefix') &nbsp; &nbsp;
-        li.dropdown(v-for="link in links")         
+        li.dropdown(:class="direction" v-for="link in links")         
           span(v-if="link.constructor === Object")
             span(v-for="target,label in link")
               span(v-if="target.constructor === Array && type==='url'")
@@ -52,7 +52,7 @@
                   span(v-for="targetN,index in target")
                     span(v-if="targetN.constructor === Object")
                       span(v-for="subUrl,subLabel in targetN")
-                          a(:href="subUrl") {{subLabel}}
+                          a(:href="subUrl") S: {{subLabel}}
                     span(v-else)
                       router-link(:to="{name: targetN}") {{targetN}} 
               span(v-else-if="type==='url'")
@@ -60,12 +60,12 @@
                 a(:href="target" target="_blank") {{label}}
               span(v-else-if="onClick")
                 span(v-if="active===target")
-                  a.active(href='#' v-on:click='activate(target)') {{label}}
+                  a.active.input-lg(href='#lower' v-on:click='activate(target)') {{label}}
                 span(v-else)
-                  a.inactive(href='#' v-on:click='activate(target)') {{label}}
+                  a.inactive.input-lg(href='#' v-on:click='activate(target)') {{label}}
               span(v-else)
                 <!-- Internal links do not need keys -->
-                router-link(:to="{name: link}") {{link}} 
+                router-link(:to="{name: link}") {{link}}
 
 </template>
 
@@ -98,6 +98,10 @@
       options: {
         type: Object,
         default () { return {} }
+      },
+      direction: {
+        type: String,
+        default: 'vertical'
       }
     },
     computed: {
@@ -116,13 +120,12 @@
 <style scoped lang="sass?outputStyle=expanded">
 
   $menu-background-colour: transparent;
-  $menu-colour: #000;
-  $hover-colour: #F00;
-  $active-colour: #F00;
-  $active-colour: #F00;
+  $menu-colour: #ccc;
+  $hover-colour: #FFF;
+  $active-colour: #EEE;
 
   .menu {
-
+    width: 100%;
   }
 
   ul {
@@ -139,8 +142,15 @@
 
   /*Format dropdown menu for multi-level menu.  ... (not yet set up) */
 
-  li a, .dropbtn {
+  li.vertical a, .dropbtn {
+      display: block;
+  }
+  li.horizontal a, .dropbtn {
       display: inline-block;
+  }
+
+
+  li a, .dropbtn {      
       color: $menu-colour;
       text-align: center;
       padding: 14px 16px;
