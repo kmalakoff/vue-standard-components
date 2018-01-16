@@ -37,7 +37,11 @@ Options (for all modal types)
   span
     span.modal-anchor
     span(v-if='openButton')
-      button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
+      button.btn.btn-primary(v-on:click="openModal()")
+        span(v-html='openButton')
+    span(v-else-if='openIcon')
+      button.btn.btn-primary(v-on:click="openModal()")
+        icon(:name='openIcon')      
     span.m-fadeOut(:id="id")
       transition(name="modal") 
         div.my-modal-mask
@@ -53,9 +57,11 @@ Options (for all modal types)
                 slot(name="body")
                   <!-- Body -->
                   div(v-if="type==='search'")
-                    SearchBlock(:search_options="search" :links="links" :data_options="modalData" :picked="picked")
+                    SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="type==='record'")
-                    DBForm(table='immunize' :onSave='save' :append='append')
+                    DBForm(:options='options' :onSave='save' :append='append')
+                    div(v-if='options.addLinks' v-for='link in options.addLinks')
+                      button.btn.btn-primary(@click.prevent="link.onPick(modalData)") {{link.name}}
                   div(v-else-if="modalData && modalData.length")
                     DataGrid(:data="modalData" :options="data_options")
                   div(v-else-if='content')
@@ -112,8 +118,7 @@ Options (for all modal types)
         fieldData: [],
         generated: {
           body: ''
-        },
-        data_options: {}
+        }
       }
     },
     props: {
@@ -230,9 +235,14 @@ Options (for all modal types)
           return 'm-fadeOut'
         }
       },
-      search: function () {
+      search_options: function () {
         if (this.options && this.options.search) {
           return this.options.search
+        } else { return {} }
+      },
+      data_options: function () {
+        if (this.options && this.options.data) {
+          return this.options.data
         } else { return {} }
       },
       body: function () {
@@ -248,14 +258,25 @@ Options (for all modal types)
       modalData: function () {
         if (this.options.data) {
           return this.options.data || {}
+        } else if (this.options.stored) {
+          var storedData = this.$store.getters.getHash(this.stored)
+          console.log('dynamically loaded data to modal: ' + JSON.stringify(storedData))
+          return storedData || []
         } else if (this.data) {
           return this.data
+        } else {
+          var data = this.$store.getters.modalData
+          return data
         }
-        // this.$store.getters('modalData')
       },
       openButton: function () {
         if (this.options && this.options.openButton) {
           return this.options.openButton || 'no'
+        } else { return '' }
+      },
+      openIcon: function () {
+        if (this.options && this.options.openIcon) {
+          return this.options.openIcon || 'no'
         } else { return '' }
       },
       closeButton: function () {
