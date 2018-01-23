@@ -27,7 +27,7 @@
                               li(v-for='problem in invalid') {{problem}}
                           hr
                         span(v-if='multiSelect && picked && picked.length')
-                          DataGrid.results.overlay(:data="picked" header='Current Selection' headerClass='GridHeader3' :deSelectable="true" :data_options="search_options")
+                          DataGrid.results.overlay(:data="picked" header='Current selection' headerClass='GridHeader3' :deSelectable="true" :data_options="search_options")
                           p &nbsp;
                         span.search-overlay(v-if="globalSearch && 1")
                           input.input-lg(:id='scope' v-model='searchString' name='searchString' :placeholder='prompt')
