@@ -241,8 +241,8 @@ Options (for all modal types)
         } else { return {} }
       },
       data_options: function () {
-        if (this.options && this.options.data) {
-          return this.options.data
+        if (this.options && this.options.data_options) {
+          return this.options.data_options
         } else { return {} }
       },
       body: function () {
