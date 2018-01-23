@@ -22,13 +22,40 @@ Advanced Options:
         tr(v-show="data_header")
           td(:class="headerClass" :colspan="columns")
             b {{data_header}}
-      tr
+      tr.dataHeader(v-if="options.listBy === 'column'")
+        <!-- Put Records in Columns -->
+        th.result-heading Field
+        th.result-heading Value
+      tr.dataHeader(v-else)      
+        <!-- Put Records in Rows -->
         th.result-heading(v-for="key in data_fields")
           span {{key}}
         th.result-heading(v-if="deSelectable") Remove
         th.result-heading(v-if="options && options.addLinks" v-for="func, key in options.addLinks")
           span &nbsp; <!-- add empty column headers -->         
-      tbody
+      tbody.dataBody(v-if="options.listBy === 'column'")
+        <!-- Put Records in Columns -->
+        tr.result-row(v-for="key in data_fields")
+          td.result-prompt {{key}}: &nbsp;
+          td.result-cell(:class="dynamicClass(record)" v-for="record, index in dynamicData")
+            a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
+
+        tr.result-cell(v-if="deSelectable") 
+          td Remove
+          td button.btn.btn-xs.btn-danger(v-on:click="remove(index)") x {{index}} 
+        tr.result-cell(v-if="options && options.addLinks" v-for="link in options.addLinks")
+          td &nbsp;
+          td
+            span(v-if="link.type === 'button'")
+              ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="dynamicData[index]" :link="link" :links="links")
+            span(v-if="link.type === 'icon'")
+              span(v-if="link.modal")
+                a(href="#" onclick='return false' @click.prevent="link.modal.onPick(record)" :record="dynamicData[index]")
+                  icon(:name='link.name' :color='link.colour' :scale='link.scale')
+              span(v-else)
+                icon(:name='link.name' :color='link.colour' :scale='link.scale')
+      tbody.dataBody(v-else)      
+        <!-- Put Records in Rows -->
         tr.result-row(:class="dynamicClass(record)" v-for="record, index in dynamicData")
           td.result-cell(v-for="key in data_fields")
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
@@ -299,6 +326,12 @@ Advanced Options:
     text-align: center;
     background-color: #999;
     color: #fff;
+  }
+
+  .result-prompt {
+    text-align: right;
+    background-color: #eee;
+    color: #000;
   }
   
   .result-row {
