@@ -7,12 +7,20 @@
     - list (array of hashes MUST include keys for 'id, name, parent')
 
   Options:
-    - show (initial array of ids to include as open - defaults to those without 'parent' values)
+    - nameKey (key for name value (defaults to 'name'))
+    - idKey (key for name value (defaults to 'id'))
+    - parentKey (key for name value (defaults to 'parent_id'))
+
+    - onPick (function to run when individual item is selected)
+    - onPickIcon (icon to use for individual item selection (defaults to edit icon))
+
+    - init (initial open setting (all, selected, top [default]) indicates which blocks to start in open mode.
     - style options (?)
 
  -->
   <template lang='pug'>
     div.recursiveList
+      Modal(id='info-modal' type='record' :options="options")
       span(v-if="newItems")
         b.undecided {{newItems}} New Interests available: &nbsp; &nbsp;
         i {{Object.keys(newItem).join(', ')}}
@@ -21,19 +29,23 @@
           span(v-for='count in item.indents')
             span &nbsp; &nbsp; > &nbsp;
 
-          span.newItem(v-if="newItem[item.name]")
-            input(v-model='select[item.name]' type='radio' value = 'yes' @click.prevent='pickYes(item.id)')
+          span.newItem(v-if="newItem[item[nameKey]]")
+            input(v-model='select[item[nameKey]]' type='radio' value = 'yes' @click.prevent='pickYes(item.id)')
             span &nbsp; Yes &nbsp;
-            input(v-model='select[item.name]' type='radio' value = 'no' @click.prevent='pickNo(item.id)') 
+            input(v-model='select[item[nameKey]]' type='radio' value = 'no' @click.prevent='pickNo(item.id)') 
             span &nbsp; No &nbsp;          
-          input(v-else type='checkbox' v-model='select[item.name]' @click.prevent='pick(item.id)')
+          input(v-else type='checkbox' v-model='select[item[nameKey]]' @click.prevent='pick(item.id)')
           span &nbsp;
-          span(v-if="select[item.name]")
-            b.selected {{item.name}} &nbsp; &nbsp;
-          span(v-else-if="newItem[item.name]")
-            b.undecided {{item.name}} &nbsp; &nbsp;
+          span(v-if="select[item[nameKey]]")
+            b.selected {{item[nameKey]}} &nbsp; &nbsp;
+          span(v-else-if="newItem[item[nameKey]]")
+            b.undecided {{item[nameKey]}} &nbsp; &nbsp;
           span(v-else)
-            b.unselected {{item.name}} &nbsp; &nbsp;            
+            b.unselected {{item[nameKey]}} &nbsp; &nbsp;
+
+          a(href='#' v-if='onPick' @click.prevent='onClick(item)')
+            icon(name='edit')
+
           button.btn.btn-xs(@click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] && under[item.id]")
             icon(name='compress')
           button.btn.btn-xs(@click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] === false  && under[item.id]")
@@ -43,9 +55,13 @@
   // import _ from 'lodash'
   import 'vue-awesome/icons/expand'
   import 'vue-awesome/icons/compress'
-  
+  import 'vue-awesome/icons/edit'
+
+  import Modal from './Modal'
+
   export default {
     components: {
+      Modal
     },
     data () {
       return {
@@ -63,15 +79,21 @@
       }
     },
     props: {
-      list: { type: Array }
+      list: { type: Array },
+      onPick: { type: Function },
+      options: { type: Object }
     },
     created: function () {
       var list = this.list || []
       for (var i = 0; i < list.length; i++) {
-        var name = list[i].name
+        var nameKey = this.nameKey || 'name'
+        var idKey = this.options.idKey || 'id'
+        var parentKey = this.options.parentKey || 'parent_id'
+
+        var name = list[i][nameKey]
         var selected = list[i].selected
-        var id = list[i].id
-        var parent = list[i].parent_id || list[i].parent
+        var id = list[i][idKey]
+        var parent = list[i][parentKey]
 
         this.$set(this.parent, id, parent)
 
@@ -123,6 +145,13 @@
       console.log('tracked underitems list: ' + JSON.stringify(this.under))
     },
     computed: {
+      nameKey: function () {
+        if (this.options && this.options.nameKey) {
+          return this.options.nameKey
+        } else {
+          return 'name'
+        }
+      },
       orderedList: function () {
       },
       isOpen: function (interest) {
@@ -149,6 +178,11 @@
               this.toggle(underid)
             }
           }
+        }
+      },
+      onClick: function (record) {
+        if (this.onPick) {
+          this.onPick(record)
         }
       },
       pick: function (id) {
