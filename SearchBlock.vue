@@ -346,12 +346,12 @@ export default {
         console.log('searcn N: ' + JSON.stringify(this.searchStrings))
       }
 
-      console.log('method = ' + method)
+      console.log('search block method = ' + method)
 
       if (method === 'post') {
         data = {}
 
-        data.scope = this.search
+        data.scope = this.scope // this.search
 
         var addCondition
         if (orConditions.length) {

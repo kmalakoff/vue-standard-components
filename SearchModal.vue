@@ -438,6 +438,8 @@
         var method = this.search_options.method || 'post'
 
         if (this.search_options.field && this.searchString) {
+          method = 'get'
+
           // global search
           console.log(this.search_options.field + ' = ' + this.searchString)
           if (tags && tags.length) {
@@ -453,7 +455,10 @@
             console.log(' .. or ' + fields[i] + ' like ' + this.searchString)
           }
           method = 'get'
+          console.log('method0 = ' + method)
+
         } else if (!this.globalSearch && this.searchStrings) {
+          method = 'get'
           // fields specific search
           var check = Object.keys(this.searchStrings)
           for (var j = 0; j < check.length; j++) {
@@ -477,7 +482,6 @@
               }
             }
           }
-          method = 'get'
         } else {
           console.log('no search criteria')
           console.log('global: ' + this.globalSearch)
@@ -485,12 +489,12 @@
           console.log('searcn N: ' + JSON.stringify(this.searchStrings))
         }
 
-        console.log('method = ' + method)
+        console.log('method1 = ' + method)
 
         if (method === 'post') {
           data = {}
 
-          data.scope = this.search
+          data.scope = this.search || this.scope
 
           var addCondition
           if (orConditions.length) {

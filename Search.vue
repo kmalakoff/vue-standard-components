@@ -277,7 +277,7 @@
         }
 
         var method = this.method || 'post'
-        console.log('method = ' + method)
+        console.log('search method = ' + method)
 
         if (method === 'post') {
           data = {}
