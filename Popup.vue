@@ -3,10 +3,10 @@
 <template lang='pug'>
   span
     span
-      a(href='/' onclick='return false' @click.prevent="holdMenu=!holdMenu" v-on:mouseover="showMenu" v-on:mouseout="hideMenu" @click="showMenu") 
+      a(href='/' onclick='return false' @click.prevent="toggleMenu") 
         icon(:name='icon' color='black' scale='2')
     div
-      table.table.popup-table(v-if="visibleMenu || holdMenu" v-on:mouseover="showMenu" v-on:mouseout="hideMenu")
+      table.table.popup-table(v-if="visibleMenu")
         tr
           td 
             a(href='#') About Us
@@ -36,20 +36,36 @@
       }
     },
     methods: {
-      showMenu () {
-        console.log('show menu...')
-        this.visibleMenu = true
+      toggleMenu () {
+        this.visibleMenu = !this.visibleMenu
+        console.log('toggled hold: ' + this.holdMenu + ': ' + this.visibleMenu)
       },
-      hideMenu () {
+      showMenu () {
+        // show menu (delay ignores rapid toggling by mouse out / in movements)
         var _this = this
-        if (!_this.holdMenu) {
+        if (this.holdMenu) {
+          this.onexpire = true
+        } else {
           setTimeout(
-            function () {
-              console.log('hide...')
+            () => {
               _this.holdMenu = false
+              this.visibleMenu = this.onexpire
             }, 1000)
           this.holdMenu = true
-          this.visibleMenu = false
+        }
+      },
+      hideMenu () {
+        // Hide menu (delay ignores rapid toggling by mouse out / in movements)
+        var _this = this
+        if (this.holdMenu) {
+          this.onexpire = false
+        } else {
+          setTimeout(
+            () => {
+              _this.holdMenu = false
+              this.visibleMenu = this.onexpire
+            }, 1000)
+          this.holdMenu = true
         }
       }
     }
@@ -62,7 +78,7 @@
   $menu-colour: #333;
 
   .popup-table {
-    position: auto;
+    position: absolute;
     background-color: #999;
     color: black;
     padding: 5px;
