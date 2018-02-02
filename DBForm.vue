@@ -34,18 +34,18 @@ Usage:
     span(v-for='r in include.hidden')
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
-      hr
-      button.btn.btn-primary(v-if="onSave" @click.prevent="onSave(form)") Save
-      hr
-      b Form: {{form}}"
+    hr
+    button.btn.btn-primary(v-if="onSave" @click.prevent="onSave(form)") Save
+    hr
+    b Form Input: {{form}}"
 </template>
 
 <script>
   import axios from 'axios'
-  import config from '@/config.js'
   import _ from 'lodash'
 
   import DBFormElement from './DBFormElement'
+  import config from '@/config.js'
 
   export default {
 
@@ -82,34 +82,18 @@ Usage:
     created: function () {
       var DBfields = []
 
-      if (this.table === 'immunize') {
+      if (this.table) {
         // load fields dynamically from table..
         // Construction
-        DBfields = [
-          // {name: 'patient', type: 'reference', reference: 'patient'},
-          // {name: 'vaccine', type: 'reference', reference: 'vaccine', default: vaccine},
-          // {name: 'vaccinator', type: 'reference', reference: 'staff'},
-          {name: 'route', type: "enum('IM - Intramuscular','SC - Subcutaneous','ID - Intradermal','IN - Intranasal','PO - Oral')"},
-          {name: 'site', type: "enum('LA - Left Arm','RA - Right Arm','LT - Left Thigh','RT - Right Thigh')"},
-          {name: 'applied', type: 'date', default: 'now()'},
-          {name: 'expiry', type: 'date'},
-          {name: 'lot', type: 'string'},
-          {name: 'reactionLevel', type: "enum('None','Mild','Strong')"},
-          {name: 'notes', type: 'string'}
-        ]
+        if (config.forms && config.forms[this.table]) {
+          DBfields = config.forms[this.table]
+        } else {
+          console.log('Error retrieving configuration for ' + this.table)
+        }
       } else if (this.fields) {
         DBfields = this.fields
       } else {
-        // Test Data ...
-        DBfields = [
-          {prompt: 'name', type: 'varchar', default: 'Joe'},
-          {name: 'email', type: 'varchar', format: '.+@.+'},
-          {prompt: 'Birthdate', name: 'birthdate', type: 'date', default: '2017-09-05'},
-          {name: 'gender', type: "enum('M','F')", default: 'M'},
-          {name: 'height', type: 'decimal'},
-          {name: 'kids', type: 'int', default: 5},
-          {name: 'mother', type: 'int', reference: 'person'}
-        ]
+        console.log('Error retrieving configuration (require fields or table spec)')
       }
 
       for (var i = 0; i < DBfields.length; i++) {
@@ -141,6 +125,8 @@ Usage:
         var hidden = []
         if (this.append) {
           for (var i = 0; i < this.append.length; i++) {
+            var name = this.append[i].name
+            this.$set(this.form, name, this.append[i].default)
             if (this.append[i].type === 'hidden') {
               hidden.push(this.append[i])
             } else {
@@ -149,6 +135,9 @@ Usage:
           }
         }
         return {visible: visible, hidden: hidden}
+      },
+      default: function (key) {
+        return this.form[key] || ''
       }
     },
     methods: {
@@ -195,7 +184,7 @@ Usage:
           if (err) {
             console.log('Err: ' + err)
           }
-          _this.DBFields = []
+          _this.DBfields = []
         })
       },
 
