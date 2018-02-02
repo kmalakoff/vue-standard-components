@@ -167,7 +167,6 @@ Advanced Options:
     },
     computed: {
       dynamicData: function () {
-        console.log('reload data from store...')
         if (this.data) {
           console.log('got defined data: ' + JSON.stringify(this.data))
           return this.data
@@ -275,7 +274,7 @@ Advanced Options:
         }
 
         if (this.multiSelect) {
-          console.log(this.target + ' appended with: ' + JSON.stringify(this.picked))
+          console.log(this.target + ' data appended with: ' + JSON.stringify(this.picked))
 
           if (this.stored) {
             console.log('DYNO - Add record: ' + JSON.stringify(record))
