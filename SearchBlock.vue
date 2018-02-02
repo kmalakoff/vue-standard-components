@@ -207,25 +207,8 @@ export default {
     }
   },
   methods: {
-    pickMe (record) {
-      console.log('stall')
-    },
-    pickMe2 (record) {
-      var target = this.search_options.target
-      console.log('PICK ME NOW')
-      if (this.search_options.multiSelect) {
-        console.log(target + ' appended with: ' + JSON.stringify(record))
-
-        if (target) {
-          console.log(target + ' appended: ' + JSON.stringify(record))
-          this.$store.commit('squeezeHash', {key: target, record: record})
-        }
-        console.log(JSON.stringify(this.$store.getters.getHash(target)))
-      } else {
-        console.log('reset pick')
-        this.$set(this.picked, 0, record)
-      }
-      this.clearList()
+    pickMe () {
+      console.log('pick in Search Block ?')
     },
     searchPick (data) {
       console.log('search pick')
@@ -376,59 +359,64 @@ export default {
       var _this = this
       axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
       console.log('call...')
-      axios({url: fullUrl, method: method, data: data})
-      .then(function (result, err) {
-        if (err) {
-               // .catch(function (err) {
-          // _this.$store.commit('increment')
-          // _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
-          console.log('set error...')
-          _this.$store.commit('increment')
-          _this.$store.commit('setError', {context: 'Searching For ' + _this.scope, err: err})
-          console.log('axios error: ' + err)
+
+      // axios({url: fullUrl, method: method, data: data})
+      // .then(function (result, err) {
+      //   if (err) {
+      //     console.log('set error...')
+      //     _this.$store.commit('increment')
+      //     _this.$store.commit('setError', {context: 'Searching For ' + _this.scope, err: err})
+      //     console.log('axios error: ' + err)
+      //   } else {
+
+      if (this) {
+        // test data
+        var result = { data: [
+          { code: 'mmr', vaccine: 'MMR', coverage: 'measles, mumps, rubells' }
+        ]}
+
+        console.log('axios returned value(s): ' + JSON.stringify(result))
+
+        var newdata = {}
+        var model = _this.search_options.model || _this.scope
+
+        console.log('got results for ' + _this.scope + ' : ' + model)
+
+        if (model && result.data[model]) {
+          console.log('found ' + model + ' results ')
+          newdata = result.data[model]
         } else {
-          console.log('axios returned value(s): ' + JSON.stringify(result))
-
-          var newdata = {}
-          var model = _this.search_options.model || _this.scope
-
-          console.log('got results for ' + _this.scope + ' : ' + model)
-
-          if (model && result.data[model]) {
-            console.log('found ' + model + ' results ')
-            newdata = result.data[model]
-          } else {
-            console.log('generic results')
-            newdata = result.data
-          }
-
-          if (result.data && result.data.error) {
-            _this.$store.commit('setError', {context: 'remote searching ' + _this.scope, err: result.data.error})
-          } else if (!newdata.length) {
-            var msg = 'No ' + _this.scope + ' record(s) found matching \'' + _this.searchString + '\''
-            _this.$store.commit('setError', {context: 'Searching for ' + _this.scope, err: msg})
-          }
-
-          if (_this.multiSelect) {
-            _this.clearList()
-          }
-
-          console.log(JSON.stringify(newdata))
-
-          for (var i = 0; i < newdata.length; i++) {
-            if (!_this.list) {
-              _this.list = []
-            }
-
-            _this.list.push(newdata[i])
-          }
-
-          _this.searchStatus = 'found'
-
-          console.log('set results: ' + JSON.stringify(newdata))
-          console.log('LIST: ' + JSON.stringify(_this.list))
+          console.log('generic results')
+          newdata = result.data
         }
-      })
+
+        if (result.data && result.data.error) {
+          _this.$store.commit('setError', {context: 'remote searching ' + _this.scope, err: result.data.error})
+        } else if (!newdata.length) {
+          var msg = 'No ' + _this.scope + ' record(s) found matching \'' + _this.searchString + '\''
+          _this.$store.commit('setError', {context: 'Searching for ' + _this.scope, err: msg})
+        }
+
+        if (_this.multiSelect) {
+          _this.clearList()
+        }
+
+        console.log(JSON.stringify(newdata))
+
+        for (var k = 0; k < newdata.length; k++) {
+          if (!_this.list) {
+            _this.list = []
+          }
+
+          _this.list.push(newdata[k])
+        }
+
+        _this.searchStatus = 'found'
+
+        console.log('set results: ' + JSON.stringify(newdata))
+        console.log('LIST: ' + JSON.stringify(_this.list))
+      }
+      // })
     },
 
     clearList (clearsearch, close) {
