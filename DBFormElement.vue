@@ -4,30 +4,29 @@
   div
     <!-- b {{field}} : {{Ftype}} {{list(field)}} : {{vModel}} = {{vm}} -->
     <!-- b {{form}} -->
-    
     span(v-if="access==='read'")
       b {{field.value}}
     span(v-else-if="Ftype==='string' || Ftype==='text'")
-      b-form-input.input-lg(v-model="vm" v-on:change="saveMe" type='string' :placeholder="placeholder" default='default')
+      b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='int'")
-      b-form-input.input-lg(v-model="vm" v-on:change="saveMe" type='number' :placeholder="placeholder" default='default')
+      b-form-input.input-lg(@change.native="myChange" type='number' :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='varchar'")
-      b-form-input.input-lg(v-model="vm" v-on:change="saveMe" type='text' :placeholder="placeholder" default='default')
+      b-form-input.input-lg(@change.native="myChange" type='text' placeholder="placeholder" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='date'")
-      b-form-input.input-lg(v-model="vm" v-on:change="saveMe" type='date' :options="list(field)" placeholder="yyyy-mm-dd")
+      b-form-input.input-lg(@change.native="myChange" type='date' :options="list(field)" placeholder="yyyy-mm-dd" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype.match(/^enum/)")
       <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
-      b-form-select.input-lg(v-model="vm" :options="list(field)" @change.native="myChange")
+      b-form-select.input-lg(@change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='boolean'")
-      b-form-checkbox.input-lg(v-model="vm" v-on:change="saveMe")
+      b-form-checkbox.input-lg(@change.native="myChange" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='decimal'")
-      b-form-input.input-lg(type='text' :state="isNumber(field)" v-model="vm" v-on:change="saveMe" :placeholder="placeholder" )
+      b-form-input.input-lg(type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='fixed'")
-      b-form-input.input-lg(type='text' v-model="vm" :placeholder="placeholder" disabled)
+      b-form-input.input-lg(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='reference'")
-      b-form-input(type='text' v-model="vm" :placeholder="placeholder" disabled)
+      b-form-input(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='hidden'")
-      b-form-input(type='hidden' v-model="vm" :placeholder="placeholder" disabled)
+      b-form-input(type='hidden' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
     span(v-else)
       b {{Ftype}}?: {{field}}
 
@@ -61,14 +60,17 @@
     },
     created: function () {
       // var keys = _.pluck(this.field.default)
-      this.$set(this.form, this.om, this.field.default)
-      console.log(this.field.name + ' found default: ' + this.field.default)
+      var defaultTo = this.field.default || this.form[this.om]
+
+      this.$set(this.form, this.om, defaultTo)
+      console.log(this.field.name + ' found default: ' + defaultTo)
     },
     computed: {
+      refModel: function () { return this.form[this.vModel] },
       Ftype: function () { return this.field.type || '' },
       name: function () { return this.field.name },
       mval: function (model) { return this[model] },
-      default: function () { return this.field.default || '' },
+      defaultTo: function () { return this.field.default || this.form[this.om] },
       addClass: function () {
         if (this.addClass) {
           return this.addClass
