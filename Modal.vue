@@ -253,6 +253,8 @@ Options (for all modal types)
           return this.options.title
         } else if (this.title) {
           return this.title
+        } else {
+          return this.$store.getters.getHash('modalTitle') || 'my Title'
         }
       },
       modalData: function () {
@@ -265,7 +267,9 @@ Options (for all modal types)
         } else if (this.data) {
           return this.data
         } else {
-          var data = this.$store.getters.modalData
+          var key = this.options.key || 'unknown key'
+          console.log('standardized modal : ' + key)
+          var data = this.$store.getters.getHash(key)
           return data
         }
       },
@@ -303,8 +307,8 @@ Options (for all modal types)
         return this.status
       },
       myheader: function () {
-        if (this.options && this.options.title) {
-          return this.options.title
+        if (this.modalTitle) {
+          return this.modalTitle
         } else if (this.header) {
           return this.header
         } else if (this.options && this.options.header) {
@@ -344,6 +348,7 @@ Options (for all modal types)
       closeModal: function () {
         console.log('close modal...')
         console.log('fade out')
+        this.$store.commit('clearModal')
         // document.getElementById(this.id).classList.toggle('m-fadeOut')
         // document.getElementById(this.id).classList.toggle('m-fadeIn')
         this.$store.getters.toggleModal(this.id)
