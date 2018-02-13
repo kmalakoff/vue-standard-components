@@ -66,6 +66,7 @@ Options (for all modal types)
                     DataGrid(:data="modalData" :options="data_options")
                   div(v-else-if='content')
                     b content: {{content}}
+                  div(v-else-if='htmlContent' v-html="htmlContent")
                   div(v-else)
                     b no data / search / record ... 
                     hr
@@ -233,6 +234,11 @@ Options (for all modal types)
           return 'm-fadeIn'
         } else {
           return 'm-fadeOut'
+        }
+      },
+      htmlContent: function () {
+        if (this.options && this.options.htmlContent) {
+          return this.options.htmlContent
         }
       },
       search_options: function () {
