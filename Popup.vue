@@ -8,11 +8,13 @@
     div
       table.table.popup-table(v-if="visibleMenu")
         tr
-          td 
-            a(href='#') About Us
+          td
+            router-link(:to="{name: 'About Ovid'}")
+              b About Us
         tr
           td
-            a(href='#') Logout
+            router-link(:to="{name: 'Login'}" @click.prevent='logout')
+              b Logout
 </template>
 
 <script>
@@ -67,6 +69,12 @@
             }, 1000)
           this.holdMenu = true
         }
+      },
+      redirect (page) {
+        this.$route.router.go(page)
+      },
+      logout () {
+        console.log('logged out')
       }
     }
   }
@@ -79,24 +87,34 @@
 
   .popup-table {
     position: absolute;
-    background-color: #999;
+    /*background-color: #999;*/
     color: black;
-    padding: 5px;
+    /*padding: 0px;*/
     right: 0;
   }
   .popup-table tr {
-    padding: 5px;
+    /*padding: 5px;*/
   }
   .popup-table tr td {
-    padding: 5px;
-    padding-left: 15px;
+    /*padding: 0px;*/
+    /*padding-left: 15px;*/
   }
 
-  .popup-table tr td a{
-    color: white;
+  .popup-table a{
+    color: black;
+    display: block;
+    background-color: #999;
+    padding: 5px;
+    padding-left: 15px;
+    /*text-decoration: none;*/
   }
-  .popup-table tr td a:hover{
-    color: red;
+  .popup-table a:hover{
+    color: white;
+    display: block;
+    background-color: #aaa;
+    padding: 5px;
+    padding-left: 15px;
+    text-decoration: none;
   }
 
 </style>
