@@ -106,9 +106,9 @@
         var regex = /^enum\(['"]?(.*?)['"]?\)/
         var list = this.Ftype.match(regex)
         if (list) {
-          var elements = list[1].split(/['"],['"]/)
+          var elements = list[1].split(/['"]\s*,\s*['"]/)
           return elements
-        } else { return ['A', 'B', 'C'] }
+        } else { return null }
       },
       isNumber: function (field) {
         var name = this.model
