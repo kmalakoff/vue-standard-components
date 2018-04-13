@@ -10,7 +10,7 @@ Usage:
 
 <template lang='pug'>
   div.table-form
-    <!-- b {{DBfields}} -->
+    b R1: {{record1}}
     hr
     table.table.form-table
       tr
@@ -77,6 +77,9 @@ Usage:
       },
       append: {
         type: Array
+      },
+      record1: {
+        type: Object
       }
     },
     created: function () {
@@ -89,11 +92,13 @@ Usage:
           DBfields = config.forms[this.table]
         } else {
           console.log('Error retrieving configuration for ' + this.table)
+          console.log('(Include form hash for ' + this.table + ' in /src/config.js file)')
         }
       } else if (this.fields) {
         DBfields = this.fields
       } else {
         console.log('Error retrieving configuration (require fields or table spec)')
+        console.log(JSON.stringify(this.options))
       }
 
       for (var i = 0; i < DBfields.length; i++) {
