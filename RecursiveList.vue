@@ -22,40 +22,49 @@
     div.recursiveList
       Modal(id='info-modal' type='record' :options="options")
       span(v-if="newItems")
-        b.undecided {{newItems}} New Interests available: &nbsp; &nbsp;
+        b.undecided {{newItems}} New {{options.label}} option(s) available: &nbsp; &nbsp;
         i {{Object.keys(newItem).join(', ')}}
       ul
         li(v-for="item in reOrderedList" v-show="openItems['id' + item.parent_id] === true")
           span(v-for='count in item.indents')
             span &nbsp; &nbsp; > &nbsp;
 
-          span.newItem(v-if="newItem[item[nameKey]]")
-            input(v-model='select[item[nameKey]]' type='radio' value = 'yes' @click.prevent='pickYes(item.id)')
-            span &nbsp; Yes &nbsp;
-            input(v-model='select[item[nameKey]]' type='radio' value = 'no' @click.prevent='pickNo(item.id)') 
-            span &nbsp; No &nbsp;          
-          input(v-else type='checkbox' v-model='select[item[nameKey]]' @click.prevent='pick(item.id)')
-          span &nbsp;
-          span(v-if="select[item[nameKey]]")
-            b.selected {{item[nameKey]}} &nbsp; &nbsp;
-          span(v-else-if="newItem[item[nameKey]]")
-            b.undecided {{item[nameKey]}} &nbsp; &nbsp;
+          span(v-if="1 || selectOne")
+            span(v-if="select[item[nameKey]]")
+              router-link(:to="{name: 'TourUTM', params: {id: item[idKey]}}")
+                <!-- a(:href="linkTo") -->
+                b.selected {{item[nameKey]}} &nbsp; &nbsp;
           span(v-else)
-            b.unselected {{item[nameKey]}} &nbsp; &nbsp;
+            span.newItem(v-if="newItem[item[nameKey]]")
+              input(v-model='select[item[nameKey]]' type='radio' value = 'yes' @click.prevent='pickYes(item.id)')
+              span &nbsp; Yes &nbsp;
+              input(v-model='select[item[nameKey]]' type='radio' value = 'no' @click.prevent='pickNo(item.id)') 
+              span &nbsp; No &nbsp;          
+            input(v-else type='checkbox' v-model='select[item[nameKey]]' @click.prevent='pick(item.id)')
+            span &nbsp;
+            span(v-if="select[item[nameKey]]")
+              b.selected {{item[nameKey]}} &nbsp; &nbsp;
+            span(v-else-if="newItem[item[nameKey]]")
+              b.undecided {{item[nameKey]}} &nbsp; &nbsp;
+            span(v-else)
+              b.unselected {{item[nameKey]}} &nbsp; &nbsp;
 
           a(href='#' v-if='onPick' @click.prevent='onClick(item)')
-            icon(name='edit')
+            icon.midline(name='edit')
 
-          button.btn.btn-xs(@click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] && under[item.id]")
-            icon(name='compress')
-          button.btn.btn-xs(@click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] === false  && under[item.id]")
-            icon(name='expand')
+          span &nbsp;
+          a(href='#' @click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] && under[item.id]")
+            icon.midline(name='compress')
+          a(href='#' @click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] === false  && under[item.id]")
+            span ({{under[item.id].length}} options) &nbsp;
+              icon.midline(name='expand')
   </template>
   <script>
   // import _ from 'lodash'
   import 'vue-awesome/icons/expand'
   import 'vue-awesome/icons/compress'
   import 'vue-awesome/icons/edit'
+  import 'vue-awesome/icons/spinner'
 
   import Modal from './Modal'
 
@@ -81,13 +90,13 @@
     props: {
       list: { type: Array },
       onPick: { type: Function },
-      options: { type: Object }
+      options: { type: Object } // idKey, parentKey, open (defaults to: id, parent_id, false)
     },
     created: function () {
       var list = this.list || []
       for (var i = 0; i < list.length; i++) {
-        var nameKey = this.nameKey || 'name'
-        var idKey = this.options.idKey || 'id'
+        var nameKey = this.options.nameKey || this.nameKey || 'name'
+        var idKey = this.options.idKey || this.idKey || 'id'
         var parentKey = this.options.parentKey || 'parent_id'
 
         var name = list[i][nameKey]
@@ -98,7 +107,6 @@
         this.$set(this.parent, id, parent)
 
         if (selected) {
-          console.log('select ' + name + ' P: ' + parent)
           this.$set(this.select, name, true)
           this.$set(this.selectParent, parent, true)
         } else if (selected === false) {
@@ -129,19 +137,18 @@
       }
 
       // open parent of selected interests (if applicable)
-      var PS = Object.keys(this.selectParent)
-      for (var j = 0; j < PS.length; j++) {
-        var pid = PS[j]
-        this.$set(this.openItems, 'id' + pid, true)
-        console.log('open ' + pid)
+      if (this.options && this.options.open) {
+        var PS = Object.keys(this.selectParent)
+        for (var j = 0; j < PS.length; j++) {
+          var pid = PS[j]
+          this.$set(this.openItems, 'id' + pid, true)
+        }
       }
 
       this.addRecursive(1, 0)
       this.addRecursive(2, 0)
       this.addRecursive(3, 0)
 
-      console.log('reordered list: ' + JSON.stringify(this.rList))
-      console.log('reordered list: ' + JSON.stringify(this.reOrderedList))
       console.log('tracked underitems list: ' + JSON.stringify(this.under))
     },
     computed: {
@@ -152,7 +159,21 @@
           return 'name'
         }
       },
+      idKey: function () {
+        if (this.options && this.options.idKey) {
+          return this.options.idKey
+        } else {
+          return 'id'
+        }
+      },
       orderedList: function () {
+      },
+      selectOne: function () {
+        if (this.options && this.options.selectOne) {
+          return true
+        } else {
+          return false
+        }
       },
       isOpen: function (interest) {
         var key = interest.parent_id
@@ -161,6 +182,13 @@
         var isOpen = this.openItems[key]
         console.log('returned ' + isOpen + ' for ' + interest.id)
         return isOpen
+      },
+      linkTo: function () {
+        if (this.options.linkTo) {
+          return this.options.linkTo
+        } else {
+          return '#'
+        }
       }
     },
     methods: {
@@ -183,6 +211,8 @@
       onClick: function (record) {
         if (this.onPick) {
           this.onPick(record)
+        } else {
+          console.log('no onPick option supplied to RecursiveList')
         }
       },
       pick: function (id) {
@@ -262,7 +292,6 @@
       addRecursive: function (id, level) {
         var refIndex = id - 1 // tmp
 
-        console.log('addRecursive: ' + id + ' : ' + this.list[refIndex].name)
         var ids = id.toString()
 
         var index = this.reOrderedList.length || 0
@@ -275,7 +304,6 @@
         }
 
         if (this.under[ids]) {
-          console.log('under ' + id + ' : ' + this.under[ids])
           for (var i = 0; i < this.under[ids].length; i++) {
             var newid = this.under[ids][i]
             this.addRecursive(newid, level + 1)
@@ -287,6 +315,7 @@
   </script>
 
 <style>
+@import '/static/css/Standard.css';
 
 .selected {
   color: blue;
