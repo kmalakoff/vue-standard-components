@@ -35,10 +35,12 @@ Options (for all modal types)
 
 <template id=this.id lang='pug'>
   span
-    span.modal-anchor
     span(v-if='openButton')
       button.btn.btn-primary(v-on:click="openModal()")
         span(v-html='openButton')
+    span(v-else-if='openText')
+      a(href='#' onclick='return false' v-on:click="openModal()")
+        b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
       button.btn.btn-primary(v-on:click="openModal()")
         icon(:name='openIcon')      
@@ -59,16 +61,32 @@ Options (for all modal types)
                   div(v-if="type==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="type==='record'")
-                    DBForm(:options='options' :onSave='save' :append='append')
+                    DBForm(:options='options' :onSave='save' :append='append' :record1='modalData')
                     div(v-if='options.addLinks' v-for='link in options.addLinks')
                       button.btn.btn-primary(@click.prevent="link.onPick(modalData)") {{link.name}}
-                  div(v-else-if="modalData && modalData.length")
-                    DataGrid(:data="modalData" :options="data_options")
-                  div(v-else-if='content')
-                    b content: {{content}}
-                  div(v-else-if='htmlContent' v-html="htmlContent")
+                  div(v-else-if="type==='data'")
+                    div(v-if="modalData && modalData.length")
+                      DataGrid(:data="modalData" :options="data_options")
+                    div(v-else)
+                      b No Data Available
+                  div(v-else-if="type==='raw'")
+                    div(v-if='content')
+                      b content: {{content}}
+                    div(v-else)
+                      b No Content Supplied
+                  div(v-else-if="type==='html'")
+                    div(v-if='htmlContent' v-html="htmlContent")
+                    div(v-else)
+                      b No HTML Content supplied
+                  div(v-else-if="type==='url'")
+                    div(v-if='url')
+                      span {{modalContent}
+                    div(v-else)
+                      b No URL or modalContent
+                  div(v-if="type==='login'")
+                    Login(:onPick='closeModal')
                   div(v-else)
-                    b no data / search / record ... 
+                    b no valid type supplied.  Options: (search, record, data, raw, html, url, login ... 
                     hr
               div.my-modal-footer
                 slot(name="footer")
@@ -102,13 +120,16 @@ Options (for all modal types)
   import SearchBlock from './SearchBlock'
   import DataGrid from './DataGrid'
   import DBForm from './DBForm'
+  import Login from './Login'
+  import axios from 'axios'
 
   export default {
     name: 'Modal',
     components: {
       SearchBlock,
       DataGrid,
-      DBForm
+      DBForm,
+      Login
     },
     data () {
       return {
@@ -119,7 +140,8 @@ Options (for all modal types)
         fieldData: [],
         generated: {
           body: ''
-        }
+        },
+        modalContent: ''
       }
     },
     props: {
@@ -259,29 +281,40 @@ Options (for all modal types)
           return this.options.title
         } else if (this.title) {
           return this.title
+        } else if (this.type === 'login') {
+          return 'Log In'
         } else {
           return this.$store.getters.getHash('modalTitle') || 'my Title'
         }
       },
       modalData: function () {
         if (this.options.data) {
+          console.log('static option data: ' + JSON.stringify(this.data))
           return this.options.data || {}
         } else if (this.options.stored) {
           var storedData = this.$store.getters.getHash(this.stored)
-          console.log('dynamically loaded data to modal: ' + JSON.stringify(storedData))
+          console.log('dynamically loaded modal data: ' + JSON.stringify(storedData))
           return storedData || []
         } else if (this.data) {
-          return this.data
+          console.log('static data: ' + JSON.stringify(this.data))
+          return this.data || []
         } else {
           var key = this.options.key || 'unknown key'
-          console.log('standardized modal : ' + key)
+          console.log('standardized modal data: ' + key)
           var data = this.$store.getters.getHash(key)
-          return data
+          return data || {}
         }
       },
       openButton: function () {
         if (this.options && this.options.openButton) {
-          return this.options.openButton || 'no'
+          return this.options.openButton || '+'
+        } else { return '' }
+      },
+      openText: function () {
+        if (this.options && this.options.openText) {
+          return this.options.openText || '+'
+        } else if (this.type === 'login') {
+          return 'Log In'
         } else { return '' }
       },
       openIcon: function () {
@@ -293,6 +326,14 @@ Options (for all modal types)
         if (this.options && this.options.closeButton) {
           return this.options.closeButton || 'no'
         } else { return 'Close' }
+      },
+      url: function () {
+        console.log('check for url in: ' + JSON.stringify(this.options))
+        if (this.options.url) {
+          return this.options.url
+        } else {
+          return null
+        }
       },
       // links: function () {
       //   if (this.options && this.options.links) {
@@ -331,6 +372,20 @@ Options (for all modal types)
         } else if (this.body) {
           return this.body
         }
+      },
+      urlContent: function () {
+        console.log('generate url content from ' + this.url)
+        var _this = this
+        axios({url: this.url, method: 'get'})
+        .then(function (result, err) {
+          console.log('axios returned value(s): ' + JSON.stringify(result))
+          if (err) {
+            console.log('axios call error')
+            return '<h3>Error calling url</h3>'
+          }
+          console.log('got results for ' + _this.url)
+          _this.modalContent = result
+        })
       }
     },
     methods: {
@@ -343,11 +398,16 @@ Options (for all modal types)
         clearTimeout(this.timeoutID)
       },
       openModal () {
-        console.log('open modal...')
+        console.log('open modal...' + this.id)
         console.log('and fade in')
         // document.getElementById(this.id).classList.toggle('m-fadeIn')
         // document.getElementById(this.id).classList.toggle('m-fadeOut')
-        this.$store.getters.toggleModal(this.id)
+        if (this.url) {
+          console.log('dynamic url content generation')
+          this.urlContent
+        }
+
+        this.$store.commit('toggleModal', this.id)
 
         clearTimeout(this.timeoutID)
       },
@@ -357,7 +417,7 @@ Options (for all modal types)
         this.$store.commit('clearModal')
         // document.getElementById(this.id).classList.toggle('m-fadeOut')
         // document.getElementById(this.id).classList.toggle('m-fadeIn')
-        this.$store.getters.toggleModal(this.id)
+        this.$store.commit('toggleModal', this.id)
       },
       save: function (form) {
         if (this.options.onSave) {
@@ -434,6 +494,7 @@ Options (for all modal types)
 }
 
 .my-modal-body {
+  min-height: 300px;
   padding: 40px;
 }
 
@@ -497,6 +558,7 @@ Options (for all modal types)
   visibility: visible;
   opacity: 1;
   transition: visibility 0s linear 0s, opacity 1000ms;
+  min-height: 500px;
 }
 
 </style>
