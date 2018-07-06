@@ -33,55 +33,12 @@
                     b Logout -->
 <template lang='pug'>
   div
-    table.table
-      tr
-        td
-          div.form-group.has-success.has-feedback
-            span.input-group
-              span.input-group-addon(style='background-color: transparent; border: 0px;')
-                a(href='/' onclick='return false' @click.prevent="toggleBlock('search')") 
-                    icon(:name='searchIcon' color='black' scale='2')
-                span &nbsp; &nbsp;
-          div(@mouseleave="hideBlock('search')")
-            table.table.popup-table.input-lg(v-if="visibleBlock['search']")
-              tr(width='100%')
-                td(width='100%')
-                  div.form-group
-                    span.input-group
-                      input.form-control.input-lg.full-page#searchString(type='text' placeholder='-- Search --')
-                      span.input-group-btn
-                        button.btn.btn-lg.btn-default.full-page(@click.prevent='searchMethod')
-                          icon(name='search' color='black' background='blue')
-        td
-          span &nbsp; &nbsp; 
-          span &nbsp; &nbsp;
-        td
-          span(v-if='user')
-            b {{user}}
-          span(v-else)
-            Modal(type='login')
-        td
-              span &nbsp; &nbsp;
-              span &nbsp; &nbsp;
-        td
-          div.form-group
-            span.input-group
-              span.input-group-addon(style='background-color: transparent; border: 0px;')
-                a(href='/' onclick='return false' @click.prevent="toggleBlock('menu')") 
-                    icon(:name='menuIcon' color='black' scale='2')
-                span &nbsp; &nbsp;
-                div(@mouseleave="hideBlock('menu')")
-                  table.table.popup-table.input-lg(v-if="visibleBlock['menu']")
-                    tr
-                      td
-                        router-link(:to="{name: 'About Us'}")
-                          b About Us
-                    tr(v-if='user')
-                      td
-                        a(href='#' onclick='return false' @click.prevent='logout') 
-                          b Logout
-
-
+    span(v-if='user')
+      b {{user}}
+    span(v-else)
+      Modal(type='login' :options='options')
+    span &nbsp; &nbsp;
+            
 </template>
 
 <script>
@@ -98,7 +55,7 @@
         holdBlock: {menu: false, search: false},
         visibleBlock: {menu: false, search: false},
 
-        loginOptions: { openButton: 'LogIN' }
+        options: { openText: 'Log In' }
       }
     },
     components: {

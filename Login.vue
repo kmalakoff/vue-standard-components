@@ -50,9 +50,20 @@
         console.log('Authorizing: ' + JSON.stringify(credentials))
         auth.login(this, credentials, 'secretquote')
 
+        console.log('was ' + this.$store.getters.payload)
         var payload = localStorage.getItem('payload')
+        this.$store.dispatch('payload', payload)
+
+        console.log('is ' + this.$store.getters.payload)
+
         var user = payload.user
         console.log(user + ' Payload: ' + JSON.stringify(payload))
+
+        var access = auth.checkAuth()
+        console.log('access: ' + access)
+
+        var payload2 = auth.payload()
+        console.log(JSON.stringify(payload2))
 
         if (this.onPick) {
           this.onPick()

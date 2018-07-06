@@ -29,12 +29,12 @@
           span(v-for='count in item.indents')
             span &nbsp; &nbsp; > &nbsp;
 
-          span(v-if="1 || selectOne")
+          span(v-if="selectOne")
             span(v-if="select[item[nameKey]]")
               router-link(:to="{name: 'TourUTM', params: {id: item[idKey]}}")
                 <!-- a(:href="linkTo") -->
-                b.selected {{item[nameKey]}} &nbsp; &nbsp;
-          span(v-else)
+                b.selected {{item[nameKey]}} &nbsp; &nbsp;{{nameKey}} in {{item}}
+          span(v-else-if='selectable')
             span.newItem(v-if="newItem[item[nameKey]]")
               input(v-model='select[item[nameKey]]' type='radio' value = 'yes' @click.prevent='pickYes(item.id)')
               span &nbsp; Yes &nbsp;
@@ -48,7 +48,8 @@
               b.undecided {{item[nameKey]}} &nbsp; &nbsp;
             span(v-else)
               b.unselected {{item[nameKey]}} &nbsp; &nbsp;
-
+          span(v-else)
+            b {{item.name}} &nbsp; &nbsp;
           a(href='#' v-if='onPick' @click.prevent='onClick(item)')
             icon.midline(name='edit')
 
@@ -115,7 +116,7 @@
           var pname = this.id2name[parent]
           if (!this.newItem[pname]) {
             this.$set(this.newItem, name, true)
-            this.newItems++
+            if (this.selectable) { this.newItems++ }
           }
         }
 
@@ -147,7 +148,7 @@
 
       this.addRecursive(1, 0)
       this.addRecursive(2, 0)
-      this.addRecursive(3, 0)
+      // this.addRecursive(3, 0)
 
       console.log('tracked underitems list: ' + JSON.stringify(this.under))
     },
@@ -173,6 +174,13 @@
           return true
         } else {
           return false
+        }
+      },
+      selectable: function () {
+        if (this.options && this.options.selectable) {
+          return true
+        } else {
+          return this.selectOne
         }
       },
       isOpen: function (interest) {
@@ -291,23 +299,27 @@
       },
       addRecursive: function (id, level) {
         var refIndex = id - 1 // tmp
+        if (id) {
+          var ids = id.toString()
 
-        var ids = id.toString()
+          var index = this.reOrderedList.length || 0
 
-        var index = this.reOrderedList.length || 0
-
-        if (this.rList.indexOf(ids) === -1) {
-          this.$set(this.rList, this.rList.length, ids)
-          var item = this.list[refIndex]
-          item.indents = level
-          this.$set(this.reOrderedList, index++, item)
-        }
-
-        if (this.under[ids]) {
-          for (var i = 0; i < this.under[ids].length; i++) {
-            var newid = this.under[ids][i]
-            this.addRecursive(newid, level + 1)
+          if (this.rList.indexOf(ids) === -1) {
+            this.$set(this.rList, this.rList.length, ids)
+            var item = this.list[refIndex]
+            console.log(refIndex + ' item: ' + JSON.stringify(item))
+            item.indents = level
+            this.$set(this.reOrderedList, index++, item)
           }
+
+          if (this.under[ids]) {
+            for (var i = 0; i < this.under[ids].length; i++) {
+              var newid = this.under[ids][i]
+              this.addRecursive(newid, level + 1)
+            }
+          }
+        } else {
+          console.log('no id specified...')
         }
       }
     }
