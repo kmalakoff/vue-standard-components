@@ -1,7 +1,7 @@
 <!-- src/components/Help.vue -->
 
   <template lang='pug'>
-    span.legend
+    span.standard-legend
       b {{title}}
       table.table.table-bordered
         tr(:class='baseClass')
@@ -53,7 +53,7 @@
 table tr td {
   border: solid black 3px;
 }
-.legend {
+.standard-legend {
   text-align: center;
 }
 .legend-cell {
