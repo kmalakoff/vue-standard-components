@@ -10,32 +10,33 @@ Usage:
 
 <template lang='pug'>
   div.table-form
-    b R1: {{record1}}
+    b R0: {{record}}
     hr
     table.table.form-table
       tr
         td.heading(colspan=3)
-          h2 {{heading}}: 
-      tr(v-for="field in DBfields")
+          h2 {{heading}}:
+      tr(v-for="field in fields")
         td.prompt-column
-          b {{label(field)}}: &nbsp;
+          b {{label(field)}}:
+          DBFormElement(:form='form' :field='idfield' vModel="id" :record='thisRecord')
         td.data-column
-          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='access')
-        td.extra-column(v-if="access !== 'read'")
+          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='access' :record='thisRecord')
+        td.extra-column(v-if="access === 'edit'")
           span &nbsp;
           a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)") 
             icon(name='question-circle' color='black' scale='2')
           b &nbsp; 
       tr(v-for="r in include.visible")
         td.prompt-column
-          b {{label(r)}}: &nbsp;
+          b {{label(r)}}:
         td.data-column
-          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='access')
+          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='access' :record='thisRecord')
     span(v-for='r in include.hidden')
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
     hr
-    button.btn.btn-primary(v-if="onSave" @click.prevent="onSave(form)") Save
+    button.btn.btn-primary(v-if="onSave && access === 'edit'" @click.prevent="onSave(form)") Save
     hr
     b Form Input: {{form}}"
 </template>
@@ -53,7 +54,8 @@ Usage:
       return {
         url: config.dbUrl,
         DBfields: [],
-        form: {}
+        form: {},
+        idfield: { name: 'id', type: 'fixed' }
       }
     },
     components: {
@@ -78,7 +80,7 @@ Usage:
       append: {
         type: Array
       },
-      record1: {
+      record: {
         type: Object
       }
     },
@@ -110,13 +112,30 @@ Usage:
         return this.options.table
       },
       fields: function () {
-        return this.options.fields
+        var f = []
+        if (this.options.fields) {
+          console.log('got fields from options')
+          f = this.options.fields
+        } else if (this.DBfields.length) {
+          console.log('got fields from config')
+          f = this.DBfields
+        } else if (this.thisRecord) {
+          console.log('got fields from keys')
+          f = Object.keys(this.thisRecord)
+        }
+        console.log('get fields: ' + JSON.stringify(f))
+        return f
       },
       access: function () {
-        this.options.access
+        return this.options.access
       },
-      record: function () {
-        this.options.record
+      thisRecord: function () {
+        if (this.record) {
+          // return null
+          return this.record
+        } else {
+          return this.options.record || {}
+        }
       },
       heading: function () {
         if (this.table) {
