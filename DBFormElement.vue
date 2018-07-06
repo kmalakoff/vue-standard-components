@@ -5,13 +5,13 @@
     <!-- b {{field}} : {{Ftype}} {{list(field)}} : {{vModel}} = {{vm}} -->
     <!-- b {{form}} -->
     span(v-if="access==='read'")
-      b {{field.value}}
+      b {{defaultTo}}
     span(v-else-if="Ftype==='string' || Ftype==='text'")
       b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='int'")
       b-form-input.input-lg(@change.native="myChange" type='number' :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='varchar'")
-      b-form-input.input-lg(@change.native="myChange" type='text' placeholder="placeholder" :value='defaultTo' :default='defaultTo')
+      b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit'")
     span(v-else-if="Ftype==='date'")
       b-form-input.input-lg(@change.native="myChange" type='date' :options="list(field)" placeholder="yyyy-mm-dd" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype.match(/^enum/)")
@@ -56,7 +56,8 @@
       placeholder: { type: String },
       vModel: { type: String },
       form: { type: Object },
-      access: { type: String }
+      access: { type: String },
+      record: { type: Object }
     },
     created: function () {
       // var keys = _.pluck(this.field.default)
@@ -67,10 +68,16 @@
     },
     computed: {
       refModel: function () { return this.form[this.vModel] },
-      Ftype: function () { return this.field.type || '' },
+      Ftype: function () { return this.field.type || 'varchar' },
       name: function () { return this.field.name },
       mval: function (model) { return this[model] },
-      defaultTo: function () { return this.field.default || this.form[this.om] },
+      defaultTo: function () {
+        if (this.record) {
+          return this.record[this.field.name]
+        } else {
+          return this.field.default || this.field.value || this.form[this.om]
+        }
+      },
       addClass: function () {
         if (this.addClass) {
           return this.addClass
