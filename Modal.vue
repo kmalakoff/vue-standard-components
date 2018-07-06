@@ -35,11 +35,12 @@ Options (for all modal types)
 
 <template id=this.id lang='pug'>
   span
+    span.modal-anchor
     span(v-if='openButton')
       button.btn.btn-primary(v-on:click="openModal()")
         span(v-html='openButton')
     span(v-else-if='openText')
-      a(href='#' onclick='return false' v-on:click="openModal()")
+      a.modal-link(href='#' onclick='return false' v-on:click="openModal()")
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
       button.btn.btn-primary(v-on:click="openModal()")
@@ -51,7 +52,7 @@ Options (for all modal types)
             div.my-modal-container
               div.my-modal-header
                 slot(name="header")
-                  b {{myheader}}
+                  b {{myheader}} ({{type}})
                     span.navbar-right
                       button.btn.btn-danger.btn-xs(@click="closeModal")
                         icon(name='close')
@@ -61,7 +62,8 @@ Options (for all modal types)
                   div(v-if="type==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="type==='record'")
-                    DBForm(:options='options' :onSave='save' :append='append' :record1='modalData')
+                    b R: {{JSON.stringify(modalData)}}
+                    DBForm(:options='options' :onSave='save' :append='append' :record='modalRecord')
                     div(v-if='options.addLinks' v-for='link in options.addLinks')
                       button.btn.btn-primary(@click.prevent="link.onPick(modalData)") {{link.name}}
                   div(v-else-if="type==='data'")
@@ -83,7 +85,7 @@ Options (for all modal types)
                       span {{modalContent}
                     div(v-else)
                       b No URL or modalContent
-                  div(v-if="type==='login'")
+                  div(v-else-if="type==='login'")
                     Login(:onPick='closeModal')
                   div(v-else)
                     b no valid type supplied.  Options: (search, record, data, raw, html, url, login ... 
@@ -246,9 +248,14 @@ Options (for all modal types)
       },
       contents: function () {
         if (this.modalData && this.modalData.length) {
+          console.log('data defined')
           return this.modalData.length
         } else if (this.content) {
+          console.log('content defined')
           return this.content
+        } else {
+          console.log('content undefined')
+          return 'content undefined'
         }
       },
       initClass: function () {
@@ -282,7 +289,7 @@ Options (for all modal types)
         } else if (this.title) {
           return this.title
         } else if (this.type === 'login') {
-          return 'Log In'
+          return 'Login'
         } else {
           return this.$store.getters.getHash('modalTitle') || 'my Title'
         }
@@ -293,7 +300,7 @@ Options (for all modal types)
           return this.options.data || {}
         } else if (this.options.stored) {
           var storedData = this.$store.getters.getHash(this.stored)
-          console.log('dynamically loaded modal data: ' + JSON.stringify(storedData))
+          console.log('dynamically loaded ' + this.options.stored + ' data: ' + JSON.stringify(storedData))
           return storedData || []
         } else if (this.data) {
           console.log('static data: ' + JSON.stringify(this.data))
@@ -301,8 +308,18 @@ Options (for all modal types)
         } else {
           var key = this.options.key || 'unknown key'
           console.log('standardized modal data: ' + key)
-          var data = this.$store.getters.getHash(key)
+          // var data = this.$store.getters.getHash(key)
+          var data = this.$store.getters.modalData
           return data || {}
+        }
+      },
+      modalRecord: function () {
+        if (this.modalData && this.modalData.constructor === Array && this.modalData.length) {
+          console.log('use first data record')
+          return this.modalData[0]
+        } else {
+          console.log('constructor is: ' + this.modalData.constructor + ' : ' + this.modalData.length)
+          return { fields: 'undef' }
         }
       },
       openButton: function () {
@@ -314,7 +331,7 @@ Options (for all modal types)
         if (this.options && this.options.openText) {
           return this.options.openText || '+'
         } else if (this.type === 'login') {
-          return 'Log In'
+          return 'Login'
         } else { return '' }
       },
       openIcon: function () {
@@ -407,7 +424,8 @@ Options (for all modal types)
           this.urlContent
         }
 
-        this.$store.commit('toggleModal', this.id)
+        // this.$store.commit('toggleModal', this.id)
+        this.$store.dispatch('toggleModal', this.id)
 
         clearTimeout(this.timeoutID)
       },
@@ -417,7 +435,8 @@ Options (for all modal types)
         this.$store.commit('clearModal')
         // document.getElementById(this.id).classList.toggle('m-fadeOut')
         // document.getElementById(this.id).classList.toggle('m-fadeIn')
-        this.$store.commit('toggleModal', this.id)
+        // this.$store.commit('toggleModal', this.id)
+        this.$store.dispatch('toggleModal', this.id)
       },
       save: function (form) {
         if (this.options.onSave) {
@@ -496,6 +515,7 @@ Options (for all modal types)
 .my-modal-body {
   min-height: 300px;
   padding: 40px;
+  color: black;
 }
 
 .my-modal-footer {
@@ -528,6 +548,9 @@ Options (for all modal types)
 }
 
 /** Customized... ***/
+.modal-link {
+  color: blue;
+}
 
 .modal-header {
   background-color: #666;  
