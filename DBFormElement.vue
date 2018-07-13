@@ -11,7 +11,7 @@
     span(v-else-if="Ftype==='int'")
       b-form-input.input-lg(@change.native="myChange" type='number' :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='varchar'")
-      b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit'")
+      b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'")
     span(v-else-if="Ftype==='date'")
       b-form-input.input-lg(@change.native="myChange" type='date' :options="list(field)" placeholder="yyyy-mm-dd" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype.match(/^enum/)")
