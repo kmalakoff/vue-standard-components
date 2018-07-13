@@ -14,7 +14,7 @@ Options (for all modal types)
 
   Standard: 
     - data (array of links triggering function or another modal)
-
+    - type (search, record, data, raw, html, url, login)
   Search Modal: (provides search field(s) that enable search via specified api)
     - search (hash with the following options)
       - options (hash input including the following search options)
