@@ -28,6 +28,7 @@
       return {
         // We need to initialize the component with any
         // properties that will be used in it
+        demo: true,
         credentials: {
           username: '',
           password: ''
@@ -52,6 +53,13 @@
 
         console.log('was ' + this.$store.getters.payload)
         var payload = localStorage.getItem('payload')
+
+        if (this.demo && payload) {
+          var payloadObject = JSON.parse(payload)
+          payloadObject.user = credentials.username + '*'
+          payload = JSON.stringify(payloadObject)
+        }
+
         this.$store.dispatch('payload', payload)
 
         console.log('is ' + this.$store.getters.payload)
