@@ -10,16 +10,13 @@ Usage:
 
 <template lang='pug'>
   div.table-form
-    b R0: {{record}}
-    hr
     table.table.form-table
-      tr
+      tr(v-if='heading')
         td.heading(colspan=3)
           h2 {{heading}}:
       tr(v-for="field in fields")
         td.prompt-column
           b {{label(field)}}:
-          DBFormElement(:form='form' :field='idfield' vModel="id" :record='thisRecord')
         td.data-column
           DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='access' :record='thisRecord')
         td.extra-column(v-if="access === 'edit'")
@@ -121,7 +118,10 @@ Usage:
           f = this.DBfields
         } else if (this.thisRecord) {
           console.log('got fields from keys')
-          f = Object.keys(this.thisRecord)
+          var keys = Object.keys(this.thisRecord)
+          for (var i = keys.length; i < keys.length; i++) {
+            f.push({name: keys[i]})
+          }
         }
         console.log('get fields: ' + JSON.stringify(f))
         return f
@@ -142,7 +142,7 @@ Usage:
           var camel = _.capitalize(this.table)
           console.log('camel case = ' + camel)
           return camel
-        } else { return 'Form' }
+        } else { return null }
       },
       include: function () {
         var visible = []
