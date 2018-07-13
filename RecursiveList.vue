@@ -20,6 +20,7 @@
  -->
   <template lang='pug'>
     div.recursiveList
+      <!-- b R: {{reOrderedList}} -->
       Modal(id='info-modal' type='record' :options="options")
       span(v-if="newItems")
         b.undecided {{newItems}} New {{options.label}} option(s) available: &nbsp; &nbsp;
@@ -30,10 +31,15 @@
             span &nbsp; &nbsp; > &nbsp;
 
           span(v-if="selectOne")
-            span(v-if="select[item[nameKey]]")
-              router-link(:to="{name: 'TourUTM', params: {id: item[idKey]}}")
-                <!-- a(:href="linkTo") -->
-                b.selected {{item[nameKey]}} &nbsp; &nbsp;{{nameKey}} in {{item}}
+            span(v-if='select[item[nameKey]]')
+              b.selected {{item[nameKey]}} &nbsp; &nbsp;
+              a(href='#' @click.prevent="deselectMe(item)")
+                icon.midline(name='minus')
+            span(v-else)
+              b.unselected {{item[nameKey]}} &nbsp; &nbsp;
+              a(href='#' @click.prevent="selectMe(item)")
+                icon.midline(name='plus')
+
           span(v-else-if='selectable')
             span.newItem(v-if="newItem[item[nameKey]]")
               input(v-model='select[item[nameKey]]' type='radio' value = 'yes' @click.prevent='pickYes(item.id)')
@@ -48,21 +54,33 @@
               b.undecided {{item[nameKey]}} &nbsp; &nbsp;
             span(v-else)
               b.unselected {{item[nameKey]}} &nbsp; &nbsp;
+          span(v-else-if="onPick")
+            a(href='#' v-if='onPick' @click.prevent='onPick(item)')
+              b {{item.name}} &nbsp; &nbsp;
           span(v-else)
-            b {{item.name}} &nbsp; &nbsp;
-          a(href='#' v-if='onPick' @click.prevent='onClick(item)')
-            icon.midline(name='edit')
+            b {{item.name}}
 
+          span(v-if='showSelect && showSelect(item)')
+            a(href='#' v-if='onSelect' @click.prevent='onSelect(item)')
+              b {{selectText}}
+              <!-- icon.midline(name='plus') -->
           span &nbsp;
           a(href='#' @click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] && under[item.id]")
             icon.midline(name='compress')
           a(href='#' @click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] === false  && under[item.id]")
             span ({{under[item.id].length}} options) &nbsp;
               icon.midline(name='expand')
+      div(v-if="1")
+        hr
+        u Current List:
+        br
+        b {{selected}}
   </template>
   <script>
   // import _ from 'lodash'
   import 'vue-awesome/icons/expand'
+  import 'vue-awesome/icons/plus'
+  import 'vue-awesome/icons/minus'
   import 'vue-awesome/icons/compress'
   import 'vue-awesome/icons/edit'
   import 'vue-awesome/icons/spinner'
@@ -85,12 +103,24 @@
         select: {},
         selectParent: {},
         newItem: {},
-        newItems: 0
+        newItems: 0,
+        seeds: []
       }
     },
     props: {
       list: { type: Array },
-      onPick: { type: Function },
+      onPick: {
+        type: Function,
+        default () { return null }
+      },
+      onEdit: {
+        type: Function,
+        default () { return null }
+      },
+      onSelect: {
+        type: Function,
+        default () { return null }
+      },
       options: { type: Object } // idKey, parentKey, open (defaults to: id, parent_id, false)
     },
     created: function () {
@@ -101,7 +131,7 @@
         var parentKey = this.options.parentKey || 'parent_id'
 
         var name = list[i][nameKey]
-        var selected = list[i].selected
+        var selected = list[i].selected && !this.clear
         var id = list[i][idKey]
         var parent = list[i][parentKey]
 
@@ -134,9 +164,13 @@
           this.$set(this.under[parent.toString()], currentLength, id)
         } else {
           this.$set(this.list[i], 'parent_id', 0)
+          this.seeds.push(list[i][idKey])
+          console.log('seed ' + list[i][idKey])
+          // this.addRecursive(list[i][idKey], 0)
         }
       }
 
+      console.log('seeds: ' + JSON.stringify(this.seeds))
       // open parent of selected interests (if applicable)
       if (this.options && this.options.open) {
         var PS = Object.keys(this.selectParent)
@@ -146,18 +180,58 @@
         }
       }
 
-      this.addRecursive(1, 0)
-      this.addRecursive(2, 0)
+      for (var k = 0; k < 4; k++) {
+        console.log('seeding ' + k)
+        this.addRecursive(k, 0)
+      }
+      // this.addRecursive(1, 0)
+      // this.addRecursive(2, 0)
       // this.addRecursive(3, 0)
 
       console.log('tracked underitems list: ' + JSON.stringify(this.under))
     },
+    after_created: function () {
+      for (var k = 0; k < this.seeds; k++) {
+        console.log('seeding ' + k)
+        this.addRecursive(k, 0)
+      }
+    },
     computed: {
+      clear: function () {
+        if (this.options && this.options.clear) {
+          return true
+        } else {
+          return false
+        }
+      },
+      editable: function () {
+        if (this.options && this.options.editable) {
+          return true
+        } else {
+          return false
+        }
+      },
+      selectText: function () {
+        if (this.options && this.options.selectText) {
+          return this.options.selectText || 'pick'
+        } else { return 'choose' }
+      },
+      selected: function () {
+        var keys = Object.keys(this.select)
+        var list = []
+        for (var i = 0; i < keys.length; i++) {
+          var choice = this.select[keys[i]]
+          if (choice) {
+            list.push(keys[i])
+          }
+        }
+        return list
+      },
       nameKey: function () {
         if (this.options && this.options.nameKey) {
           return this.options.nameKey
         } else {
-          return 'name'
+          return 'alias'
         }
       },
       idKey: function () {
@@ -168,6 +242,13 @@
         }
       },
       orderedList: function () {
+      },
+      showSelect: function () {
+        if (this.options && this.options.showSelect) {
+          return this.options.showSelect
+        } else {
+          return false
+        }
       },
       selectOne: function () {
         if (this.options && this.options.selectOne) {
@@ -190,16 +271,24 @@
         var isOpen = this.openItems[key]
         console.log('returned ' + isOpen + ' for ' + interest.id)
         return isOpen
-      },
-      linkTo: function () {
-        if (this.options.linkTo) {
-          return this.options.linkTo
-        } else {
-          return '#'
-        }
       }
+      // onPick: function () {
+      //   if (this.options.onPick) {
+      //     return this.options.onPick
+      //   } else {
+      //     return null
+      //   }
+      // },
     },
     methods: {
+      deselectMe: function (item) {
+        console.log('deselect ' + JSON.stringify(item.name))
+        this.$set(this.select, item.name, false)
+      },
+      selectMe: function (item) {
+        console.log('select ' + JSON.stringify(item.name))
+        this.$set(this.select, item.name, true)
+      },
       toggle: function (id) {
         var key = 'id' + id
         console.log('toggle ' + id)
