@@ -5,13 +5,21 @@
 
   Input:
     - list (array of hashes MUST include keys for 'id, name, parent')
+    - [onPick]  (function to run when individual item is clicked on)
+    - [onSelect]  (function to run when individual item is selected using checkbox)
 
   Options:
     - nameKey (key for name value (defaults to 'name'))
     - idKey (key for name value (defaults to 'id'))
     - parentKey (key for name value (defaults to 'parent_id'))
+    - clear (start with empty list of preselected values)
+    - selectOne (pick items one at a time)
 
-    - onPick (function to run when individual item is selected)
+    - selectText (text prompt to trigger individual select method)
+    - showSelect (method to determine if selectText option is available for each record)
+
+    - showSelect (optional method to enable dynamic visibility for selecting single items)
+    - 
     - onPickIcon (icon to use for individual item selection (defaults to edit icon))
 
     - init (initial open setting (all, selected, top [default]) indicates which blocks to start in open mode.
