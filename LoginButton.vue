@@ -33,8 +33,8 @@
                     b Logout -->
 <template lang='pug'>
   div
-    span(v-if='user')
-      b {{user}}
+    span(v-if='payload && payload.user')
+      b {{payload.user}}
     span(v-else)
       Modal(type='login' :options='options')
     span &nbsp; &nbsp;
@@ -110,7 +110,7 @@
     },
     computed: {
       user: function () {
-        var payload = this.payload
+        var payload = this.$store.getters.payload
         console.log('loginpop user' + JSON.stringify(payload))
         if (payload && payload.user) {
           return payload.user
