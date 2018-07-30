@@ -20,7 +20,7 @@
 
 > cd ovid
 
-> add icons required to webpack.base file ?  ... (eg 'fa-close'); import in .vue file somewhere ... (eg import 'vue-awesome/icons/home')
+> add icons required to webpack.base file ?  ... (eg 'fa-times'); import in .vue file somewhere ... (eg import 'vue-awesome/icons/home')
 
 > source .install
 

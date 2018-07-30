@@ -3,7 +3,7 @@
     div.myOpenCart(v-if='showCart')
       div.navbar-right
         a(href='#' @click.prevent='closeCart')
-          icon(name='close' color='red  ' scale='2')
+          icon(name='times' color='red  ' scale='2')
         span &nbsp; &nbsp;
       b.input-lg {{items}} items: &nbsp; &nbsp;
       h3
@@ -37,7 +37,7 @@ import PublicHeader from './../PublicHeader'
 import PublicFooter from './../PublicFooter'
 
 import 'vue-awesome/icons/shopping-cart'
-import 'vue-awesome/icons/close'
+import 'vue-awesome/icons/times'
 import 'vue-awesome/icons/home'
 
 // import { StripeCheckout } from 'vue-stripe'

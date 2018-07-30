@@ -25,7 +25,7 @@ one of:
           span(v-html="new_content")
         span(v-if="open")
           button.btn.btn-xs.btn-danger(type='button' @click.prevent="cancelEditor" data-toggle='tooltip' title='cancel')
-            icon(name='close')
+            icon(name='times')
           span &nbsp; &nbsp;
           button.btn.btn-xs.btn-success(type='button' @click.prevent="closeEditor" data-toggle='tooltip' title='accept changes')
             icon(name='check')
@@ -36,7 +36,7 @@ one of:
 
   <script>
   import 'vue-awesome/icons/edit'
-  import 'vue-awesome/icons/close'
+  import 'vue-awesome/icons/times'
   import 'vue-awesome/icons/check'
 
   export default {
