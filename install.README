@@ -8,7 +8,7 @@
 
 > npm install
 
-> npm install -S vuex axios cors bootstrap bootstrap-vue vue-form-generator vue-directive-tooltip
+> npm install -S vuex axios cors bootstrap@3.* bootstrap-vue vue-form-generator vue-directive-tooltip vue-async-computed
 
 > npm install -D pug vue-awesome node-sass sass-loader
 
@@ -16,11 +16,12 @@
 
 > git clone https://github.com/ran-guin/vue-standard-components Standard
 
-> git clone https://github.com/ran-guin/vue-ovid ovid
+> git clone https://github.com/ran-guin/MYPROJ projName
 
-> cd ovid
+> cd projName
 
-> add icons required to webpack.base file ?  ... (eg 'fa-close'); import in .vue file somewhere ... (eg import 'vue-awesome/icons/home')
+> add icons required to webpack.base file ?  ... (eg 'fa-times'); import in .vue file somewhere ... (eg import 'vue-awesome/icons/home')
 
 > source .install
 
+// customize .eslint file to remove indentation errors (?)

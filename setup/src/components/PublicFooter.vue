@@ -5,7 +5,6 @@
     span.navbar-right(v-html="right")
 </template>
 
-
 <script>
 export default {
   // template: require('./main.pug'),

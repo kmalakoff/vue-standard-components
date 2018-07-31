@@ -6,49 +6,49 @@
 
   </template>
 
-  <script>
-  import Modal from './Modal'
+<script>
+import Modal from './Modal'
 
-  export default {
-    components: {
-      Modal
-    },
-    data () {
-      return {
-        step: 1,
-        showModal: false
-      }
-    },
-    computed: {
-      id: function () {
-        if (this.demoStep) {
-          return 'demoStep' + this.demoStep
-        } else {
-          return this.name
-        }
-      }
-    },
-    props: {
-      demoStep: {
-        type: String
-      },
-      title: {
-        type: String
-      },
-      name: {
-        type: String,
-        default: 'help'
-      },
-      message: {
-        type: String
-      },
-      show: {
-        type: Boolean
+export default {
+  components: {
+    Modal
+  },
+  data () {
+    return {
+      step: 1,
+      showModal: false
+    }
+  },
+  computed: {
+    id: function () {
+      if (this.demoStep) {
+        return 'demoStep' + this.demoStep
+      } else {
+        return this.name
       }
     }
+  },
+  props: {
+    demoStep: {
+      type: String
+    },
+    title: {
+      type: String
+    },
+    name: {
+      type: String,
+      default: 'help'
+    },
+    message: {
+      type: String
+    },
+    show: {
+      type: Boolean
+    }
   }
-  </script>
+}
+</script>
 
 <style>
-  
+
 </style>

@@ -13,7 +13,7 @@
       div.col-md-10#mapSubBlock
         gmap-map.google-map(:center="cent" :zoom="zoom" :style="style" ref='gmap')
           gmap-marker(
-            :key="index" 
+            :key="index"
             v-for="(m, index) in markers"
             :label="m.label.text"
             :position="m.position"
@@ -26,8 +26,8 @@
           )
   </template>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=initialize"></script>
-  
+<script async defer src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=initialize"></script>
+
   <script>
   import config from '@/config.js'
   import * as VueGoogleMaps from 'vue2-google-maps'

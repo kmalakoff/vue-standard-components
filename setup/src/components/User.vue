@@ -90,10 +90,10 @@ export default {
     tip: function () {
       if (this.user) {
         return '<ul> ' +
-          '<li> Name: ' + this.user.name + '</li>' +
-          '<li> Email: ' + this.user.email + '</li>' +
-          '<li> Role: ' + this.role + '</li>' +
-          '</ul>'
+            '<li> Name: ' + this.user.name + '</li>' +
+            '<li> Email: ' + this.user.email + '</li>' +
+            '<li> Role: ' + this.role + '</li>' +
+            '</ul>'
       } else {
         return 'TBD'
       }
@@ -112,7 +112,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 h1, h2 {
   font-weight: normal;
 }

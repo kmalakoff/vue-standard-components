@@ -6,7 +6,7 @@ import Vue from 'vue';
 
 <template id="modal-template" lang='pug'>
   div
-    transition(name="modal") 
+    transition(name="modal")
       div.modal-mask
         div.modal-wrapper
           div.modal-container
@@ -33,7 +33,7 @@ import Vue from 'vue';
                           input(type='text' :placeholder="field.type")
                   hr
                   div(v-if="modalButton")
-                    button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalAction()") {{modalButton}} 
+                    button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalAction()") {{modalButton}}
 
                 div(v-show="loadStatus !== 'loaded'")
                   b Loading...
@@ -46,63 +46,63 @@ import Vue from 'vue';
 </template>
 
 <script>
-  import axios from 'axios'
-  import config from '@/config'
+import axios from 'axios'
+import config from '@/config'
 
-  export default {
-    data () {
-      return {
-        modalVisible: false,
-        timeoutID: 0,
-        showModal: false,
-        status: 'pending',
-        dbURL: config.dbURL
-      }
+export default {
+  data () {
+    return {
+      modalVisible: false,
+      timeoutID: 0,
+      showModal: false,
+      status: 'pending',
+      dbURL: config.dbURL
+    }
+  },
+  props: {
+    table: {
+      type: String,
+      default: 'Equipment'
     },
-    props: {
-      table: {
-        type: String,
-        default: 'Equipment'
-      },
-      fields: {
-        type: Array,
-        default () { return [] }
-      },
-      prompt: {
-        type: String
-      },
-      type: {
-        type: String
-      },
-      modalHeader: {
-        type: String
-      },
-      modalFooter: {
-        type: String
-      },
-      modalBody: {
-        type: String,
-        default: 'Content...'
-      },
-      modalButton: {
-        type: String
-      },
-      modalAction: {
-        type: Function
-      }
+    fields: {
+      type: Array,
+      default () { return [] }
     },
-    computed: {
-      loadStatus: function () {
-        return this.status
-      }
+    prompt: {
+      type: String
     },
-    created: function () {
-      var DBfieldUrl = this.dbURL
-      console.log('DB run : ' + DBfieldUrl)
+    type: {
+      type: String
+    },
+    modalHeader: {
+      type: String
+    },
+    modalFooter: {
+      type: String
+    },
+    modalBody: {
+      type: String,
+      default: 'Content...'
+    },
+    modalButton: {
+      type: String
+    },
+    modalAction: {
+      type: Function
+    }
+  },
+  computed: {
+    loadStatus: function () {
+      return this.status
+    }
+  },
+  created: function () {
+    var DBfieldUrl = this.dbURL
+    console.log('DB run : ' + DBfieldUrl)
 
-      var _this = this
-      console.log('status = ' + this.status)
-      axios.post(DBfieldUrl, { table: this.table })
+    var _this = this
+    console.log('status = ' + this.status)
+    axios.post(DBfieldUrl, { table: this.table })
       .then(function (result) {
         console.log('R: ' + JSON.stringify(result))
         for (var i = 0; i < result.data.length; i++) {
@@ -117,15 +117,15 @@ import Vue from 'vue';
         }
         _this.DBFields = []
       })
-    },
+  },
 
-    methods: {
-      loadTable () {
-        var DBfieldUrl = this.dbURL
-        console.log('run : ' + DBfieldUrl)
+  methods: {
+    loadTable () {
+      var DBfieldUrl = this.dbURL
+      console.log('run : ' + DBfieldUrl)
 
-        var _this = this
-        axios.post(DBfieldUrl, { table: this.table })
+      var _this = this
+      axios.post(DBfieldUrl, { table: this.table })
         .then(function (result) {
           console.log('R: ' + JSON.stringify(result))
           for (var i = 0; i < result.data.length; i++) {
@@ -138,16 +138,16 @@ import Vue from 'vue';
           }
           this.DBFields = []
         })
-      },
-      showMe () {
-        this.modalVisible = true
-        clearTimeout(this.timeoutID)
-      },
-      oNotification () {
-        console.log('on')
-      }
+    },
+    showMe () {
+      this.modalVisible = true
+      clearTimeout(this.timeoutID)
+    },
+    oNotification () {
+      console.log('on')
     }
   }
+}
 </script>
 
 <style scoped>
@@ -245,6 +245,4 @@ import Vue from 'vue';
   text-align: right;
 }
 
-
 </style>
-

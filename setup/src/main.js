@@ -17,6 +17,7 @@ import store from './store'
 
 import auth from './auth'
 import axios from 'axios'
+import AsyncComputed from 'vue-async-computed'
 
 // Check the users auth status when the app starts
 auth.checkAuth()
@@ -27,6 +28,7 @@ Vue.use(BootstrapVue)
 
 Vue.component('icon', Icon)
 Vue.use(BootstrapVue)
+Vue.use(AsyncComputed)
 
 const token = localStorage.getItem('user-token')
 if (token) {

@@ -3,7 +3,7 @@
     div.myOpenCart(v-if='showCart')
       div.navbar-right
         a(href='#' @click.prevent='closeCart')
-          icon(name='close' color='red  ' scale='2')
+          icon(name='times' color='red  ' scale='2')
         span &nbsp; &nbsp;
       b.input-lg {{items}} items: &nbsp; &nbsp;
       h3
@@ -23,7 +23,7 @@
       br
       h4 Total: {{total}}
       hr
-      form(action="/process-payment" method="POST") 
+      form(action="/process-payment" method="POST")
         button.btn.btn-primary(:disabled="!items") Checkout
         <!-- stripe-checkout(stripe-key="my-stripe-key" product="product(tea.name, tea.description, tea.price100g)") -->
     div.myClosedCart(v-else)
@@ -37,7 +37,7 @@ import PublicHeader from './../PublicHeader'
 import PublicFooter from './../PublicFooter'
 
 import 'vue-awesome/icons/shopping-cart'
-import 'vue-awesome/icons/close'
+import 'vue-awesome/icons/times'
 import 'vue-awesome/icons/home'
 
 // import { StripeCheckout } from 'vue-stripe'
@@ -65,15 +65,15 @@ export default {
     items: function () {
       var ids = Object.keys(this.cart)
       var count = 0
-      var total = 0
+      // var total = 0
       for (var i = 0; i < ids.length; i++) {
         var qty = this.cart[ids[i]].qty || 1
-        var subtotal = this.cart[ids[i]].amount * qty
-        total += subtotal
+        // var subtotal = this.cart[ids[i]].amount * qty
+        // total += subtotal
         count += qty
       }
 
-      this.total = total
+      // this.total = total .. cannot introduce side-effects
       return count
     }
   },
@@ -121,7 +121,6 @@ export default {
   padding-top: 20px;
   border: 1px solid black;
 }
-
 
 ul {
   list-style-type: none;

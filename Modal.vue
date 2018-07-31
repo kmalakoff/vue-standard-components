@@ -8,11 +8,11 @@ Options (for all modal types)
   - body
   - footer
   - openButton (name of button used to open modal)
-  - 
+  -
 
   Three primary types along with associated input props:
 
-  Standard: 
+  Standard:
     - data (array of links triggering function or another modal)
     - type (search, record, data, raw, html, url, login)
   Search Modal: (provides search field(s) that enable search via specified api)
@@ -24,7 +24,7 @@ Options (for all modal types)
         function - function to execute upon clicking of button above
         url - url to generate content of modal
         urlData - data to pass to url (post) (may include tags replaced by record data ( eg urlData = {id: '<foundId>'} where the record supplied includes the 'foundId' attribute))
-  
+
   Record Modal: (provides access to record-based modal form)
     - record (hash with the following options)
       - table
@@ -44,9 +44,9 @@ Options (for all modal types)
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
       button.btn.btn-primary(v-on:click="openModal()")
-        icon(:name='openIcon')      
+        icon(:name='openIcon')
     span.m-fadeOut(:id="id")
-      transition(name="modal") 
+      transition(name="modal")
         div.my-modal-mask
           div.my-modal-wrapper
             div.my-modal-container
@@ -88,7 +88,7 @@ Options (for all modal types)
                   div(v-else-if="type==='login'")
                     Login(:onPick='closeModal')
                   div(v-else)
-                    b no valid type supplied.  Options: (search, record, data, raw, html, url, login ... 
+                    b no valid type supplied.  Options: (search, record, data, raw, html, url, login ...
                     hr
               div.my-modal-footer
                 slot(name="footer")
@@ -98,7 +98,7 @@ Options (for all modal types)
 </template>
 
 <script>
-  /*
+/*
 
   Usage examples:
     Modal(header='Modal Title' body='Modal Content')
@@ -119,341 +119,341 @@ Options (for all modal types)
 
   */
 
-  import SearchBlock from './SearchBlock'
-  import DataGrid from './DataGrid'
-  import DBForm from './DBForm'
-  import Login from './Login'
-  import axios from 'axios'
+import SearchBlock from './SearchBlock'
+import DataGrid from './DataGrid'
+import DBForm from './DBForm'
+import Login from './Login'
+// import axios from 'axios'
 
-  export default {
-    name: 'Modal',
-    components: {
-      SearchBlock,
-      DataGrid,
-      DBForm,
-      Login
+export default {
+  name: 'Modal',
+  components: {
+    SearchBlock,
+    DataGrid,
+    DBForm,
+    Login
+  },
+  data () {
+    return {
+      isVisible: false,
+      timeoutID: 0,
+      showModal: false,
+      status: 'pending',
+      fieldData: [],
+      generated: {
+        body: ''
+      },
+      modalContent: ''
+    }
+  },
+  props: {
+    id: {
+      type: String,
+      default: 'default-modal_id'
     },
-    data () {
-      return {
-        isVisible: false,
-        timeoutID: 0,
-        showModal: false,
-        status: 'pending',
-        fieldData: [],
-        generated: {
-          body: ''
-        },
-        modalContent: ''
+    type: {
+      type: String,
+      default: ''
+    },
+    header: {
+      type: String,
+      default: ''
+    },
+    title: {
+      type: String
+    },
+    picked: {
+      type: Array
+    },
+    footer: {
+      type: String,
+      default: ''
+    },
+    data: {
+      type: Array
+    },
+    content: {
+      type: String
+    },
+    // links: {
+    //   type: Object
+    // },
+    toggle: {
+      type: Boolean
+    },
+
+    // openButton: {
+    //   type: String
+    // },
+    // closeButton: {
+    //   type: String
+    // },
+    record: {
+      type: Object
+    },
+    link: {
+      type: Object
+    },
+    options: {
+      type: Object,
+      default () { return {} }
+    },
+    append: {
+      type: Array
+    }
+    // title: {
+    //   type: String,
+    //   default: ''
+    // },
+    // table: {
+    //   type: String
+    // },
+    // fields: {
+    //   type: Array,
+    //   default () { return [] }
+    // },
+    // prompt: {
+    //   type: String
+    // },
+    // action: {
+    //   type: Function
+    // },
+    // url: {
+    //   type: String
+    // },
+    // urlData: {
+    //   type: Object
+    // },
+    // function: {
+    //   type: Function
+    // },
+    // close: {
+    //   type: String,
+    //   default: 'Cancel'
+    // },
+    // record: {
+    //   type: Object
+    // },
+  },
+  created: function () {
+  },
+  computed: {
+    recordTable: function () {
+      if (this.options.table) {
+        return this.options.table
+      } else {
+        console.log('no table defined')
       }
     },
-    props: {
-      id: {
-        type: String,
-        default: 'default-modal_id'
-      },
-      type: {
-        type: String,
-        default: ''
-      },
-      header: {
-        type: String,
-        default: ''
-      },
-      title: {
-        type: String
-      },
-      picked: {
-        type: Array
-      },
-      footer: {
-        type: String,
-        default: ''
-      },
-      data: {
-        type: Array
-      },
-      content: {
-        type: String
-      },
-      // links: {
-      //   type: Object
-      // },
-      toggle: {
-        type: Boolean
-      },
-
-      // openButton: {
-      //   type: String
-      // },
-      // closeButton: {
-      //   type: String
-      // },
-      record: {
-        type: Object
-      },
-      link: {
-        type: Object
-      },
-      options: {
-        type: Object,
-        default () { return {} }
-      },
-      append: {
-        type: Array
+    contents: function () {
+      if (this.modalData && this.modalData.length) {
+        console.log('data defined')
+        return this.modalData.length
+      } else if (this.content) {
+        console.log('content defined')
+        return this.content
+      } else {
+        console.log('content undefined')
+        return 'content undefined'
       }
-      // title: {
-      //   type: String,
-      //   default: ''
-      // },
-      // table: {
-      //   type: String
-      // },
-      // fields: {
-      //   type: Array,
-      //   default () { return [] }
-      // },
-      // prompt: {
-      //   type: String
-      // },
-      // action: {
-      //   type: Function
-      // },
-      // url: {
-      //   type: String
-      // },
-      // urlData: {
-      //   type: Object
-      // },
-      // function: {
-      //   type: Function
-      // },
-      // close: {
-      //   type: String,
-      //   default: 'Cancel'
-      // },
-      // record: {
-      //   type: Object
-      // },
     },
-    created: function () {
+    initClass: function () {
+      if (this.options && this.options.show) {
+        return 'm-fadeIn'
+      } else {
+        return 'm-fadeOut'
+      }
     },
-    computed: {
-      recordTable: function () {
-        if (this.options.table) {
-          return this.options.table
-        } else {
-          console.log('no table defined')
-          return
-        }
-      },
-      contents: function () {
-        if (this.modalData && this.modalData.length) {
-          console.log('data defined')
-          return this.modalData.length
-        } else if (this.content) {
-          console.log('content defined')
-          return this.content
-        } else {
-          console.log('content undefined')
-          return 'content undefined'
-        }
-      },
-      initClass: function () {
-        if (this.options && this.options.show) {
-          return 'm-fadeIn'
-        } else {
-          return 'm-fadeOut'
-        }
-      },
-      htmlContent: function () {
-        if (this.options && this.options.htmlContent) {
-          return this.options.htmlContent
-        }
-      },
-      search_options: function () {
-        if (this.options && this.options.search) {
-          return this.options.search
-        } else { return {} }
-      },
-      data_options: function () {
-        if (this.options && this.options.data_options) {
-          return this.options.data_options
-        } else { return {} }
-      },
-      body: function () {
-        return this.options.body || ''
-      },
-      modalTitle: function () {
-        if (this.options.title) {
-          return this.options.title
-        } else if (this.title) {
-          return this.title
-        } else if (this.type === 'login') {
-          return 'Login'
-        } else {
-          return this.$store.getters.getHash('modalTitle') || 'my Title'
-        }
-      },
-      modalData: function () {
-        if (this.options.data) {
-          console.log('static option data: ' + JSON.stringify(this.data))
-          return this.options.data || {}
-        } else if (this.options.stored) {
-          var storedData = this.$store.getters.getHash(this.stored)
-          console.log('dynamically loaded ' + this.options.stored + ' data: ' + JSON.stringify(storedData))
-          return storedData || []
-        } else if (this.data) {
-          console.log('static data: ' + JSON.stringify(this.data))
-          return this.data || []
-        } else {
-          var key = this.options.key || 'unknown key'
-          console.log('standardized modal data: ' + key)
-          // var data = this.$store.getters.getHash(key)
-          var data = this.$store.getters.modalData
-          return data || {}
-        }
-      },
-      modalRecord: function () {
-        if (this.modalData && this.modalData.constructor === Array && this.modalData.length) {
-          console.log('use first data record')
-          return this.modalData[0]
-        } else {
-          console.log('constructor is: ' + this.modalData.constructor + ' : ' + this.modalData.length)
-          return { fields: 'undef' }
-        }
-      },
-      openButton: function () {
-        if (this.options && this.options.openButton) {
-          return this.options.openButton || '+'
-        } else { return '' }
-      },
-      openText: function () {
-        if (this.options && this.options.openText) {
-          return this.options.openText || '+'
-        } else if (this.type === 'login') {
-          return 'Login'
-        } else { return '' }
-      },
-      openIcon: function () {
-        if (this.options && this.options.openIcon) {
-          return this.options.openIcon || 'no'
-        } else { return '' }
-      },
-      closeButton: function () {
-        if (this.options && this.options.closeButton) {
-          return this.options.closeButton || 'no'
-        } else { return 'Close' }
-      },
-      url: function () {
-        console.log('check for url in: ' + JSON.stringify(this.options))
-        if (this.options.url) {
-          return this.options.url
-        } else {
-          return null
-        }
-      },
-      // links: function () {
-      //   if (this.options && this.options.links) {
-      //     return this.options.links || {}
+    htmlContent: function () {
+      if (this.options && this.options.htmlContent) {
+        return this.options.htmlContent
+      }
+    },
+    search_options: function () {
+      if (this.options && this.options.search) {
+        return this.options.search
+      } else { return {} }
+    },
+    data_options: function () {
+      if (this.options && this.options.data_options) {
+        return this.options.data_options
+      } else { return {} }
+    },
+    body: function () {
+      return this.options.body || ''
+    },
+    modalTitle: function () {
+      if (this.options.title) {
+        return this.options.title
+      } else if (this.title) {
+        return this.title
+      } else if (this.type === 'login') {
+        return 'Login'
+      } else {
+        return this.$store.getters.getHash('modalTitle') || 'my Title'
+      }
+    },
+    modalData: function () {
+      if (this.options.data) {
+        console.log('static option data: ' + JSON.stringify(this.data))
+        return this.options.data || {}
+      } else if (this.options.stored) {
+        var storedData = this.$store.getters.getHash(this.stored)
+        console.log('dynamically loaded ' + this.options.stored + ' data: ' + JSON.stringify(storedData))
+        return storedData || []
+      } else if (this.data) {
+        console.log('static data: ' + JSON.stringify(this.data))
+        return this.data || []
+      } else {
+        var key = this.options.key || 'unknown key'
+        console.log('standardized modal data: ' + key)
+        // var data = this.$store.getters.getHash(key)
+        var data = this.$store.getters.modalData
+        return data || {}
+      }
+    },
+    modalRecord: function () {
+      if (this.modalData && this.modalData.constructor === Array && this.modalData.length) {
+        console.log('use first data record')
+        return this.modalData[0]
+      } else {
+        console.log('constructor is: ' + this.modalData.constructor + ' : ' + this.modalData.length)
+        return { fields: 'undef' }
+      }
+    },
+    openButton: function () {
+      if (this.options && this.options.openButton) {
+        return this.options.openButton || '+'
+      } else { return '' }
+    },
+    openText: function () {
+      if (this.options && this.options.openText) {
+        return this.options.openText || '+'
+      } else if (this.type === 'login') {
+        return 'Login'
+      } else { return '' }
+    },
+    openIcon: function () {
+      if (this.options && this.options.openIcon) {
+        return this.options.openIcon || 'no'
+      } else { return '' }
+    },
+    closeButton: function () {
+      if (this.options && this.options.closeButton) {
+        return this.options.closeButton || 'no'
+      } else { return 'Close' }
+    },
+    url: function () {
+      console.log('check for url in: ' + JSON.stringify(this.options))
+      if (this.options.url) {
+        return this.options.url
+      } else {
+        return null
+      }
+    },
+    // links: function () {
+    //   if (this.options && this.options.links) {
+    //     return this.options.links || {}
+    //   }
+    // },
+    links: function (key) {
+      var L = this.$store.getters.getLinks
+      if (L && L.constructor === Object) {
+        console.log('got link object')
+        return L
+      } else {
+        console.log('got link function ?')
+        return L
+      }
+    },
+    loadStatus: function () {
+      return this.status
+    },
+    myheader: function () {
+      if (this.modalTitle) {
+        return this.modalTitle
+      } else if (this.header) {
+        return this.header
+      } else if (this.options && this.options.header) {
+        return this.options.header
+      } else if (this.options && this.options.model) {
+        return this.options.model
+      } else {
+        return 'Title'
+      }
+    },
+    modalBody: function () {
+      if (this.generated && this.generated.body) {
+        return this.generated.body
+      } else if (this.body) {
+        return this.body
+      } else { return null }
+    },
+    urlContent: function () {
+      console.log('generate url content from ' + this.url)
+      // var _this = this
+      // axios({url: this.url, method: 'get'})
+      // .then(function (result, err) {
+      //   console.log('axios returned value(s): ' + JSON.stringify(result))
+      //   if (err) {
+      //     console.log('axios call error')
+      //     return '<h3>Error calling url</h3>'
       //   }
-      // },
-      links: function (key) {
-        var L = this.$store.getters.getLinks
-        if (L && L.constructor === Object) {
-          console.log('got link object')
-          return L
-        } else {
-          console.log('got link function ?')
-          return L
-        }
-      },
-      loadStatus: function () {
-        return this.status
-      },
-      myheader: function () {
-        if (this.modalTitle) {
-          return this.modalTitle
-        } else if (this.header) {
-          return this.header
-        } else if (this.options && this.options.header) {
-          return this.options.header
-        } else if (this.options && this.options.model) {
-          return this.options.model
-        } else {
-          return 'Title'
-        }
-      },
-      modalBody: function () {
-        if (this.generated && this.generated.body) {
-          return this.generated.body
-        } else if (this.body) {
-          return this.body
-        }
-      },
-      urlContent: function () {
-        console.log('generate url content from ' + this.url)
-        var _this = this
-        axios({url: this.url, method: 'get'})
-        .then(function (result, err) {
-          console.log('axios returned value(s): ' + JSON.stringify(result))
-          if (err) {
-            console.log('axios call error')
-            return '<h3>Error calling url</h3>'
-          }
-          console.log('got results for ' + _this.url)
-          _this.modalContent = result
-        })
+      //   console.log('got results for ' + _this.url)
+      //   _this.modalContent = result
+      //   return _this.modalContent
+      // })
+      return 'dynamic content'
+    }
+  },
+  methods: {
+    showMe () {
+      this.isVisible = true
+      clearTimeout(this.timeoutID)
+    },
+    hideMe () {
+      this.isVisible = false
+      clearTimeout(this.timeoutID)
+    },
+    openModal () {
+      console.log('open modal...' + this.id)
+      console.log('and fade in')
+      // document.getElementById(this.id).classList.toggle('m-fadeIn')
+      // document.getElementById(this.id).classList.toggle('m-fadeOut')
+      if (this.url) {
+        console.log('dynamic url content generation')
+        console.log(this.urlContent)
+      }
+      // this.$store.commit('toggleModal', this.id)
+      this.$store.dispatch('toggleModal', this.id)
+
+      clearTimeout(this.timeoutID)
+    },
+    closeModal: function () {
+      console.log('close modal...')
+      console.log('fade out')
+      this.$store.commit('clearModal')
+      // document.getElementById(this.id).classList.toggle('m-fadeOut')
+      // document.getElementById(this.id).classList.toggle('m-fadeIn')
+      // this.$store.commit('toggleModal', this.id)
+      this.$store.dispatch('toggleModal', this.id)
+    },
+    save: function (form) {
+      if (this.options.onSave) {
+        console.log('save form: ' + JSON.stringify(form))
+        this.options.onSave(form)
+        this.closeModal()
+      } else {
+        console.log('save function not supplied')
       }
     },
-    methods: {
-      showMe () {
-        this.isVisible = true
-        clearTimeout(this.timeoutID)
-      },
-      hideMe () {
-        this.isVisible = false
-        clearTimeout(this.timeoutID)
-      },
-      openModal () {
-        console.log('open modal...' + this.id)
-        console.log('and fade in')
-        // document.getElementById(this.id).classList.toggle('m-fadeIn')
-        // document.getElementById(this.id).classList.toggle('m-fadeOut')
-        if (this.url) {
-          console.log('dynamic url content generation')
-          this.urlContent
-        }
-
-        // this.$store.commit('toggleModal', this.id)
-        this.$store.dispatch('toggleModal', this.id)
-
-        clearTimeout(this.timeoutID)
-      },
-      closeModal: function () {
-        console.log('close modal...')
-        console.log('fade out')
-        this.$store.commit('clearModal')
-        // document.getElementById(this.id).classList.toggle('m-fadeOut')
-        // document.getElementById(this.id).classList.toggle('m-fadeIn')
-        // this.$store.commit('toggleModal', this.id)
-        this.$store.dispatch('toggleModal', this.id)
-      },
-      save: function (form) {
-        if (this.options.onSave) {
-          console.log('save form: ' + JSON.stringify(form))
-          this.options.onSave(form)
-          this.closeModal()
-        } else {
-          console.log('save function not supplied')
-        }
-      },
-      watch: {
-        'toggle': function () {
-          console.log('changed body')
-        }
+    watch: {
+      'toggle': function () {
+        console.log('changed body')
       }
     }
   }
+}
 </script>
 
 <style>
@@ -553,11 +553,11 @@ Options (for all modal types)
 }
 
 .modal-header {
-  background-color: #666;  
+  background-color: #666;
 }
 .modal-footer {
   background-color: #666;
-}  
+}
 
 .modal-table {
   color: black
@@ -585,4 +585,3 @@ Options (for all modal types)
 }
 
 </style>
-

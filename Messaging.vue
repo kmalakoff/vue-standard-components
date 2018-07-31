@@ -1,6 +1,6 @@
 <!-- src/components/Messaging.vue -->
 
-<!-- 
+<!--
   Usage:
 
     1. include Messaging component in script block and component list:
@@ -20,7 +20,6 @@
       this.$store.commit('clearErrors')
 
 !-->
-
 
 <template lang='pug'>
   div.message-block
@@ -56,41 +55,41 @@
 </template>
 
 <script>
-  // import store from './../myState.js'
-  import { mapState } from 'vuex'
+// import store from './../myState.js'
+import { mapState } from 'vuex'
 
-  export default {
-    data () {
-      return {
-        status: ''
-      }
-    },
-    props: {
-      verbosity: {
-        type: String
-      }
-    },
-    // computed: {
-    //   count () { return store.count },
-    //   errorCount () { return store.errorCount },
-    //   errors () { return store.errors }
-    // },
-    computed: mapState([
-      'count',
-      'errorCount',
-      'errors',
-      'warningCount',
-      'warnings',
-      'messageCount',
-      'messages'
-    ]),
-    methods: {
-      clear (scope) {
-        console.log('clear ' + scope + ' messages')
-        this.$store.commit('clearErrors', scope)
-      }
+export default {
+  data () {
+    return {
+      status: ''
+    }
+  },
+  props: {
+    verbosity: {
+      type: String
+    }
+  },
+  // computed: {
+  //   count () { return store.count },
+  //   errorCount () { return store.errorCount },
+  //   errors () { return store.errors }
+  // },
+  computed: mapState([
+    'count',
+    'errorCount',
+    'errors',
+    'warningCount',
+    'warnings',
+    'messageCount',
+    'messages'
+  ]),
+  methods: {
+    clear (scope) {
+      console.log('clear ' + scope + ' messages')
+      this.$store.commit('clearErrors', scope)
     }
   }
+}
 </script>
 
 <style>

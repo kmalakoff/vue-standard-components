@@ -18,7 +18,7 @@
             span &nbsp; &nbsp;
             span &nbsp; &nbsp;
         span.input-group-addon(style='background-color: transparent; border: 0px;')
-          a(href='/' onclick='return false' @click.prevent="toggleBlock") 
+          a(href='/' onclick='return false' @click.prevent="toggleBlock")
               icon(:name='icon' color='black' scale='2')
           span &nbsp; &nbsp;
           div(@mouseleave="hideMenu")
@@ -29,7 +29,7 @@
                     b About Us
               tr(v-if='user')
                 td
-                  a(href='#' onclick='return false' @click.prevent='logout') 
+                  a(href='#' onclick='return false' @click.prevent='logout')
                     b Logout -->
 <template lang='pug'>
   div
@@ -39,7 +39,7 @@
           div.form-group.has-success.has-feedback
             span.input-group
               span.input-group-addon(style='background-color: transparent; border: 0px;')
-                a(href='/' onclick='return false' @click.prevent="toggleBlock('search')") 
+                a(href='/' onclick='return false' @click.prevent="toggleBlock('search')")
                     icon(:name='searchIcon' color='black' scale='2')
                 span &nbsp; &nbsp;
           div(@mouseleave="hideBlock('search')")
@@ -53,7 +53,7 @@
                         button.btn.btn-lg.btn-default.full-page(@click.prevent='searchMethod')
                           icon(name='search' color='black' background='blue')
         td
-          span &nbsp; &nbsp; 
+          span &nbsp; &nbsp;
           span &nbsp; &nbsp;
         td
           span(v-if='user')
@@ -67,7 +67,7 @@
           div.form-group
             span.input-group
               span.input-group-addon(style='background-color: transparent; border: 0px;')
-                a(href='/' onclick='return false' @click.prevent="toggleBlock('menu')") 
+                a(href='/' onclick='return false' @click.prevent="toggleBlock('menu')")
                     icon(:name='menuIcon' color='black' scale='2')
                 span &nbsp; &nbsp;
                 div(@mouseleave="hideBlock('menu')")
@@ -78,135 +78,134 @@
                           b About Us
                     tr(v-if='user')
                       td
-                        a(href='#' onclick='return false' @click.prevent='logout') 
+                        a(href='#' onclick='return false' @click.prevent='logout')
                           b Logout
-
 
 </template>
 
 <script>
-  // require icon supplied by calling component...
-  import Modal from './Modal'
-  import 'vue-awesome/icons/bars'
-  import 'vue-awesome/icons/search'
-  import auth from '../../auth'
-  // import config from '@/config.js'
+// require icon supplied by calling component...
+import Modal from './Modal'
+import 'vue-awesome/icons/bars'
+import 'vue-awesome/icons/search'
+import auth from '../../auth'
+// import config from '@/config.js'
 
-  export default {
-    data () {
-      return {
-        holdBlock: {menu: false, search: false},
-        visibleBlock: {menu: false, search: false},
+export default {
+  data () {
+    return {
+      holdBlock: {menu: false, search: false},
+      visibleBlock: {menu: false, search: false},
 
-        loginOptions: { openButton: 'LogIN' }
+      loginOptions: { openButton: 'LogIN' }
+    }
+  },
+  components: {
+    Modal
+  },
+  props: {
+    menuIcon: {
+      type: String,
+      default: 'bars'
+    },
+    searchIcon: {
+      type: String,
+      default: 'search'
+    },
+    list: {
+      type: Array
+    },
+    links: {
+      type: Array
+    },
+    payload: {
+      type: Object
+    }
+  },
+  mounted: function () {
+    // console.log('header mounted')
+    // var payload = this.$store.getters.payload
+    // console.log('header payload: ' + JSON.stringify(payload))
+    // this.payload = payload
+  },
+  // computed: {
+  //   payload: function () {
+  //     return this.payload
+  //   }
+  // },
+  created: function () {
+    console.log('load payload first...')
+
+    // var payload = config.demo_payload
+    // console.log('config payload: ' + JSON.stringify(payload))
+
+    // this.$store.commit('LOAD_DEMO')
+    // var initPayload = this.$store.getters.payload
+
+    // console.log('init: ' + JSON.stringify(initPayload))
+    // console.log(initPayload)
+
+    // var localPayload = localStorage.getItem('payload')
+
+    // this.payload = localPayload
+    // console.log('local: ' + JSON.stringify(localPayload))
+  },
+  computed: {
+    user: function () {
+      var payload = this.payload
+      console.log('loginpop user' + JSON.stringify(payload))
+      if (payload && payload.user) {
+        return payload.user
+      } else {
+        return null
       }
     },
-    components: {
-      Modal
+    ac: function () {
+      return auth.checkAuth()
+    }
+  },
+  methods: {
+    logout () {
+      console.log('log out')
+      // auth.logout()
+      this.$store.dispatch('AUTH_LOGOUT')
     },
-    props: {
-      menuIcon: {
-        type: String,
-        default: 'bars'
-      },
-      searchIcon: {
-        type: String,
-        default: 'search'
-      },
-      list: {
-        type: Array
-      },
-      links: {
-        type: Array
-      },
-      payload: {
-        type: Object
+    toggleBlock (block) {
+      this.visibleBlock[block] = !this.visibleBlock[block]
+      console.log('toggled hold: ' + this.holdBlock[block] + ': ' + this.visibleBlock[block])
+    },
+    hideBlock (block) {
+      // Hide menu (delay ignores rapid toggling by mouse out / in movements)
+      var _this = this
+      if (!block) {
+        console.log('no block defined')
+      } else if (this.holdBlock[block]) {
+        this.onexpire = false
+      } else {
+        setTimeout(
+          () => {
+            _this.holdBlock[block] = false
+            this.visibleBlock[block] = this.onexpire
+          }, 1000)
+        this.holdBlock[block] = true
       }
     },
-    mounted: function () {
-      // console.log('header mounted')
-      // var payload = this.$store.getters.payload
-      // console.log('header payload: ' + JSON.stringify(payload))
-      // this.payload = payload
-    },
-    // computed: {
-    //   payload: function () {
-    //     return this.payload
-    //   }
-    // },
-    created: function () {
-      console.log('load payload first...')
-
-      // var payload = config.demo_payload
-      // console.log('config payload: ' + JSON.stringify(payload))
-
-      // this.$store.commit('LOAD_DEMO')
-      // var initPayload = this.$store.getters.payload
-
-      // console.log('init: ' + JSON.stringify(initPayload))
-      // console.log(initPayload)
-
-      // var localPayload = localStorage.getItem('payload')
-
-      // this.payload = localPayload
-      // console.log('local: ' + JSON.stringify(localPayload))
-    },
-    computed: {
-      user: function () {
-        var payload = this.payload
-        console.log('loginpop user' + JSON.stringify(payload))
-        if (payload && payload.user) {
-          return payload.user
-        } else {
-          return null
-        }
-      },
-      ac: function () {
-        return auth.checkAuth()
+    searchMethod () {
+      var id = document.getElementById('searchString')
+      var search = ''
+      if (id && id.value) {
+        console.log('search for: ' + id.value)
+        search = id.value
+      } else {
+        console.log('no search string...')
       }
+      console.log('perform search for ' + search)
     },
-    methods: {
-      logout () {
-        console.log('log out')
-        // auth.logout()
-        this.$store.dispatch('AUTH_LOGOUT')
-      },
-      toggleBlock (block) {
-        this.visibleBlock[block] = !this.visibleBlock[block]
-        console.log('toggled hold: ' + this.holdBlock[block] + ': ' + this.visibleBlock[block])
-      },
-      hideBlock (block) {
-        // Hide menu (delay ignores rapid toggling by mouse out / in movements)
-        var _this = this
-        if (!block) {
-          console.log('no block defined')
-        } else if (this.holdBlock[block]) {
-          this.onexpire = false
-        } else {
-          setTimeout(
-            () => {
-              _this.holdBlock[block] = false
-              this.visibleBlock[block] = this.onexpire
-            }, 1000)
-          this.holdBlock[block] = true
-        }
-      },
-      searchMethod () {
-        var id = document.getElementById('searchString')
-        var search = ''
-        if (id && id.value) {
-          console.log('search for: ' + id.value)
-          search = id.value
-        } else {
-          console.log('no search string...')
-        }
-        console.log('perform search for ' + search)
-      },
-      redirect (page) {
-        this.$route.router.go(page)
-      }
+    redirect (page) {
+      this.$route.router.go(page)
     }
   }
+}
 </script>
 
 <style scoped lang="sass?outputStyle=expanded">
