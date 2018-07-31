@@ -65,15 +65,15 @@ export default {
     items: function () {
       var ids = Object.keys(this.cart)
       var count = 0
-      var total = 0
+      // var total = 0
       for (var i = 0; i < ids.length; i++) {
         var qty = this.cart[ids[i]].qty || 1
-        var subtotal = this.cart[ids[i]].amount * qty
-        total += subtotal
+        // var subtotal = this.cart[ids[i]].amount * qty
+        // total += subtotal
         count += qty
       }
 
-      this.total = total
+      // this.total = total .. cannot introduce side-effects
       return count
     }
   },

@@ -16,6 +16,7 @@ import Icon from 'vue-awesome/components/Icon'
 import store from './components/myState.js'
 
 import auth from './auth'
+import AsyncComputed from 'vue-async-computed'
 
 // Check the users auth status when the app starts
 auth.checkAuth()
@@ -26,6 +27,7 @@ Vue.use(BootstrapVue)
 
 Vue.component('icon', Icon)
 Vue.use(BootstrapVue)
+Vue.use(AsyncComputed)
 
 /* eslint-disable no-new */
 new Vue({
