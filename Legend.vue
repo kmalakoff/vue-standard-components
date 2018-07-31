@@ -10,43 +10,43 @@
 
   </template>
 
-  <script>
-  export default {
-    components: {
-    },
-    data () {
-      return {
+<script>
+export default {
+  components: {
+  },
+  data () {
+    return {
+    }
+  },
+  computed: {
+    altkeys: function () {
+      if (this.demoStep) {
+        return 'demoStep' + this.demoStep
+      } else {
+        return this.name
       }
     },
-    computed: {
-      altkeys: function () {
-        if (this.demoStep) {
-          return 'demoStep' + this.demoStep
-        } else {
-          return this.name
-        }
-      },
-      dynamicClass: function () {
-        var key = 'covered'
-        return 'result-row result-cell ' + key
-      }
+    dynamicClass: function () {
+      var key = 'covered'
+      return 'result-row result-cell ' + key
+    }
+  },
+  props: {
+    keys: {
+      type: Array
     },
-    props: {
-      keys: {
-        type: Array
-      },
-      baseClass: {
-        type: String
-      },
-      title: {
-        type: String
-      },
-      show: {
-        type: Boolean
-      }
+    baseClass: {
+      type: String
+    },
+    title: {
+      type: String
+    },
+    show: {
+      type: Boolean
     }
   }
-  </script>
+}
+</script>
 
 <style>
 

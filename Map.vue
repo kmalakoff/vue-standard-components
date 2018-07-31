@@ -26,7 +26,7 @@
           )
   </template>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=initialize"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=initialize"></script>
 
   <script>
   import config from '@/config.js'

@@ -9,31 +9,31 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex'
 
-  export default {
+export default {
 
-    data () {
-      return {
-      }
-    },
-
-    props: {
-      scope: {
-        type: String
-      }
-    },
-
-    computed: mapState([
-      'picked',
-      'searchStatus'
-    ]),
-
-    methods: {
-      deselect (id) {
-        this.$store.commit('unselectOne', {scope: this.scope, id: id})
-      }
+  data () {
+    return {
     }
+  },
 
+  props: {
+    scope: {
+      type: String
+    }
+  },
+
+  computed: mapState([
+    'picked',
+    'searchStatus'
+  ]),
+
+  methods: {
+    deselect (id) {
+      this.$store.commit('unselectOne', {scope: this.scope, id: id})
+    }
   }
+
+}
 </script>

@@ -15,15 +15,15 @@ import dynamicForm from 'vue-dynamic-forms'
 import { createDemo } from './FormData.Immunize.js'
 
 export default {
-    name: 'demo',
-    components: {
-        dynamicForm
-    },
-    data () {
-        return {
-            formdata: createDemo()
-        }
+  name: 'demo',
+  components: {
+    dynamicForm
+  },
+  data () {
+    return {
+      formdata: createDemo()
     }
+  }
 }
 </script>
 

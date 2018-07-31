@@ -69,51 +69,51 @@
 </template>
 
 <script>
-  export default {
+export default {
 
-    data () {
-      return {
-        active_block: ''
-      }
-    },
+  data () {
+    return {
+      active_block: ''
+    }
+  },
 
-    props: {
-      links: {
-        type: Array
-      },
-      type: {
-        type: String,
-        default: 'url'
-      },
-      prefix: {
-        type: String
-      },
-      default: {
-        type: String
-      },
-      onClick: {
-        type: Function
-      },
-      options: {
-        type: Object,
-        default () { return {} }
-      },
-      direction: {
-        type: String,
-        default: 'vertical'
-      }
+  props: {
+    links: {
+      type: Array
     },
-    computed: {
-      active: function () { return this.active_block || this.options.default }
+    type: {
+      type: String,
+      default: 'url'
     },
-    methods: {
-      activate: function (layer) {
-        this.active_block = layer
-        console.log('activated ' + this.active_block)
-        this.onClick(layer)
-      }
+    prefix: {
+      type: String
+    },
+    default: {
+      type: String
+    },
+    onClick: {
+      type: Function
+    },
+    options: {
+      type: Object,
+      default () { return {} }
+    },
+    direction: {
+      type: String,
+      default: 'vertical'
+    }
+  },
+  computed: {
+    active: function () { return this.active_block || this.options.default }
+  },
+  methods: {
+    activate: function (layer) {
+      this.active_block = layer
+      console.log('activated ' + this.active_block)
+      this.onClick(layer)
     }
   }
+}
 </script>
 
 <style scoped lang="sass?outputStyle=expanded">

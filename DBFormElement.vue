@@ -33,100 +33,100 @@
 </template>
 
 <script>
-  // import axios from 'axios'
-  // import bFormInput from 'bootstrap-vue/es/components/b-form-input/b-form-input'
-  // import bFormInputDirective from 'bootstrap-vue/es/directives/b-form-input/b-form-input'
-  import 'vue-awesome/icons/question-circle'
+// import axios from 'axios'
+// import bFormInput from 'bootstrap-vue/es/components/b-form-input/b-form-input'
+// import bFormInputDirective from 'bootstrap-vue/es/directives/b-form-input/b-form-input'
+import 'vue-awesome/icons/question-circle'
 
-  export default {
-    components: {
-      // 'b-form-input': bFormInput
+export default {
+  components: {
+    // 'b-form-input': bFormInput
+  },
+  // directives: {
+  //   'b-form-input' : 'bFormInputDirective'
+  // },
+  data () {
+    return {
+      vm: this.field.default,
+      om: this.vModel
+    }
+  },
+  props: {
+    field: { type: Object },
+    placeholder: { type: String },
+    vModel: { type: String },
+    form: { type: Object },
+    access: { type: String },
+    record: { type: Object }
+  },
+  created: function () {
+    // var keys = _.pluck(this.field.default)
+    var defaultTo = this.field.default || this.form[this.om]
+
+    this.$set(this.form, this.om, defaultTo)
+    console.log(this.field.name + ' found default: ' + defaultTo)
+  },
+  computed: {
+    refModel: function () { return this.form[this.vModel] },
+    Ftype: function () { return this.field.type || 'varchar' },
+    name: function () { return this.field.name },
+    mval: function (model) { return this[model] },
+    defaultTo: function () {
+      if (this.record) {
+        return this.record[this.field.name]
+      } else {
+        return this.field.default || this.field.value || this.form[this.om]
+      }
     },
-    // directives: {
-    //   'b-form-input' : 'bFormInputDirective'
+    addClass: function () {
+      if (this.addClass) {
+        return this.addClass
+      } else {
+        return 'input-lg'
+      }
+    }
+  },
+  methods: {
+    saveMe (val) {
+      this.$set(this.form, this.om, this.vm)
+    },
+    myChange (evt) {
+      this.$set(this.form, this.om, evt.target.value)
+    },
+    validate (evt) {
+      console.log('validate ' + JSON.stringify(evt.target))
+    },
+    // type: function (field) {
+    //   if (!field) {
+    //     return null
+    //   } else { return Ftype }
     // },
-    data () {
-      return {
-        vm: this.field.default,
-        om: this.vModel
+    form_element: function (field) {
+      if (!field) {
+        return null
+      } else if (this.Ftype.match(/^int/i)) {
+        return null
+      } else {
+        return true
       }
     },
-    props: {
-      field: { type: Object },
-      placeholder: { type: String },
-      vModel: { type: String },
-      form: { type: Object },
-      access: { type: String },
-      record: { type: Object }
-    },
-    created: function () {
-      // var keys = _.pluck(this.field.default)
-      var defaultTo = this.field.default || this.form[this.om]
 
-      this.$set(this.form, this.om, defaultTo)
-      console.log(this.field.name + ' found default: ' + defaultTo)
+    list: function (field) {
+      var regex = /^enum\(['"]?(.*?)['"]?\)/
+      var list = this.Ftype.match(regex)
+      if (list) {
+        var elements = list[1].split(/['"]\s*,\s*['"]/)
+        return elements
+      } else { return null }
     },
-    computed: {
-      refModel: function () { return this.form[this.vModel] },
-      Ftype: function () { return this.field.type || 'varchar' },
-      name: function () { return this.field.name },
-      mval: function (model) { return this[model] },
-      defaultTo: function () {
-        if (this.record) {
-          return this.record[this.field.name]
-        } else {
-          return this.field.default || this.field.value || this.form[this.om]
-        }
-      },
-      addClass: function () {
-        if (this.addClass) {
-          return this.addClass
-        } else {
-          return 'input-lg'
-        }
-      }
-    },
-    methods: {
-      saveMe (val) {
-        this.$set(this.form, this.om, this.vm)
-      },
-      myChange (evt) {
-        this.$set(this.form, this.om, evt.target.value)
-      },
-      validate (evt) {
-        console.log('validate ' + JSON.stringify(evt.target))
-      },
-      // type: function (field) {
-      //   if (!field) {
-      //     return null
-      //   } else { return Ftype }
-      // },
-      form_element: function (field) {
-        if (!field) {
-          return null
-        } else if (this.Ftype.match(/^int/i)) {
-          return null
-        } else {
-          return true
-        }
-      },
-
-      list: function (field) {
-        var regex = /^enum\(['"]?(.*?)['"]?\)/
-        var list = this.Ftype.match(regex)
-        if (list) {
-          var elements = list[1].split(/['"]\s*,\s*['"]/)
-          return elements
-        } else { return null }
-      },
-      isNumber: function (field) {
-        var name = this.model
-        console.log('name: ' + name)
-        return 'ok'
-        // return this[name].length > 2
-      }
-
+    isNumber: function (field) {
+      var name = this.model
+      console.log('name: ' + name)
+      return 'ok'
+      // return this[name].length > 2
     }
 
   }
+
+}
 </script>

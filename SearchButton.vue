@@ -22,71 +22,71 @@
 </template>
 
 <script>
-  // require icon supplied by calling component...
-  import Modal from './Modal'
-  import 'vue-awesome/icons/search'
+// require icon supplied by calling component...
+import Modal from './Modal'
+import 'vue-awesome/icons/search'
 
-  export default {
-    name: 'SearchButton',
-    components: {
-      Modal
-    },
-    data () {
-      return {
-        holdSearch: false,
-        visibleSearch: false,
+export default {
+  name: 'SearchButton',
+  components: {
+    Modal
+  },
+  data () {
+    return {
+      holdSearch: false,
+      visibleSearch: false,
 
-        searchIcon: {
-          type: String,
-          default: 'search'
-        }
-      }
-    },
-    methods: {
-      toggleSearch (block) {
-        this.visibleSearch = !this.visibleSearch
-        console.log('toggled hold: ' + this.holdSearch + ': ' + this.visibleSearch)
-      },
-      hideSearch (block) {
-        // Hide menu (delay ignores rapid toggling by mouse out / in movements)
-        var _this = this
-        if (!block) {
-          console.log('no block defined')
-        } else if (this.holdSearch) {
-          this.onexpire = false
-        } else {
-          setTimeout(
-            () => {
-              _this.holdSearch = false
-              this.visibleSearch = this.onexpire
-            }, 1000)
-          this.holdSearch = true
-        }
-      },
-      searchMethod () {
-        var id = document.getElementById('searchString')
-        var search = ''
-        if (id && id.value) {
-          console.log('search for: ' + id.value)
-          search = id.value
-        } else {
-          console.log('no search string...')
-        }
-        console.log('perform search for ' + search)
-
-        var results = [
-          { name: 'searched for', value: search },
-          { name: 'found_eg', value: 'value_eg' }
-        ]
-
-        this.$store.dispatch('clearModal')
-        // populate modal...
-        this.$store.dispatch('setModalData', results)
-        this.$store.dispatch('toggleModal', 'searchresults')
-        console.log('results: ' + JSON.stringify(results))
+      searchIcon: {
+        type: String,
+        default: 'search'
       }
     }
+  },
+  methods: {
+    toggleSearch (block) {
+      this.visibleSearch = !this.visibleSearch
+      console.log('toggled hold: ' + this.holdSearch + ': ' + this.visibleSearch)
+    },
+    hideSearch (block) {
+      // Hide menu (delay ignores rapid toggling by mouse out / in movements)
+      var _this = this
+      if (!block) {
+        console.log('no block defined')
+      } else if (this.holdSearch) {
+        this.onexpire = false
+      } else {
+        setTimeout(
+          () => {
+            _this.holdSearch = false
+            this.visibleSearch = this.onexpire
+          }, 1000)
+        this.holdSearch = true
+      }
+    },
+    searchMethod () {
+      var id = document.getElementById('searchString')
+      var search = ''
+      if (id && id.value) {
+        console.log('search for: ' + id.value)
+        search = id.value
+      } else {
+        console.log('no search string...')
+      }
+      console.log('perform search for ' + search)
+
+      var results = [
+        { name: 'searched for', value: search },
+        { name: 'found_eg', value: 'value_eg' }
+      ]
+
+      this.$store.dispatch('clearModal')
+      // populate modal...
+      this.$store.dispatch('setModalData', results)
+      this.$store.dispatch('toggleModal', 'searchresults')
+      console.log('results: ' + JSON.stringify(results))
+    }
   }
+}
 </script>
 
 <style scoped lang="sass?outputStyle=expanded">

@@ -78,238 +78,238 @@ Advanced Options:
 </template>
 
 <script>
-  import ActionButton from './ActionButton.vue'
+import ActionButton from './ActionButton.vue'
 
-  export default {
-    name: 'data-grid',
-    components: {
-      ActionButton
+export default {
+  name: 'data-grid',
+  components: {
+    ActionButton
+  },
+  data () {
+    return {
+      showModal: false
+    }
+  },
+  props: {
+    name: {
+      type: String,
+      default: 'data-grid'
     },
-    data () {
-      return {
-        showModal: false
+    header: {
+      type: String
+    },
+    headerClass: {
+      type: String,
+      default: 'GridHeader'
+    },
+    data: {
+      type: Array
+    },
+    fields: {
+      type: Array
+    },
+    options: {
+      type: Object,
+      default () { return {} }
+    },
+    search_options: {
+      type: Object
+    },
+
+    links: {
+      type: Object
+    },
+    noDataMsg: {
+      type: String,
+      default: ''
+    },
+    picked: {
+      type: Array,
+      default: () => []
+    },
+    onPick: {
+      type: Function
+    },
+    multiSelect: {
+      type: Boolean,
+      default: false
+    },
+    deSelectable: {
+      type: Boolean,
+      default: false
+    },
+    addColumn: {
+      type: Object
+    },
+    modal_options: {
+      type: Object
+    },
+    modalButton: {
+      type: String
+    },
+    modalTable: {
+      type: String
+    },
+    modalURL: {
+      type: String
+    },
+    baseClass: {
+      type: String
+    },
+    fieldClass: {
+      type: String
+    }
+  },
+  created: function () {
+    console.log('created DataGrid...')
+    // this.metaData = this.data // Slightly dangerous !? This is a reference equation so the original data is changed ? (ie not a clone)
+    if (this.stored) { console.log('stored DataGrid') }
+  },
+  computed: {
+    dynamicData: function () {
+      if (this.data) {
+        console.log('got defined data: ' + JSON.stringify(this.data))
+        return this.data
+      } else if (this.stored) {
+        var storedData = this.$store.getters.getHash(this.stored)
+        console.log('dynamically loaded: ' + JSON.stringify(storedData))
+        return storedData || []
+      } else {
+        console.log('no data supplied for DataGrid')
+        return []
       }
     },
-    props: {
-      name: {
-        type: String,
-        default: 'data-grid'
-      },
-      header: {
-        type: String
-      },
-      headerClass: {
-        type: String,
-        default: 'GridHeader'
-      },
-      data: {
-        type: Array
-      },
-      fields: {
-        type: Array
-      },
-      options: {
-        type: Object,
-        default () { return {} }
-      },
-      search_options: {
-        type: Object
-      },
-
-      links: {
-        type: Object
-      },
-      noDataMsg: {
-        type: String,
-        default: ''
-      },
-      picked: {
-        type: Array,
-        default: () => []
-      },
-      onPick: {
-        type: Function
-      },
-      multiSelect: {
-        type: Boolean,
-        default: false
-      },
-      deSelectable: {
-        type: Boolean,
-        default: false
-      },
-      addColumn: {
-        type: Object
-      },
-      modal_options: {
-        type: Object
-      },
-      modalButton: {
-        type: String
-      },
-      modalTable: {
-        type: String
-      },
-      modalURL: {
-        type: String
-      },
-      baseClass: {
-        type: String
-      },
-      fieldClass: {
-        type: String
+    data_fields: function () {
+      if (this.search_options && this.search_options.search_fields) {
+        return this.search_options.search_fields
+      } else if (this.options && this.options.fields) {
+        return this.options.fields
+      } else {
+        var keys = Object.keys(this.data[0])
+        console.log('defaulting to keys from first record since no fields specified')
+        return keys
       }
     },
-    created: function () {
-      console.log('created DataGrid...')
-      // this.metaData = this.data // Slightly dangerous !? This is a reference equation so the original data is changed ? (ie not a clone)
-      if (this.stored) { console.log('stored DataGrid') }
+    target: function () {
+      if (this.options && this.options.target) {
+        return this.options.target
+      } else { return null }
     },
-    computed: {
-      dynamicData: function () {
-        if (this.data) {
-          console.log('got defined data: ' + JSON.stringify(this.data))
-          return this.data
-        } else if (this.stored) {
-          var storedData = this.$store.getters.getHash(this.stored)
-          console.log('dynamically loaded: ' + JSON.stringify(storedData))
-          return storedData || []
-        } else {
-          console.log('no data supplied for DataGrid')
-          return []
-        }
-      },
-      data_fields: function () {
-        if (this.search_options && this.search_options.search_fields) {
-          return this.search_options.search_fields
-        } else if (this.options && this.options.fields) {
-          return this.options.fields
-        } else {
-          var keys = Object.keys(this.data[0])
-          console.log('defaulting to keys from first record since no fields specified')
-          return keys
-        }
-      },
-      target: function () {
-        if (this.options && this.options.target) {
-          return this.options.target
-        } else { return null }
-      },
-      stored: function () {
-        if (this.options && this.options.stored) {
-          return this.options.stored
-        } else { return null }
-      },
-      data_header: function () {
-        if (this.header) {
-          return this.header
-        } else if (this.options && this.options.title) {
-          return this.options.title
-        } else { return '' }
-      },
-      addLinks: function () {
-        if (this.options && this.options.addLinks && this.options.addLinks.length) {
-          return this.options.addLinks
-        } else {
-          return []
-        }
-      },
-      columns: function () {
-        var count = 1
-
-        if (this.data && this.data.length) {
-          count += Object.keys(this.data[0]).length
-        }
-
-        if (this.addLinks) {
-          count += Object.keys(this.addLinks).length
-        }
-
-        return count
+    stored: function () {
+      if (this.options && this.options.stored) {
+        return this.options.stored
+      } else { return null }
+    },
+    data_header: function () {
+      if (this.header) {
+        return this.header
+      } else if (this.options && this.options.title) {
+        return this.options.title
+      } else { return '' }
+    },
+    addLinks: function () {
+      if (this.options && this.options.addLinks && this.options.addLinks.length) {
+        return this.options.addLinks
+      } else {
+        return []
       }
     },
+    columns: function () {
+      var count = 1
 
-    methods: {
-      showM () {
-        this.showModal = true
-      },
-      hideM () {
-        this.showModal = false
-      },
-      remove (index) {
-        console.log('remove item #' + index)
-        console.log(JSON.stringify(this.data))
-        // this.data.splice(index, 1)
-        // console.log(JSON.stringify(this.data))
+      if (this.data && this.data.length) {
+        count += Object.keys(this.data[0]).length
+      }
 
-        // this.$store.commit('removeHashItem', {key: this.stored, index: index})
+      if (this.addLinks) {
+        count += Object.keys(this.addLinks).length
+      }
 
-        if (this.onDelete) {
-          this.onDelete(index)
-        } else if (this.options.onDelete) {
-          this.options.onDelete(index)
-        } else {
-          console.log('requires onDelete function specification')
+      return count
+    }
+  },
+
+  methods: {
+    showM () {
+      this.showModal = true
+    },
+    hideM () {
+      this.showModal = false
+    },
+    remove (index) {
+      console.log('remove item #' + index)
+      console.log(JSON.stringify(this.data))
+      // this.data.splice(index, 1)
+      // console.log(JSON.stringify(this.data))
+
+      // this.$store.commit('removeHashItem', {key: this.stored, index: index})
+
+      if (this.onDelete) {
+        this.onDelete(index)
+      } else if (this.options.onDelete) {
+        this.options.onDelete(index)
+      } else {
+        console.log('requires onDelete function specification')
+      }
+
+      // this.$store.getters.getHash('updates')
+    },
+    pickOne (index) {
+      console.log('pick ' + index)
+      console.log('MS ? ' + this.multiSelect)
+
+      console.log('picked: ' + JSON.stringify(this.picked))
+      console.log('data: ' + JSON.stringify(this.data))
+      var item = this.data[index]
+      console.log('item: ' + JSON.stringify(item))
+      console.log('options: ' + JSON.stringify(this.options))
+
+      // var target = this.options.target
+
+      var record = {}
+      var keys = Object.keys(item)
+      for (var i = 0; i < keys.length; i++) {
+        // this.$set(this.target, keys[i], item[keys[i]])
+        record[keys[i]] = item[keys[i]]
+      }
+
+      if (this.multiSelect) {
+        console.log(this.target + ' data appended with: ' + JSON.stringify(this.picked))
+
+        if (this.stored) {
+          console.log('DYNO - Add record: ' + JSON.stringify(record))
+          this.$store.commit('squeezeHash', {key: this.stored, record: record})
         }
+        console.log('target ? ' + this.target)
+        console.log(this.stored + ' TARGET ->  ' + JSON.stringify(this.$store.getters.getHash(this.stored)))
+      } else {
+        console.log('reset pick')
+        this.$set(this.picked, 0, item)
+        console.log('TARGET2 = ' + JSON.stringify(this.picked))
+      }
 
-        // this.$store.getters.getHash('updates')
-      },
-      pickOne (index) {
-        console.log('pick ' + index)
-        console.log('MS ? ' + this.multiSelect)
+      // if (this.onPick) {
+      //   console.log('onPick defined')
+      //   this.onPick(this.picked)
+      // } else {
+      //   console.log('no onpick for DG')
+      // }
+      this.$store.getters.getHash('updates')
 
-        console.log('picked: ' + JSON.stringify(this.picked))
-        console.log('data: ' + JSON.stringify(this.data))
-        var item = this.data[index]
-        console.log('item: ' + JSON.stringify(item))
-        console.log('options: ' + JSON.stringify(this.options))
-
-        // var target = this.options.target
-
-        var record = {}
-        var keys = Object.keys(item)
-        for (var i = 0; i < keys.length; i++) {
-          // this.$set(this.target, keys[i], item[keys[i]])
-          record[keys[i]] = item[keys[i]]
-        }
-
-        if (this.multiSelect) {
-          console.log(this.target + ' data appended with: ' + JSON.stringify(this.picked))
-
-          if (this.stored) {
-            console.log('DYNO - Add record: ' + JSON.stringify(record))
-            this.$store.commit('squeezeHash', {key: this.stored, record: record})
-          }
-          console.log('target ? ' + this.target)
-          console.log(this.stored + ' TARGET ->  ' + JSON.stringify(this.$store.getters.getHash(this.stored)))
-        } else {
-          console.log('reset pick')
-          this.$set(this.picked, 0, item)
-          console.log('TARGET2 = ' + JSON.stringify(this.picked))
-        }
-
-        // if (this.onPick) {
-        //   console.log('onPick defined')
-        //   this.onPick(this.picked)
-        // } else {
-        //   console.log('no onpick for DG')
-        // }
-        this.$store.getters.getHash('updates')
-
-        return false
-      },
-      dynamicClass: function (record) {
-        // enables control of class for highlighting or hiding records based on specific field values ...
-        if (this.options && this.options.fieldClass && record[this.options.fieldClass]) {
-          return this.options.baseClass + ' ' + record[this.options.fieldClass]
-        } else if (this.options && this.options.baseClass) {
-          return this.options.baseClass
-        } else {
-          return ''
-        }
+      return false
+    },
+    dynamicClass: function (record) {
+      // enables control of class for highlighting or hiding records based on specific field values ...
+      if (this.options && this.options.fieldClass && record[this.options.fieldClass]) {
+        return this.options.baseClass + ' ' + record[this.options.fieldClass]
+      } else if (this.options && this.options.baseClass) {
+        return this.options.baseClass
+      } else {
+        return ''
       }
     }
   }
+}
 </script>
 
 <style scoped>

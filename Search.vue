@@ -308,51 +308,51 @@ export default {
       axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
       axios({url: fullUrl, method: method, data: data})
-      .then(function (result, err) {
-        console.log('axios returned value(s): ' + JSON.stringify(result))
-        if (err) {
-          console.log('axios call error')
-        }
-        console.log('got results for ' + table)
+        .then(function (result, err) {
+          console.log('axios returned value(s): ' + JSON.stringify(result))
+          if (err) {
+            console.log('axios call error')
+          }
+          console.log('got results for ' + table)
 
-        var newdata = {}
-        if (table && result.data[table]) {
-          newdata = result.data[table]
-        } else {
-          newdata = result.data
-        }
-
-        if (!newdata.length) {
-          var msg = 'no ' + _this.scope + ' record(s) found matching: \'' + _this.searchString + '\''
-          _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: msg})
-        }
-
-        if (_this.multiSelect) {
-          _this.clearList()
-        }
-
-        console.log(JSON.stringify(newdata))
-
-        for (var i = 0; i < newdata.length; i++) {
-          if (!_this.list[_this.scope]) {
-            _this.list[_this.scope] = []
+          var newdata = {}
+          if (table && result.data[table]) {
+            newdata = result.data[table]
+          } else {
+            newdata = result.data
           }
 
-          _this.list[_this.scope].push(newdata[i])
-        }
+          if (!newdata.length) {
+            var msg = 'no ' + _this.scope + ' record(s) found matching: \'' + _this.searchString + '\''
+            _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: msg})
+          }
 
-        _this.searchStatus = 'found'
+          if (_this.multiSelect) {
+            _this.clearList()
+          }
 
-        console.log('set results: ' + JSON.stringify(newdata))
-      })
-      .catch(function (err) {
+          console.log(JSON.stringify(newdata))
+
+          for (var i = 0; i < newdata.length; i++) {
+            if (!_this.list[_this.scope]) {
+              _this.list[_this.scope] = []
+            }
+
+            _this.list[_this.scope].push(newdata[i])
+          }
+
+          _this.searchStatus = 'found'
+
+          console.log('set results: ' + JSON.stringify(newdata))
+        })
+        .catch(function (err) {
         // _this.$store.commit('increment')
         // _this.$store.commit('setSearchStatus', {scope: _this.scope, status: 'aborted'})
-        console.log('set error...' + _this.$store.state.count)
-        _this.$store.commit('increment')
-        _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: err})
-        console.log('axios error: ' + err)
-      })
+          console.log('set error...' + _this.$store.state.count)
+          _this.$store.commit('increment')
+          _this.$store.commit('setError', {context: 'searching for ' + _this.scope, err: err})
+          console.log('axios error: ' + err)
+        })
     },
 
     clearList (clearsearch) {

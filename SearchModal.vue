@@ -76,14 +76,14 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import cors from 'cors'
+import axios from 'axios'
+import cors from 'cors'
 
-  import config from '@/config.js'
-  import DataGrid from './DataGrid'
-  import Messaging from './Messaging.vue'
+import config from '@/config.js'
+import DataGrid from './DataGrid'
+import Messaging from './Messaging.vue'
 
-  /*
+/*
 
   Usage:
 
@@ -109,416 +109,416 @@
 
   */
 
-  export default {
-    components: {
-      DataGrid,
-      Messaging
-    },
-    data () {
-      return {
-        timeoutID: 0,
-        showModal: false,
-        status: 'pending',
-        formData: {},
-        generated: {
-          body: ''
-        },
-        dbURL: config.dbURL,
-        isVisible: false,
+export default {
+  components: {
+    DataGrid,
+    Messaging
+  },
+  data () {
+    return {
+      timeoutID: 0,
+      showModal: false,
+      status: 'pending',
+      formData: {},
+      generated: {
+        body: ''
+      },
+      dbURL: config.dbURL,
+      isVisible: false,
 
-        searchString: '',
-        searchStrings: [],
-        selectOne: '',
-        foundRecords: 0,
-        corsOptions: {
-          origin: true,
-          methods: ['GET', 'POST'],
-          credentials: true,
-          maxAge: 3600
-        },
-        list: [],
-        searchStatus: this.status,
-        errs: []
+      searchString: '',
+      searchStrings: [],
+      selectOne: '',
+      foundRecords: 0,
+      corsOptions: {
+        origin: true,
+        methods: ['GET', 'POST'],
+        credentials: true,
+        maxAge: 3600
+      },
+      list: [],
+      searchStatus: this.status,
+      errs: []
+    }
+  },
+  props: {
+    id: {
+      type: String,
+      default: 'search-modal'
+    },
+    toggle: {
+      type: Boolean,
+      default: false
+    },
+    search_options: {
+      type: Object,
+      default () { return {} }
+    },
+    name: {
+      type: String,
+      default: 'modal'
+    },
+    openButton: {
+      type: String,
+      default: '+'
+    },
+    buttonClass: {
+      type: String,
+      default: 'btn btn-primary'
+    },
+    title: {
+      type: String,
+      default: ''
+    },
+    table: {
+      type: String
+    },
+    prompt: {
+      type: String
+    },
+    type: {
+      type: String
+    },
+    header: {
+      type: String,
+      default: ''
+    },
+    body: {
+      type: String,
+      default: 'default body'
+    },
+    footer: {
+      type: String,
+      default: ''
+    },
+    button: {
+      type: String
+    },
+    action: {
+      type: Function
+    },
+    urlData: {
+      type: Object
+    },
+    function: {
+      type: Function
+    },
+    close: {
+      type: String,
+      default: 'Cancel'
+    },
+    record: {
+      type: Object
+    },
+    picked: {
+      type: Array,
+      default: () => []
+    }
+  },
+  created: function () {
+    // this.closeModal()
+    this.status = 'loaded'
+    console.log('body')
+
+    var fields = this.search_options.fields
+
+    if (fields && fields.length) {
+      for (var i = 0; i < this.search_options.fields.length; i++) {
+        var f = this.search_options.fields[i]
+        this.searchStrings[f] = ''
+      }
+    }
+
+    if (this.invalid) {
+      console.log('validation failed:')
+      console.log(this.invalid.join('; '))
+    }
+  },
+  computed: {
+    loadStatus: function () {
+      return this.status
+    },
+
+    url: function () {
+      return this.search_options.url
+    },
+    scope: function () {
+      return this.search_options.scope
+    },
+    search: function () {
+      return this.search_options.search
+    },
+    globalSearch: function () {
+      return this.search_options.globalSearch || 1
+    },
+    fields: function () {
+      return this.search_options.fields
+    },
+    multiSelect: function () {
+      return this.search_options.multiSelect
+    },
+    target: function () {
+      return this.search_options.target || {}
+    },
+    chooseTitle: function () {
+      return 'Click on record to select ' + this.scope
+    },
+    currentList: function () {
+      return this.list
+    },
+
+    myheader: function () {
+      if (this.search_options.title) {
+        return this.search_options.title
+      } else if (this.header) {
+        return this.header
+      } else if (this.title) {
+        return this.title
+      } else if (this.table) {
+        return this.table
+      } else {
+        return 'default'
       }
     },
-    props: {
-      id: {
-        type: String,
-        default: 'search-modal'
-      },
-      toggle: {
-        type: Boolean,
-        default: false
-      },
-      search_options: {
-        type: Object,
-        default () { return {} }
-      },
-      name: {
-        type: String,
-        default: 'modal'
-      },
-      openButton: {
-        type: String,
-        default: '+'
-      },
-      buttonClass: {
-        type: String,
-        default: 'btn btn-primary'
-      },
-      title: {
-        type: String,
-        default: ''
-      },
-      table: {
-        type: String
-      },
-      prompt: {
-        type: String
-      },
-      type: {
-        type: String
-      },
-      header: {
-        type: String,
-        default: ''
-      },
-      body: {
-        type: String,
-        default: 'default body'
-      },
-      footer: {
-        type: String,
-        default: ''
-      },
-      button: {
-        type: String
-      },
-      action: {
-        type: Function
-      },
-      urlData: {
-        type: Object
-      },
-      function: {
-        type: Function
-      },
-      close: {
-        type: String,
-        default: 'Cancel'
-      },
-      record: {
-        type: Object
-      },
-      picked: {
-        type: Array,
-        default: () => []
+    closeButton: function () {
+      if (this.close) {
+        return this.close
+      } else {
+        return 'Cancel'
       }
     },
-    created: function () {
-      // this.closeModal()
-      this.status = 'loaded'
-      console.log('body')
-
-      var fields = this.search_options.fields
-
-      if (fields && fields.length) {
-        for (var i = 0; i < this.search_options.fields.length; i++) {
-          var f = this.search_options.fields[i]
-          this.searchStrings[f] = ''
-        }
-      }
-
-      if (this.invalid) {
-        console.log('validation failed:')
-        console.log(this.invalid.join('; '))
+    modalBody: function () {
+      if (this.generated && this.generated.body) {
+        return this.generated.body
+      } else if (this.body) {
+        return this.body
       }
     },
-    computed: {
-      loadStatus: function () {
-        return this.status
-      },
+    visible: function () {
+      if (!this.toggle !== !this.isVisible) {
+        return true
+      } else {
+        return false
+      }
+    },
+    invalid: function () {
+      var reqd = ['fields|field', 'scope', 'url']
 
-      url: function () {
-        return this.search_options.url
-      },
-      scope: function () {
-        return this.search_options.scope
-      },
-      search: function () {
-        return this.search_options.search
-      },
-      globalSearch: function () {
-        return this.search_options.globalSearch || 1
-      },
-      fields: function () {
-        return this.search_options.fields
-      },
-      multiSelect: function () {
-        return this.search_options.multiSelect
-      },
-      target: function () {
-        return this.search_options.target || {}
-      },
-      chooseTitle: function () {
-        return 'Click on record to select ' + this.scope
-      },
-      currentList: function () {
-        return this.list
-      },
-
-      myheader: function () {
-        if (this.search_options.title) {
-          return this.search_options.title
-        } else if (this.header) {
-          return this.header
-        } else if (this.title) {
-          return this.title
-        } else if (this.table) {
-          return this.table
-        } else {
-          return 'default'
-        }
-      },
-      closeButton: function () {
-        if (this.close) {
-          return this.close
-        } else {
-          return 'Cancel'
-        }
-      },
-      modalBody: function () {
-        if (this.generated && this.generated.body) {
-          return this.generated.body
-        } else if (this.body) {
-          return this.body
-        }
-      },
-      visible: function () {
-        if (!this.toggle !== !this.isVisible) {
-          return true
-        } else {
-          return false
-        }
-      },
-      invalid: function () {
-        var reqd = ['fields|field', 'scope', 'url']
-
-        var fail = []
-        if (this.search_options) {
-          for (var i = 0; i < reqd.length; i++) {
-            var req = reqd[i]
-            var or = req.split('|')
-            if (or.length > 1) {
-              var ok = 0
-              for (var j = 0; j < or.length; j++) {
-                if (this.search_options[or[j]]) {
-                  ok++
-                  j = or.length
-                }
+      var fail = []
+      if (this.search_options) {
+        for (var i = 0; i < reqd.length; i++) {
+          var req = reqd[i]
+          var or = req.split('|')
+          if (or.length > 1) {
+            var ok = 0
+            for (var j = 0; j < or.length; j++) {
+              if (this.search_options[or[j]]) {
+                ok++
+                j = or.length
               }
-              if (!ok) {
-                fail.push('require \'' + or.join("' OR '") + '\'')
+            }
+            if (!ok) {
+              fail.push('require \'' + or.join("' OR '") + '\'')
+            }
+          } else {
+            if (!this.search_options[or]) {
+              fail.push('missing ' + or)
+            }
+          }
+        }
+      } else {
+        fail.push('no search options')
+      }
+      return fail
+    }
+  },
+  methods: {
+    openModal () {
+      console.log('open modal...')
+      console.log('and fade in')
+      document.getElementById(this.id).classList.toggle('m-fadeIn')
+      document.getElementById(this.id).classList.toggle('m-fadeOut')
+
+      clearTimeout(this.timeoutID)
+    },
+    onPick (data) {
+      if (this.search_options.onPick) {
+        this.search_options.onPick(data)
+      }
+
+      this.clearList(true, true)
+    },
+    modalClick (data) {
+      console.log('Form: ' + JSON.stringify(this.formData))
+      if (this.function) {
+        this.function()
+      }
+    },
+    oNotification () {
+      console.log('on')
+    },
+    closeModal: function () {
+      console.log('close modal...')
+      console.log('fade out')
+      document.getElementById(this.id).classList.toggle('m-fadeOut')
+      document.getElementById(this.id).classList.toggle('m-fadeIn')
+    },
+    searchPick (data) {
+      console.log('search pick')
+      if (this.pickTarget) {
+        this.pickTarget(data)
+        this.clearList()
+      } else { console.log('no onPick') }
+    },
+    deselect (id) {
+      console.log('unselectOne' + '{scope: this.scope, id: id}')
+    },
+    clearTarget (close) {
+      if (this.target) {
+        var keys = Object.keys(this.target)
+        for (var j = 0; j < keys.length; j++) {
+          this.$delete(this.target, keys[j])
+        }
+      } else { console.log('target already empty') }
+
+      if (close) {
+        this.closeModal()
+      }
+    },
+    pickTarget (data) {
+      console.log('picked ' + this.title)
+      console.log(JSON.stringify(data))
+      console.log(JSON.stringify(this.target))
+
+      var keys = Object.keys(data[0])
+      for (var i = 0; i < keys.length; i++) {
+        this.$set(this.target, keys[i], data[0][keys[i]])
+        console.log('set target ' + keys[i] + ' to ' + data[0][keys[i]])
+      }
+
+      if (!this.search_options.multiSelect) {
+        this.closeModal()
+      }
+
+      this.picked.push(this.target)
+
+      console.log('Picked: ' + JSON.stringify(this.target))
+      console.log('List: ' + JSON.stringify(this.picked))
+    },
+    searchForIt () {
+      console.log('Search for ' + this.model + ' data containing...' + this.searchString)
+      console.log('or ' + this.searchStrings.name + ' or ' + this.searchStrings.email)
+      console.log('via url: ' + this.url)
+
+      this.clearList()
+      var orConditions = []
+      var andConditions = []
+      var fields = []
+
+      var conditions = this.conditions || [1]
+      var table = this.model
+
+      if (this.search && table && this.search[table]) {
+        fields = this.search[table]
+      } else {
+        fields = this.fields || []
+      }
+      console.log('got fields: ' + fields + ' from ' + JSON.stringify(this.search) + ' && ' + this.scope)
+
+      var data = cors(this.corsOptions)
+      console.log('CORS: ' + JSON.stringify(cors))
+
+      data = null
+
+      var fullUrl = this.url || ''
+      var tagtest = /<(.+)>/
+      var tags = fullUrl.match(tagtest)
+
+      var method = this.search_options.method || 'post'
+
+      if (this.search_options.field && this.searchString) {
+        method = 'get'
+
+        // global search
+        console.log(this.search_options.field + ' = ' + this.searchString)
+        if (tags && tags.length) {
+          var tag = new RegExp('<' + tags[1] + '>')
+          fullUrl = fullUrl.replace(tag, this.searchString)
+          console.log('replaced ' + tag + ' tag with ' + this.searchString)
+        } else {
+          fullUrl += '&' + this.search_options.field + '=' + this.searchString
+        }
+
+        for (var i = 0; i < fields.length; i++) {
+          orConditions.push(fields[i] + ' LIKE "%' + this.searchString + '%"')
+          console.log(' .. or ' + fields[i] + ' like ' + this.searchString)
+        }
+        method = 'get'
+        console.log('method0 = ' + method)
+      } else if (!this.globalSearch && this.searchStrings) {
+        method = 'get'
+        // fields specific search
+        var check = Object.keys(this.searchStrings)
+        for (var j = 0; j < check.length; j++) {
+          var test = this.searchStrings[check[j]]
+          if (test) {
+            andConditions.push(check[j] + ' LIKE \'' + test + '%\'')
+            console.log(' .. and ' + check[j] + ' like ' + test)
+
+            if (tags && tags.length) {
+              console.log('replace ' + tags.length + ' tags')
+              for (var t = 1; t < tags.length; t++) {
+                console.log(tags[t] + ' vs ' + check[j])
+                if (tags[t] === check[j]) {
+                  var thistag = new RegExp('<' + check[j] + '>')
+                  fullUrl = fullUrl.replace(thistag, test)
+                  console.log('replaced ' + thistag + ' tag with ' + test)
+                }
               }
             } else {
-              if (!this.search_options[or]) {
-                fail.push('missing ' + or)
-              }
+              fullUrl += '&' + check[j] + '=' + test
             }
           }
-        } else {
-          fail.push('no search options')
         }
-        return fail
+      } else {
+        console.log('no search criteria')
+        console.log('global: ' + this.globalSearch)
+        console.log('search 1: ' + this.searchString + ' in ' + this.search_options.field)
+        console.log('searcn N: ' + JSON.stringify(this.searchStrings))
       }
-    },
-    methods: {
-      openModal () {
-        console.log('open modal...')
-        console.log('and fade in')
-        document.getElementById(this.id).classList.toggle('m-fadeIn')
-        document.getElementById(this.id).classList.toggle('m-fadeOut')
 
-        clearTimeout(this.timeoutID)
-      },
-      onPick (data) {
-        if (this.search_options.onPick) {
-          this.search_options.onPick(data)
+      console.log('method1 = ' + method)
+
+      if (method === 'post') {
+        data = {}
+
+        data.scope = this.search || this.scope
+
+        var addCondition
+        if (orConditions.length) {
+          console.log('add ' + orConditions.length + ' OR conditions')
+          addCondition = '(' + orConditions.join(' OR ') + ')'
         }
 
-        this.clearList(true, true)
-      },
-      modalClick (data) {
-        console.log('Form: ' + JSON.stringify(this.formData))
-        if (this.function) {
-          this.function()
-        }
-      },
-      oNotification () {
-        console.log('on')
-      },
-      closeModal: function () {
-        console.log('close modal...')
-        console.log('fade out')
-        document.getElementById(this.id).classList.toggle('m-fadeOut')
-        document.getElementById(this.id).classList.toggle('m-fadeIn')
-      },
-      searchPick (data) {
-        console.log('search pick')
-        if (this.pickTarget) {
-          this.pickTarget(data)
-          this.clearList()
-        } else { console.log('no onPick') }
-      },
-      deselect (id) {
-        console.log('unselectOne' + '{scope: this.scope, id: id}')
-      },
-      clearTarget (close) {
-        if (this.target) {
-          var keys = Object.keys(this.target)
-          for (var j = 0; j < keys.length; j++) {
-            this.$delete(this.target, keys[j])
-          }
-        } else { console.log('target already empty') }
-
-        if (close) {
-          this.closeModal()
-        }
-      },
-      pickTarget (data) {
-        console.log('picked ' + this.title)
-        console.log(JSON.stringify(data))
-        console.log(JSON.stringify(this.target))
-
-        var keys = Object.keys(data[0])
-        for (var i = 0; i < keys.length; i++) {
-          this.$set(this.target, keys[i], data[0][keys[i]])
-          console.log('set target ' + keys[i] + ' to ' + data[0][keys[i]])
+        if (andConditions.length) {
+          console.log('add ' + andConditions.length + ' AND conditions')
+          addCondition = '(' + andConditions.join(' AND ') + ')'
         }
 
-        if (!this.search_options.multiSelect) {
-          this.closeModal()
-        }
+        var allConditions = conditions.join(' AND ')
+        if (addCondition) { allConditions += ' AND ' + addCondition }
 
-        this.picked.push(this.target)
+        data.condition = allConditions
+      }
 
-        console.log('Picked: ' + JSON.stringify(this.target))
-        console.log('List: ' + JSON.stringify(this.picked))
-      },
-      searchForIt () {
-        console.log('Search for ' + this.model + ' data containing...' + this.searchString)
-        console.log('or ' + this.searchStrings.name + ' or ' + this.searchStrings.email)
-        console.log('via url: ' + this.url)
+      console.log('axios ' + method + ': ' + fullUrl)
+      console.log('searchModal data: ' + JSON.stringify(data))
 
-        this.clearList()
-        var orConditions = []
-        var andConditions = []
-        var fields = []
+      var _this = this
+      axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
-        var conditions = this.conditions || [1]
-        var table = this.model
-
-        if (this.search && table && this.search[table]) {
-          fields = this.search[table]
-        } else {
-          fields = this.fields || []
-        }
-        console.log('got fields: ' + fields + ' from ' + JSON.stringify(this.search) + ' && ' + this.scope)
-
-        var data = cors(this.corsOptions)
-        console.log('CORS: ' + JSON.stringify(cors))
-
-        data = null
-
-        var fullUrl = this.url || ''
-        var tagtest = /<(.+)>/
-        var tags = fullUrl.match(tagtest)
-
-        var method = this.search_options.method || 'post'
-
-        if (this.search_options.field && this.searchString) {
-          method = 'get'
-
-          // global search
-          console.log(this.search_options.field + ' = ' + this.searchString)
-          if (tags && tags.length) {
-            var tag = new RegExp('<' + tags[1] + '>')
-            fullUrl = fullUrl.replace(tag, this.searchString)
-            console.log('replaced ' + tag + ' tag with ' + this.searchString)
-          } else {
-            fullUrl += '&' + this.search_options.field + '=' + this.searchString
-          }
-
-          for (var i = 0; i < fields.length; i++) {
-            orConditions.push(fields[i] + ' LIKE "%' + this.searchString + '%"')
-            console.log(' .. or ' + fields[i] + ' like ' + this.searchString)
-          }
-          method = 'get'
-          console.log('method0 = ' + method)
-        } else if (!this.globalSearch && this.searchStrings) {
-          method = 'get'
-          // fields specific search
-          var check = Object.keys(this.searchStrings)
-          for (var j = 0; j < check.length; j++) {
-            var test = this.searchStrings[check[j]]
-            if (test) {
-              andConditions.push(check[j] + ' LIKE \'' + test + '%\'')
-              console.log(' .. and ' + check[j] + ' like ' + test)
-
-              if (tags && tags.length) {
-                console.log('replace ' + tags.length + ' tags')
-                for (var t = 1; t < tags.length; t++) {
-                  console.log(tags[t] + ' vs ' + check[j])
-                  if (tags[t] === check[j]) {
-                    var thistag = new RegExp('<' + check[j] + '>')
-                    fullUrl = fullUrl.replace(thistag, test)
-                    console.log('replaced ' + thistag + ' tag with ' + test)
-                  }
-                }
-              } else {
-                fullUrl += '&' + check[j] + '=' + test
-              }
-            }
-          }
-        } else {
-          console.log('no search criteria')
-          console.log('global: ' + this.globalSearch)
-          console.log('search 1: ' + this.searchString + ' in ' + this.search_options.field)
-          console.log('searcn N: ' + JSON.stringify(this.searchStrings))
-        }
-
-        console.log('method1 = ' + method)
-
-        if (method === 'post') {
-          data = {}
-
-          data.scope = this.search || this.scope
-
-          var addCondition
-          if (orConditions.length) {
-            console.log('add ' + orConditions.length + ' OR conditions')
-            addCondition = '(' + orConditions.join(' OR ') + ')'
-          }
-
-          if (andConditions.length) {
-            console.log('add ' + andConditions.length + ' AND conditions')
-            addCondition = '(' + andConditions.join(' AND ') + ')'
-          }
-
-          var allConditions = conditions.join(' AND ')
-          if (addCondition) { allConditions += ' AND ' + addCondition }
-
-          data.condition = allConditions
-        }
-
-        console.log('axios ' + method + ': ' + fullUrl)
-        console.log('searchModal data: ' + JSON.stringify(data))
-
-        var _this = this
-        axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-
-        console.log('call...')
-        axios({url: fullUrl, method: method, data: data})
+      console.log('call...')
+      axios({url: fullUrl, method: method, data: data})
         .then(function (result, err) {
           console.log('axios returned value(s): ' + JSON.stringify(result))
 
@@ -573,36 +573,36 @@
           _this.$store.commit('setError', {context: 'Searching For ' + _this.scope, err: err})
           console.log('axios error: ' + err)
         })
-      },
+    },
 
-      clearList (clearsearch, close) {
-        var _this = this
-        if (_this.list) {
-          var count = _this.list.length
-          console.log('clear current list of ' + count)
-          for (var j = 0; j < count; j++) {
-            _this.$delete(_this.list, 0)
-            console.log('clear ' + j)
+    clearList (clearsearch, close) {
+      var _this = this
+      if (_this.list) {
+        var count = _this.list.length
+        console.log('clear current list of ' + count)
+        for (var j = 0; j < count; j++) {
+          _this.$delete(_this.list, 0)
+          console.log('clear ' + j)
+        }
+      }
+
+      if (clearsearch) {
+        if (this.globalSearch) {
+          console.log('global clear')
+          _this.searchString = ''
+        } else {
+          for (var i = 0; i < this.fields.length; i++) {
+            this.$delete(this.searchStrings, this.fields[i])
           }
         }
+      }
 
-        if (clearsearch) {
-          if (this.globalSearch) {
-            console.log('global clear')
-            _this.searchString = ''
-          } else {
-            for (var i = 0; i < this.fields.length; i++) {
-              this.$delete(this.searchStrings, this.fields[i])
-            }
-          }
-        }
-
-        if (close) {
-          _this.closeModal()
-        }
+      if (close) {
+        _this.closeModal()
       }
     }
   }
+}
 </script>
 
 <style scoped>

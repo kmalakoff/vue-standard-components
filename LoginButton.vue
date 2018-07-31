@@ -41,128 +41,128 @@
 </template>
 
 <script>
-  // require icon supplied by calling component...
-  import Modal from './Modal'
-  import 'vue-awesome/icons/bars'
-  import 'vue-awesome/icons/search'
-  import auth from '../../auth'
-  // import config from '@/config.js'
+// require icon supplied by calling component...
+import Modal from './Modal'
+import 'vue-awesome/icons/bars'
+import 'vue-awesome/icons/search'
+import auth from '../../auth'
+// import config from '@/config.js'
 
-  export default {
-    data () {
-      return {
-        holdBlock: {menu: false, search: false},
-        visibleBlock: {menu: false, search: false},
+export default {
+  data () {
+    return {
+      holdBlock: {menu: false, search: false},
+      visibleBlock: {menu: false, search: false},
 
-        options: { openText: 'Log In' }
+      options: { openText: 'Log In' }
+    }
+  },
+  components: {
+    Modal
+  },
+  props: {
+    menuIcon: {
+      type: String,
+      default: 'bars'
+    },
+    searchIcon: {
+      type: String,
+      default: 'search'
+    },
+    list: {
+      type: Array
+    },
+    links: {
+      type: Array
+    },
+    payload: {
+      type: Object
+    }
+  },
+  mounted: function () {
+    // console.log('header mounted')
+    // var payload = this.$store.getters.payload
+    // console.log('header payload: ' + JSON.stringify(payload))
+    // this.payload = payload
+  },
+  // computed: {
+  //   payload: function () {
+  //     return this.payload
+  //   }
+  // },
+  created: function () {
+    console.log('load payload first...')
+
+    // var payload = config.demo_payload
+    // console.log('config payload: ' + JSON.stringify(payload))
+
+    // this.$store.commit('LOAD_DEMO')
+    // var initPayload = this.$store.getters.payload
+
+    // console.log('init: ' + JSON.stringify(initPayload))
+    // console.log(initPayload)
+
+    // var localPayload = localStorage.getItem('payload')
+
+    // this.payload = localPayload
+    // console.log('local: ' + JSON.stringify(localPayload))
+  },
+  computed: {
+    user: function () {
+      var payload = this.$store.getters.payload
+      console.log('loginpop user' + JSON.stringify(payload))
+      if (payload && payload.user) {
+        return payload.user
+      } else {
+        return null
       }
     },
-    components: {
-      Modal
+    ac: function () {
+      return auth.checkAuth()
+    }
+  },
+  methods: {
+    logout () {
+      console.log('log out')
+      // auth.logout()
+      this.$store.dispatch('AUTH_LOGOUT')
     },
-    props: {
-      menuIcon: {
-        type: String,
-        default: 'bars'
-      },
-      searchIcon: {
-        type: String,
-        default: 'search'
-      },
-      list: {
-        type: Array
-      },
-      links: {
-        type: Array
-      },
-      payload: {
-        type: Object
+    toggleBlock (block) {
+      this.visibleBlock[block] = !this.visibleBlock[block]
+      console.log('toggled hold: ' + this.holdBlock[block] + ': ' + this.visibleBlock[block])
+    },
+    hideBlock (block) {
+      // Hide menu (delay ignores rapid toggling by mouse out / in movements)
+      var _this = this
+      if (!block) {
+        console.log('no block defined')
+      } else if (this.holdBlock[block]) {
+        this.onexpire = false
+      } else {
+        setTimeout(
+          () => {
+            _this.holdBlock[block] = false
+            this.visibleBlock[block] = this.onexpire
+          }, 1000)
+        this.holdBlock[block] = true
       }
     },
-    mounted: function () {
-      // console.log('header mounted')
-      // var payload = this.$store.getters.payload
-      // console.log('header payload: ' + JSON.stringify(payload))
-      // this.payload = payload
-    },
-    // computed: {
-    //   payload: function () {
-    //     return this.payload
-    //   }
-    // },
-    created: function () {
-      console.log('load payload first...')
-
-      // var payload = config.demo_payload
-      // console.log('config payload: ' + JSON.stringify(payload))
-
-      // this.$store.commit('LOAD_DEMO')
-      // var initPayload = this.$store.getters.payload
-
-      // console.log('init: ' + JSON.stringify(initPayload))
-      // console.log(initPayload)
-
-      // var localPayload = localStorage.getItem('payload')
-
-      // this.payload = localPayload
-      // console.log('local: ' + JSON.stringify(localPayload))
-    },
-    computed: {
-      user: function () {
-        var payload = this.$store.getters.payload
-        console.log('loginpop user' + JSON.stringify(payload))
-        if (payload && payload.user) {
-          return payload.user
-        } else {
-          return null
-        }
-      },
-      ac: function () {
-        return auth.checkAuth()
+    searchMethod () {
+      var id = document.getElementById('searchString')
+      var search = ''
+      if (id && id.value) {
+        console.log('search for: ' + id.value)
+        search = id.value
+      } else {
+        console.log('no search string...')
       }
+      console.log('perform search for ' + search)
     },
-    methods: {
-      logout () {
-        console.log('log out')
-        // auth.logout()
-        this.$store.dispatch('AUTH_LOGOUT')
-      },
-      toggleBlock (block) {
-        this.visibleBlock[block] = !this.visibleBlock[block]
-        console.log('toggled hold: ' + this.holdBlock[block] + ': ' + this.visibleBlock[block])
-      },
-      hideBlock (block) {
-        // Hide menu (delay ignores rapid toggling by mouse out / in movements)
-        var _this = this
-        if (!block) {
-          console.log('no block defined')
-        } else if (this.holdBlock[block]) {
-          this.onexpire = false
-        } else {
-          setTimeout(
-            () => {
-              _this.holdBlock[block] = false
-              this.visibleBlock[block] = this.onexpire
-            }, 1000)
-          this.holdBlock[block] = true
-        }
-      },
-      searchMethod () {
-        var id = document.getElementById('searchString')
-        var search = ''
-        if (id && id.value) {
-          console.log('search for: ' + id.value)
-          search = id.value
-        } else {
-          console.log('no search string...')
-        }
-        console.log('perform search for ' + search)
-      },
-      redirect (page) {
-        this.$route.router.go(page)
-      }
+    redirect (page) {
+      this.$route.router.go(page)
     }
   }
+}
 </script>
 
 <style scoped lang="sass?outputStyle=expanded">

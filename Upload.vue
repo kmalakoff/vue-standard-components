@@ -40,100 +40,100 @@ Generate block for uploading data from excel file:
         h2 Unrecognized result ... ?
   </template>
 
-  <script>
-  import Messaging from './Messaging.vue'
-  import { upload } from './../../services/file-upload.service'
+<script>
+import Messaging from './Messaging.vue'
+import { upload } from './../../services/file-upload.service'
 
-  const STATUS_INITIAL = 0
-  const STATUS_SAVING = 1
-  const STATUS_SUCCESS = 2
-  const STATUS_FAILED = 3
+const STATUS_INITIAL = 0
+const STATUS_SAVING = 1
+const STATUS_SUCCESS = 2
+const STATUS_FAILED = 3
 
-  export default {
-    components: {
-      Messaging
-    },
-    data () {
-      return {
-        uploadedFiles: [],
-        uploadError: null,
-        currentStatus: null,
-        uploadFieldName: 'untitled',
-        fileCount: 0
-      }
-    },
-    props: {
-      type: {
-        type: String,
-        defaultTo: 'excel'
-      }
-    },
-    computed: {
-      isInitial: function () {
-        return this.currentStatus === STATUS_INITIAL
-      },
-      isSaving: function () {
-        return this.currentStatus === STATUS_SAVING
-      },
-      isSuccess: function () {
-        return this.currentStatus === STATUS_SUCCESS
-      },
-      isFailed: function () {
-        return this.currentStatus === STATUS_FAILED
-      }
-    },
-    methods: {
-      uploadFile (file) {
-        console.log('upload ' + file)
-      },
-      // uploadToDB (data) {
-      //   console.log('upload to database')
-      // },
-      // filesChange (data) {
-      //   console.log('reload files based on change')
-      // },
-      reset () {
-        // reset form to initial state
-        this.currentStatus = STATUS_INITIAL
-        this.uploadedFiles = []
-        this.uploadError = null
-      },
-      save (formData) {
-        // upload data to the server
-        this.currentStatus = STATUS_SAVING
-
-        upload(formData)
-          .then(x => {
-            this.uploadedFiles = [].concat(x)
-            this.currentStatus = STATUS_SUCCESS
-          })
-          .catch(err => {
-            console.log(JSON.stringify(err))
-            this.uploadError = err.response || 'error uploading file(s)'
-            this.currentStatus = STATUS_FAILED
-          })
-      },
-      filesChange (fieldName, fileList) {
-        // handle file changes
-        const formData = new FormData()
-
-        if (!fileList.length) return
-
-        // append the files to FormData
-        Array
-          .from(Array(fileList.length).keys())
-          .map(x => {
-            formData.append(fieldName, fileList[x], fileList[x].name)
-          })
-        // save it
-        this.save(formData)
-      }
-    },
-    mounted: function () {
-      this.reset()
+export default {
+  components: {
+    Messaging
+  },
+  data () {
+    return {
+      uploadedFiles: [],
+      uploadError: null,
+      currentStatus: null,
+      uploadFieldName: 'untitled',
+      fileCount: 0
     }
+  },
+  props: {
+    type: {
+      type: String,
+      defaultTo: 'excel'
+    }
+  },
+  computed: {
+    isInitial: function () {
+      return this.currentStatus === STATUS_INITIAL
+    },
+    isSaving: function () {
+      return this.currentStatus === STATUS_SAVING
+    },
+    isSuccess: function () {
+      return this.currentStatus === STATUS_SUCCESS
+    },
+    isFailed: function () {
+      return this.currentStatus === STATUS_FAILED
+    }
+  },
+  methods: {
+    uploadFile (file) {
+      console.log('upload ' + file)
+    },
+    // uploadToDB (data) {
+    //   console.log('upload to database')
+    // },
+    // filesChange (data) {
+    //   console.log('reload files based on change')
+    // },
+    reset () {
+      // reset form to initial state
+      this.currentStatus = STATUS_INITIAL
+      this.uploadedFiles = []
+      this.uploadError = null
+    },
+    save (formData) {
+      // upload data to the server
+      this.currentStatus = STATUS_SAVING
+
+      upload(formData)
+        .then(x => {
+          this.uploadedFiles = [].concat(x)
+          this.currentStatus = STATUS_SUCCESS
+        })
+        .catch(err => {
+          console.log(JSON.stringify(err))
+          this.uploadError = err.response || 'error uploading file(s)'
+          this.currentStatus = STATUS_FAILED
+        })
+    },
+    filesChange (fieldName, fileList) {
+      // handle file changes
+      const formData = new FormData()
+
+      if (!fileList.length) return
+
+      // append the files to FormData
+      Array
+        .from(Array(fileList.length).keys())
+        .map(x => {
+          formData.append(fieldName, fileList[x], fileList[x].name)
+        })
+        // save it
+      this.save(formData)
+    }
+  },
+  mounted: function () {
+    this.reset()
   }
-  </script>
+}
+</script>
 
 <style >
   .block {
