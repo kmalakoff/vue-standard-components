@@ -2,7 +2,7 @@
 <template id=this.id lang='pug'>
   span
     span.m-fadeOut(:id="id")
-      transition(name="modal") 
+      transition(name="modal")
         div.modal-mask
           div.modal-wrapper
             div.modal-container
@@ -21,7 +21,7 @@
                           ul
                             li(v-for='err in errs')
                               alert.alert-danger {{err}}
-                        h2(v-if="invalid && invalid.length") 
+                        h2(v-if="invalid && invalid.length")
                           div.alert.alert-danger Invalid search options:
                             ul
                               li(v-for='problem in invalid') {{problem}}
@@ -66,15 +66,14 @@
         span &nbsp;
         button.btn.btn-primary(v-on:click="openModal()") {{openButton}}
       span(v-else)
-        span &nbsp; &nbsp; 
-        button.btn.btn-primary(v-on:click="clearTarget; openModal()") 
+        span &nbsp; &nbsp;
+        button.btn.btn-primary(v-on:click="clearTarget; openModal()")
           span(v-if="search_options.multiSelect")
-            span + 
+            span +
           span(v-if="picked && picked.length && !search_options.multiSelect")
             span change
           span {{search_options.scope}}
 </template>
-
 
 <script>
   import axios from 'axios'
@@ -456,7 +455,6 @@
           }
           method = 'get'
           console.log('method0 = ' + method)
-
         } else if (!this.globalSearch && this.searchStrings) {
           method = 'get'
           // fields specific search
@@ -622,7 +620,7 @@
   display: -moz-box !important;
   display: -ms-flexbox !important;
   display: -webkit-flex !important;
-  display: flex !important;  
+  display: flex !important;
   transition: all opacity 1s ease;
 }
 
@@ -646,8 +644,8 @@
   flex: 1 !important;
   width: 100% !important;
   margin: 100px auto;
-  padding: 0px;   
-  /*20px 30px;*/ use wrapper above for the padding... 
+  padding: 0px;
+  /*20px 30px;*/ use wrapper above for the padding...
   background-color: #fff;
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
@@ -739,4 +737,3 @@
   transform: scale(1.1);
 }
 </style>
-

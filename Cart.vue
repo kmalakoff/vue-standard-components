@@ -23,7 +23,7 @@
       br
       h4 Total: {{total}}
       hr
-      form(action="/process-payment" method="POST") 
+      form(action="/process-payment" method="POST")
         button.btn.btn-primary(:disabled="!items") Checkout
         <!-- stripe-checkout(stripe-key="my-stripe-key" product="product(tea.name, tea.description, tea.price100g)") -->
     div.myClosedCart(v-else)
@@ -121,7 +121,6 @@ export default {
   padding-top: 20px;
   border: 1px solid black;
 }
-
 
 ul {
   list-style-type: none;

@@ -19,7 +19,7 @@
     - showSelect (method to determine if selectText option is available for each record)
 
     - showSelect (optional method to enable dynamic visibility for selecting single items)
-    - 
+    -
     - onPickIcon (icon to use for individual item selection (defaults to edit icon))
 
     - init (initial open setting (all, selected, top [default]) indicates which blocks to start in open mode.
@@ -52,8 +52,8 @@
             span.newItem(v-if="newItem[item[nameKey]]")
               input(v-model='select[item[nameKey]]' type='radio' value = 'yes' @click.prevent='pickYes(item.id)')
               span &nbsp; Yes &nbsp;
-              input(v-model='select[item[nameKey]]' type='radio' value = 'no' @click.prevent='pickNo(item.id)') 
-              span &nbsp; No &nbsp;          
+              input(v-model='select[item[nameKey]]' type='radio' value = 'no' @click.prevent='pickNo(item.id)')
+              span &nbsp; No &nbsp;
             input(v-else type='checkbox' v-model='select[item[nameKey]]' @click.prevent='pick(item.id)')
             span &nbsp;
             span(v-if="select[item[nameKey]]")
@@ -250,6 +250,7 @@
         }
       },
       orderedList: function () {
+        return null // fix this
       },
       showSelect: function () {
         if (this.options && this.options.showSelect) {
@@ -424,7 +425,7 @@
   </script>
 
 <style>
-@import '/static/css/Standard.css';
+/*@import '/static/css/Standard.css';*/
 
 .selected {
   color: blue;

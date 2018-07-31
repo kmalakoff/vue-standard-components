@@ -1,7 +1,7 @@
 <!-- src/components/Standard/SearchBlock.vue -->
 
 <template lang='pug'>
-  div  
+  div
     Messaging
     div(v-if="0 && loadStatus === 'pending'")
       b Loading...
@@ -11,7 +11,7 @@
         ul
           li(v-for='err in errs')
             alert.alert-danger {{err}}
-      h2(v-if="invalid && invalid.length") 
+      h2(v-if="invalid && invalid.length")
         div.alert.alert-danger Invalid search options:
           ul
             li(v-for='problem in invalid') {{problem}}
@@ -25,7 +25,6 @@
         button.btn.btn-primary(@click.prevent="searchForIt") Search
         span &nbsp; &nbsp;
         button.btn.btn-primary(v-if="searchString" @click.prevent="clearList(1)") Clear Search
-      
       span.search-overlay(v-if="1 && !globalSearch")
         span(v-if='1')
           div.search-section

@@ -149,7 +149,7 @@ Generate block for uploading data from excel file:
     padding: 10px 10px;
     min-height: 220px; /* minimum height */
     position: relative;
-    cursor: pointer;    
+    cursor: pointer;
   }
   .input-file {
     opacity: 0; /* invisible but it's there! */

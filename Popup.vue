@@ -3,7 +3,7 @@
 <template lang='pug'>
   span
     span
-      a(href='/' onclick='return false' @click.prevent="toggleMenu") 
+      a(href='/' onclick='return false' @click.prevent="toggleMenu")
         icon(:name='icon' color='black' scale='2')
     div
       table.table.popup-table(v-if="visibleMenu")

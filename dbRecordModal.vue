@@ -6,7 +6,7 @@ import Vue from 'vue';
 
 <template id="modal-template" lang='pug'>
   div
-    transition(name="modal") 
+    transition(name="modal")
       div.modal-mask
         div.modal-wrapper
           div.modal-container
@@ -33,7 +33,7 @@ import Vue from 'vue';
                           input(type='text' :placeholder="field.type")
                   hr
                   div(v-if="modalButton")
-                    button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalAction()") {{modalButton}} 
+                    button.btn.btn-primary(v-if="type==='append'" @click.prevent="modalAction()") {{modalButton}}
 
                 div(v-show="loadStatus !== 'loaded'")
                   b Loading...
@@ -245,6 +245,4 @@ import Vue from 'vue';
   text-align: right;
 }
 
-
 </style>
-

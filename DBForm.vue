@@ -1,6 +1,6 @@
 <!-- src/components/Form.vue -->
 <!--
-Usage: 
+Usage:
   DBForm(table='widget' :onSave='save' :append='append'))
 
   Options:
@@ -21,9 +21,9 @@ Usage:
           DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='access' :record='thisRecord')
         td.extra-column(v-if="access === 'edit'")
           span &nbsp;
-          a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)") 
+          a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)")
             icon(name='question-circle' color='black' scale='2')
-          b &nbsp; 
+          b &nbsp;
       tr(v-for="r in include.visible")
         td.prompt-column
           b {{label(r)}}:
@@ -224,8 +224,8 @@ Usage:
         if (!field) {
           return null
         } else if (field.type.match(/^int/i)) {
-          return
-        }
+          return null
+        } else { return true }
       },
       vModel: function (field) {
         var label = this.label(field)

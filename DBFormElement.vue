@@ -37,7 +37,7 @@
   // import bFormInput from 'bootstrap-vue/es/components/b-form-input/b-form-input'
   // import bFormInputDirective from 'bootstrap-vue/es/directives/b-form-input/b-form-input'
   import 'vue-awesome/icons/question-circle'
-  
+
   export default {
     components: {
       // 'b-form-input': bFormInput
@@ -105,7 +105,9 @@
         if (!field) {
           return null
         } else if (this.Ftype.match(/^int/i)) {
-          return
+          return null
+        } else {
+          return true
         }
       },
 

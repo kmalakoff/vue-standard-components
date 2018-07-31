@@ -8,11 +8,11 @@ Options (for all modal types)
   - body
   - footer
   - openButton (name of button used to open modal)
-  - 
+  -
 
   Three primary types along with associated input props:
 
-  Standard: 
+  Standard:
     - data (array of links triggering function or another modal)
     - type (search, record, data, raw, html, url, login)
   Search Modal: (provides search field(s) that enable search via specified api)
@@ -24,7 +24,7 @@ Options (for all modal types)
         function - function to execute upon clicking of button above
         url - url to generate content of modal
         urlData - data to pass to url (post) (may include tags replaced by record data ( eg urlData = {id: '<foundId>'} where the record supplied includes the 'foundId' attribute))
-  
+
   Record Modal: (provides access to record-based modal form)
     - record (hash with the following options)
       - table
@@ -44,9 +44,9 @@ Options (for all modal types)
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
       button.btn.btn-primary(v-on:click="openModal()")
-        icon(:name='openIcon')      
+        icon(:name='openIcon')
     span.m-fadeOut(:id="id")
-      transition(name="modal") 
+      transition(name="modal")
         div.my-modal-mask
           div.my-modal-wrapper
             div.my-modal-container
@@ -88,7 +88,7 @@ Options (for all modal types)
                   div(v-else-if="type==='login'")
                     Login(:onPick='closeModal')
                   div(v-else)
-                    b no valid type supplied.  Options: (search, record, data, raw, html, url, login ... 
+                    b no valid type supplied.  Options: (search, record, data, raw, html, url, login ...
                     hr
               div.my-modal-footer
                 slot(name="footer")
@@ -123,7 +123,7 @@ Options (for all modal types)
   import DataGrid from './DataGrid'
   import DBForm from './DBForm'
   import Login from './Login'
-  import axios from 'axios'
+  // import axios from 'axios'
 
   export default {
     name: 'Modal',
@@ -243,7 +243,6 @@ Options (for all modal types)
           return this.options.table
         } else {
           console.log('no table defined')
-          return
         }
       },
       contents: function () {
@@ -388,21 +387,23 @@ Options (for all modal types)
           return this.generated.body
         } else if (this.body) {
           return this.body
-        }
+        } else { return null }
       },
       urlContent: function () {
         console.log('generate url content from ' + this.url)
-        var _this = this
-        axios({url: this.url, method: 'get'})
-        .then(function (result, err) {
-          console.log('axios returned value(s): ' + JSON.stringify(result))
-          if (err) {
-            console.log('axios call error')
-            return '<h3>Error calling url</h3>'
-          }
-          console.log('got results for ' + _this.url)
-          _this.modalContent = result
-        })
+        // var _this = this
+        // axios({url: this.url, method: 'get'})
+        // .then(function (result, err) {
+        //   console.log('axios returned value(s): ' + JSON.stringify(result))
+        //   if (err) {
+        //     console.log('axios call error')
+        //     return '<h3>Error calling url</h3>'
+        //   }
+        //   console.log('got results for ' + _this.url)
+        //   _this.modalContent = result
+        //   return _this.modalContent
+        // })
+        return 'dynamic content'
       }
     },
     methods: {
@@ -421,9 +422,8 @@ Options (for all modal types)
         // document.getElementById(this.id).classList.toggle('m-fadeOut')
         if (this.url) {
           console.log('dynamic url content generation')
-          this.urlContent
+          console.log(this.urlContent)
         }
-
         // this.$store.commit('toggleModal', this.id)
         this.$store.dispatch('toggleModal', this.id)
 
@@ -553,11 +553,11 @@ Options (for all modal types)
 }
 
 .modal-header {
-  background-color: #666;  
+  background-color: #666;
 }
 .modal-footer {
   background-color: #666;
-}  
+}
 
 .modal-table {
   color: black
@@ -585,4 +585,3 @@ Options (for all modal types)
 }
 
 </style>
-

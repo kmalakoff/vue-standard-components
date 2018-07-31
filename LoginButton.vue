@@ -18,7 +18,7 @@
             span &nbsp; &nbsp;
             span &nbsp; &nbsp;
         span.input-group-addon(style='background-color: transparent; border: 0px;')
-          a(href='/' onclick='return false' @click.prevent="toggleBlock") 
+          a(href='/' onclick='return false' @click.prevent="toggleBlock")
               icon(:name='icon' color='black' scale='2')
           span &nbsp; &nbsp;
           div(@mouseleave="hideMenu")
@@ -29,7 +29,7 @@
                     b About Us
               tr(v-if='user')
                 td
-                  a(href='#' onclick='return false' @click.prevent='logout') 
+                  a(href='#' onclick='return false' @click.prevent='logout')
                     b Logout -->
 <template lang='pug'>
   div
@@ -38,7 +38,6 @@
     span(v-else)
       Modal(type='login' :options='options')
     span &nbsp; &nbsp;
-            
 </template>
 
 <script>

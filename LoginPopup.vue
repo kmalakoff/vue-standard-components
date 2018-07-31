@@ -18,7 +18,7 @@
             span &nbsp; &nbsp;
             span &nbsp; &nbsp;
         span.input-group-addon(style='background-color: transparent; border: 0px;')
-          a(href='/' onclick='return false' @click.prevent="toggleBlock") 
+          a(href='/' onclick='return false' @click.prevent="toggleBlock")
               icon(:name='icon' color='black' scale='2')
           span &nbsp; &nbsp;
           div(@mouseleave="hideMenu")
@@ -29,7 +29,7 @@
                     b About Us
               tr(v-if='user')
                 td
-                  a(href='#' onclick='return false' @click.prevent='logout') 
+                  a(href='#' onclick='return false' @click.prevent='logout')
                     b Logout -->
 <template lang='pug'>
   div
@@ -39,7 +39,7 @@
           div.form-group.has-success.has-feedback
             span.input-group
               span.input-group-addon(style='background-color: transparent; border: 0px;')
-                a(href='/' onclick='return false' @click.prevent="toggleBlock('search')") 
+                a(href='/' onclick='return false' @click.prevent="toggleBlock('search')")
                     icon(:name='searchIcon' color='black' scale='2')
                 span &nbsp; &nbsp;
           div(@mouseleave="hideBlock('search')")
@@ -53,7 +53,7 @@
                         button.btn.btn-lg.btn-default.full-page(@click.prevent='searchMethod')
                           icon(name='search' color='black' background='blue')
         td
-          span &nbsp; &nbsp; 
+          span &nbsp; &nbsp;
           span &nbsp; &nbsp;
         td
           span(v-if='user')
@@ -67,7 +67,7 @@
           div.form-group
             span.input-group
               span.input-group-addon(style='background-color: transparent; border: 0px;')
-                a(href='/' onclick='return false' @click.prevent="toggleBlock('menu')") 
+                a(href='/' onclick='return false' @click.prevent="toggleBlock('menu')")
                     icon(:name='menuIcon' color='black' scale='2')
                 span &nbsp; &nbsp;
                 div(@mouseleave="hideBlock('menu')")
@@ -78,9 +78,8 @@
                           b About Us
                     tr(v-if='user')
                       td
-                        a(href='#' onclick='return false' @click.prevent='logout') 
+                        a(href='#' onclick='return false' @click.prevent='logout')
                           b Logout
-
 
 </template>
 

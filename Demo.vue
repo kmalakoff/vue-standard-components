@@ -1,14 +1,14 @@
 <template lang='pug'>
-  <!-- Usage: 
+  <!-- Usage:
     Demo (name="example1" :demo="demo")
   -->
-  span 
+  span
     Help(:show="demo" :demoStep="docs.step" :title='docs.title' :message="docs.message" name='docs.name')
 </template>
 
 <script>
   import Help from './../Standard/Help.vue'
-  
+
   export default {
     name: 'schedule',
     data () {
@@ -50,7 +50,7 @@
           return {}
         }
       }
-    },
+    }
   }
 </script>
 

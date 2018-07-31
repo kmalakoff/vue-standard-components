@@ -1,13 +1,13 @@
 <template>
 <div>
-    <!-- 
+    <!--
         custom html element
         custom atribute formdata is required
      -->
     <dynamic-form :formdata="formdata"></dynamic-form>
 </div>
 </template>
- 
+
 <script>
 
 import dynamicForm from 'vue-dynamic-forms'
@@ -26,6 +26,6 @@ export default {
     }
 }
 </script>
- 
+
 <style lang="css" scoped>
 </style>
