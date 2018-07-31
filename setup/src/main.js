@@ -13,9 +13,10 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import Icon from 'vue-awesome/components/Icon'
-import store from './components/myState.js'
+import store from './store'
 
 import auth from './auth'
+import axios from 'axios'
 
 // Check the users auth status when the app starts
 auth.checkAuth()
@@ -26,6 +27,11 @@ Vue.use(BootstrapVue)
 
 Vue.component('icon', Icon)
 Vue.use(BootstrapVue)
+
+const token = localStorage.getItem('user-token')
+if (token) {
+  axios.defaults.headers.common['Authorization'] = token
+}
 
 /* eslint-disable no-new */
 new Vue({
