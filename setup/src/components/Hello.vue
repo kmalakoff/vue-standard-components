@@ -74,7 +74,7 @@ $body-colour: black;
   color: $footer-colour;
   height: $footer-height;
   width: 100%;
-  
+
   padding-left: 40px;
   padding-right: 40px;
   padding-top: 15px;
@@ -115,7 +115,7 @@ img.bg {
   /* Set up proportionate scaling */
   width: 100%;
   height: auto;
-  
+
   /* Set up positioning */
   position: fixed;
   top: calc(#{$header-height});
