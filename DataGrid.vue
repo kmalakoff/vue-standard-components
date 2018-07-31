@@ -1,6 +1,6 @@
 <!-- src/components/Login.vue -->
 
-<!-- 
+<!--
 Usage:
 
   DataGrid(:data="data" :type="link.type" :modal="link.modal" :record="data[index]" :link="link")
@@ -26,13 +26,13 @@ Advanced Options:
         <!-- Put Records in Columns -->
         th.result-heading Field
         th.result-heading Value
-      tr.dataHeader(v-else)      
+      tr.dataHeader(v-else)
         <!-- Put Records in Rows -->
         th.result-heading(v-for="key in data_fields")
           span {{key}}
         th.result-heading(v-if="deSelectable") Remove
         th.result-heading(v-if="options && options.addLinks" v-for="func, key in options.addLinks")
-          span &nbsp; <!-- add empty column headers -->         
+          span &nbsp; <!-- add empty column headers -->
       tbody.dataBody(v-if="options.listBy === 'column'")
         <!-- Put Records in Columns -->
         tr.result-row(v-for="key in data_fields")
@@ -40,9 +40,9 @@ Advanced Options:
           td.result-cell(:class="dynamicClass(record)" v-for="record, index in dynamicData")
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
 
-        tr.result-cell(v-if="deSelectable") 
+        tr.result-cell(v-if="deSelectable")
           td Remove
-          td button.btn.btn-xs.btn-danger(v-on:click="remove(index)") x {{index}} 
+          td button.btn.btn-xs.btn-danger(v-on:click="remove(index)") x {{index}}
         tr.result-cell(v-if="options && options.addLinks" v-for="link in options.addLinks")
           td &nbsp;
           td
@@ -54,13 +54,13 @@ Advanced Options:
                   icon(:name='link.name' :color='link.colour' :scale='link.scale')
               span(v-else)
                 icon(:name='link.name' :color='link.colour' :scale='link.scale')
-      tbody.dataBody(v-else)      
+      tbody.dataBody(v-else)
         <!-- Put Records in Rows -->
         tr.result-row(:class="dynamicClass(record)" v-for="record, index in dynamicData")
           td.result-cell(v-for="key in data_fields")
             a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
-          td.result-cell(v-if="deSelectable") 
-            button.btn.btn-xs.btn-danger(v-on:click="remove(index)") x {{index}} 
+          td.result-cell(v-if="deSelectable")
+            button.btn.btn-xs.btn-danger(v-on:click="remove(index)") x {{index}}
           td.result-cell(v-if="options && options.addLinks" v-for="link in options.addLinks")
             span(v-if="link.type === 'button'")
               ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="dynamicData[index]" :link="link" :links="links")
@@ -72,7 +72,7 @@ Advanced Options:
                 icon(:name='link.name' :color='link.colour' :scale='link.scale')
 
     div(v-if='!dynamicData || !dynamicData.length')
-      table(align='center' v-if='noDataMsg') 
+      table(align='center' v-if='noDataMsg')
         tr
           td {{noDataMsg}}
 </template>
@@ -319,7 +319,7 @@ Advanced Options:
     border: 1px solid black;
     padding: 5px;
     /*background-color: lightgreen;*/
-  }  
+  }
 
   .result-heading {
     text-align: center;
@@ -332,7 +332,7 @@ Advanced Options:
     background-color: #eee;
     color: #000;
   }
-  
+
   .result-row {
     padding:10px;
   }
@@ -358,4 +358,3 @@ Advanced Options:
     background-color: #ffC;
   }
 </style>
-

@@ -1,4 +1,4 @@
-<!-- src/components/Standard/Menu.vue 
+<!-- src/components/Standard/Menu.vue
 
   Usage:
 
@@ -9,10 +9,9 @@
   links: [ goHere: '/goHere', maps: 'https/maps.google.ca']
   eg Menu(:links="links")
 
-
   type = 'onClick' ... execute onClick (eg switch layers on tab clicks)
   *****************
-  
+
   predefine:
 
   links: [ A: 'Acomponent', B: 'Bcomponent'],
@@ -26,7 +25,7 @@
   },
 
   template:
-  
+
   Menu(:links="links" :onClick='activate' :active="active_block")
 
   div(v-for='link in links')
@@ -42,19 +41,19 @@
       span
       ul
         span(v-html='prefix') &nbsp; &nbsp;
-        li.dropdown(:class="direction" v-for="link in links")         
+        li.dropdown(:class="direction" v-for="link in links")
           span(v-if="link.constructor === Object")
             span(v-for="target,label in link")
               span(v-if="target.constructor === Array && type==='url'")
                 <!-- Multi-level menus only ...  -->
-                a.dropbtn(href="javascript:void(0)") {{label}} 
+                a.dropbtn(href="javascript:void(0)") {{label}}
                 div.dropdown-content
-                  span(v-for="targetN,index in target")
+                  span(v-for="targetN, index in target")
                     span(v-if="targetN.constructor === Object")
                       span(v-for="subUrl,subLabel in targetN")
                           a(:href="subUrl") S: {{subLabel}}
                     span(v-else)
-                      router-link(:to="{name: targetN}") {{targetN}} 
+                      router-link(:to="{name: targetN}") {{targetN}}
               span(v-else-if="type==='url'")
                 <!-- Standard array of key:value pairs (name: target)  -->
                 a(:href="target" target="_blank") {{label}}
@@ -149,8 +148,7 @@
       display: inline-block;
   }
 
-
-  li a, .dropbtn {      
+  li a, .dropbtn {
       color: $menu-colour;
       text-align: center;
       padding: 14px 16px;
@@ -206,5 +204,4 @@
     font-weight: normal;
     color: $menu-colour;
   }
-
 </style>

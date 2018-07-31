@@ -17,7 +17,7 @@
               a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} v-on:click="onPick(scope, record[reference], record[key])") {{val}}
             span(v-else) {{val}}
     div(v-if='!searchResults[scope] || !searchResults[scope].length')
-      table(align='center' v-if='noDataMsg') 
+      table(align='center' v-if='noDataMsg')
         tr
           td {{noDataMsg}}
     div(v-if='searchStatus[scope] === "searching"')
@@ -31,52 +31,51 @@
 </template>
 
 <script>
-  export default {
+export default {
 
-    data () {
-      return {
-        fields: '',
-        show: [],
-        highlight: '',
-        searchResults: this.list,
-        searchStatus: this.status
-      }
-    },
-
-    props: {
-      scope: {
-        type: String
-      },
-      noDataMsg: {
-        type: String
-      },
-      reference: {
-        type: String
-      },
-      list: {
-        type: Array,
-        default () { return [] }
-      },
-      picked: {
-        type: Array,
-        default () { return [] }
-      },
-      status: {
-        type: String,
-        default: 'pending'
-      }
-    },
-
-    methods: {
-      onPick (scope, id, label) {
-        console.log(scope + ' picked ' + id)
-        // this.$store.commit('selectOneMore', {scope: scope, id: id, label: label})
-        this.picked.push({id: id, label: label})
-        return false
-      }
+  data () {
+    return {
+      fields: '',
+      show: [],
+      highlight: '',
+      searchResults: this.list,
+      searchStatus: this.status
     }
+  },
 
+  props: {
+    scope: {
+      type: String
+    },
+    noDataMsg: {
+      type: String
+    },
+    reference: {
+      type: String
+    },
+    list: {
+      type: Array,
+      default () { return [] }
+    },
+    picked: {
+      type: Array,
+      default () { return [] }
+    },
+    status: {
+      type: String,
+      default: 'pending'
+    }
+  },
+
+  methods: {
+    onPick (scope, id, label) {
+      console.log(scope + ' picked ' + id)
+      // this.$store.commit('selectOneMore', {scope: scope, id: id, label: label})
+      this.picked.push({id: id, label: label})
+      return false
+    }
   }
+}
 </script>
 
 <style scoped>
@@ -87,8 +86,7 @@
     margin-top: 40px;
     border: 1px solid black;
     padding: 10px;
-  }  
-
+  }
   .result-heading {
     text-align: center;
     background-color: #999;

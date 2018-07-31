@@ -1,6 +1,6 @@
 <!-- src/components/Messaging.vue -->
 
-<!-- 
+<!--
   Usage:
 
     1. include Messaging component in script block and component list:
@@ -20,7 +20,6 @@
       this.$store.commit('clearErrors')
 
 !-->
-
 
 <template lang='pug'>
   div.message-block
