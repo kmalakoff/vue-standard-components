@@ -10,7 +10,7 @@
 
 > npm install -S vuex axios cors bootstrap@3.* bootstrap-vue vue-form-generator vue-directive-tooltip vue-async-computed
 
-> npm install -D pug vue-awesome node-sass sass-loader
+> npm install -D pug vue-awesome node-sass sass-loader http-proxy-middleware
 
 > cd src/components
 
