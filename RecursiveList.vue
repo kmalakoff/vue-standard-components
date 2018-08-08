@@ -13,7 +13,9 @@
     - idKey (key for name value (defaults to 'id'))
     - parentKey (key for name value (defaults to 'parent_id'))
     - clear (start with empty list of preselected values)
-    - selectOne (pick items one at a time)
+
+    - selectOne (toggle items one at a time, closing list automatically upon selection)
+    - selectable (enable users to toggle individual items on and off using checkbox)
 
     - selectText (text prompt to trigger individual select method)
     - showSelect (method to determine if selectText option is available for each record)
@@ -25,64 +27,86 @@
     - init (initial open setting (all, selected, top [default]) indicates which blocks to start in open mode.
     - style options (?)
 
+    - secondaryPick (clickable link beside static list item - only appears after selection is complete)
+      - show (boolean or method returning computed boolean value)
+      - selectText (text for clickable link for secondary pick execution)
+      - onPick (method to execute upon selection for individual item)
+
  -->
   <template lang='pug'>
     div.recursiveList
       <!-- b R: {{reOrderedList}} -->
-      Modal(id='info-modal' type='record' :options="options")
-      span(v-if="newItems")
+      Modal(:id='modalID' type='record' :options="options")
+      span(v-if="newItems && promptNew")
         b.undecided {{newItems}} New {{options.label}} option(s) available: &nbsp; &nbsp;
         i {{Object.keys(newItem).join(', ')}}
-      ul
-        li(v-for="item in reOrderedList" v-show="openItems['id' + item.parent_id] === true")
-          span(v-for='count in item.indents')
-            span &nbsp; &nbsp; > &nbsp;
-
-          span(v-if="selectOne")
-            span(v-if='select[item[nameKey]]')
-              b.selected {{item[nameKey]}} &nbsp; &nbsp;
-              a(href='#' @click.prevent="deselectMe(item)")
-                icon.midline(name='minus')
-            span(v-else)
-              b.unselected {{item[nameKey]}} &nbsp; &nbsp;
-              a(href='#' @click.prevent="selectMe(item)")
-                icon.midline(name='plus')
-
-          span(v-else-if='selectable')
-            span.newItem(v-if="newItem[item[nameKey]]")
-              input(v-model='select[item[nameKey]]' type='radio' value = 'yes' @click.prevent='pickYes(item.id)')
-              span &nbsp; Yes &nbsp;
-              input(v-model='select[item[nameKey]]' type='radio' value = 'no' @click.prevent='pickNo(item.id)')
-              span &nbsp; No &nbsp;
-            input(v-else type='checkbox' v-model='select[item[nameKey]]' @click.prevent='pick(item.id)')
-            span &nbsp;
-            span(v-if="select[item[nameKey]]")
-              b.selected {{item[nameKey]}} &nbsp; &nbsp;
-            span(v-else-if="newItem[item[nameKey]]")
-              b.undecided {{item[nameKey]}} &nbsp; &nbsp;
-            span(v-else)
-              b.unselected {{item[nameKey]}} &nbsp; &nbsp;
-          span(v-else-if="onPick")
-            a(href='#' v-if='onPick' @click.prevent='onPick(item)')
-              b {{item.name}} &nbsp; &nbsp;
-          span(v-else)
-            b {{item.name}}
-
-          span(v-if='showSelect && showSelect(item)')
-            a(href='#' v-if='onSelect' @click.prevent='onSelect(item)')
-              b {{selectText}}
-              <!-- icon.midline(name='plus') -->
-          span &nbsp;
-          a(href='#' @click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] && under[item.id]")
-            icon.midline(name='compress')
-          a(href='#' @click.prevent="toggle(item.id)"  v-if="openItems['id' + item.id] === false  && under[item.id]")
-            span ({{under[item.id].length}} options) &nbsp;
-              icon.midline(name='expand')
-      div(v-if="1")
-        hr
-        u Current List:
+      div(v-if='hideList')
+        ul(v-if='selectOne' style='display:inline-flex')
+          li(v-for='picked in static')
+            span(v-show = 'picked !== static[0]')  &nbsp; > &nbsp;
+            b {{id2name[picked]}} &nbsp;
+            span(v-if='secondaryPick && secondaryPick.show(hash[picked])')
+              a(href='#' v-on:click='secondaryPick.onPick(hash[picked])')
+                b &nbsp; {{secondaryPick.selectText}}
+        ul(v-else)
+          li(v-for='picked in static')
+            i {{id2name[picked]}} &nbsp;
+            span(v-if='secondaryPick && secondaryPick.show(hash[picked])')
+              a(href='#' v-on:click='secondaryPick.onPick(hash[picked])')
+                b &nbsp; {{secondaryPick.selectText}}
         br
-        b {{selected}}
+        div.button.btn.btn-primary(@click.prevent='editList()') Edit
+      div(v-else)
+        ul
+          li(v-for="item in reOrderedList" v-show="openItems['id' + item.parent_id] === true")
+            span(v-for='count in item.indents')
+              span &nbsp; &nbsp; > &nbsp;
+
+            span(v-if="selectToggle")
+              span(v-if='select[item[idKey]]')
+                b.selected {{item[nameKey]}} &nbsp; &nbsp;
+                a(href='#' @click.prevent="deselectMe(item)")
+                  icon.midline(name='minus')
+              span(v-else)
+                b.unselected {{item[nameKey]}} &nbsp; &nbsp;
+                a(href='#' @click.prevent="selectMe(item)")
+                  icon.midline(name='plus')
+
+            span(v-else-if='selectable')
+              // checkboxes to enbable multiple options to be chosen
+              span.newItem(v-if="newItem[item[nameKey]] && promptNew")
+                input(v-model='select[item[idKey]]' type='radio' value = 'yes' @click.prevent='toggleYes(item.id)')
+                span &nbsp; Yes &nbsp;
+                input(v-model='select[item[idKey]]' type='radio' value = 'no' @click.prevent='toggleNo(item.id)')
+                span &nbsp; No &nbsp;
+              input(v-else type='checkbox' v-model='select[item[idKey]]' @click.prevent='toggle(item)')
+              span &nbsp;
+              span(v-if="select[item[idKey]]")
+                b.selected {{item[nameKey]}} &nbsp; &nbsp;
+              span(v-else-if="newItem[item[nameKey]]")
+                b.undecided {{item[nameKey]}} &nbsp; &nbsp;
+              span(v-else)
+                b.unselected {{item[nameKey]}} &nbsp; &nbsp;
+            span(v-else-if="onPick")
+              a(href='#' v-if='onPick' @click.prevent='onPick(item)')
+                b {{item.name}} &nbsp; &nbsp;
+            span(v-else)
+              b {{item.name}}
+
+            span(v-if='showSelect && showSelect(item)')
+              a(href='#' v-if='onSelect' @click.prevent='onSelect(item)')
+                b {{selectText}}
+                <!-- icon.midline(name='plus') -->
+            span &nbsp;
+            a(href='#' @click.prevent="toggleProgeny(item.id)"  v-if="openItems['id' + item.id] && under[item.id]")
+              icon.midline(name='compress')
+            a(href='#' @click.prevent="toggleProgeny(item.id)"  v-if="openItems['id' + item.id] === false  && under[item.id]")
+              span ({{under[item.id].length}} options) &nbsp;
+                icon.midline(name='expand')
+        span.button.btn.btn-primary(@click.prevent='saveList()' v-show='!hideList && !selectOne') Done
+        span &nbsp; &nbsp;
+        span.button.btn.btn-primary(@click.prevent='showList()' v-show='hideList') Edit
+        p &nbsp;
   </template>
 <script>
 // import _ from 'lodash'
@@ -102,6 +126,8 @@ export default {
   data () {
     return {
       openItems: {'idnull': true, 'id0': true},
+      hash: {},
+      seeds: [],
       under: {},
       rList: [],
       parent: {},
@@ -112,7 +138,9 @@ export default {
       selectParent: {},
       newItem: {},
       newItems: 0,
-      seeds: []
+      static: [],
+      hideList: false,
+      defaultModalID: 'info-modal'
     }
   },
   props: {
@@ -129,82 +157,24 @@ export default {
       type: Function,
       default () { return null }
     },
-    options: { type: Object } // idKey, parentKey, open (defaults to: id, parent_id, false)
+    options: { type: Object }, // idKey, parentKey, open (defaults to: id, parent_id, false)
+    secondaryPick: {
+      type: Object
+    }
   },
   created: function () {
-    var list = this.list || []
-    for (var i = 0; i < list.length; i++) {
-      var nameKey = this.options.nameKey || this.nameKey || 'name'
-      var idKey = this.options.idKey || this.idKey || 'id'
-      var parentKey = this.options.parentKey || 'parent_id'
-
-      var name = list[i][nameKey]
-      var selected = list[i].selected && !this.clear
-      var id = list[i][idKey]
-      var parent = list[i][parentKey]
-
-      this.$set(this.parent, id, parent)
-
-      if (selected) {
-        this.$set(this.select, name, true)
-        this.$set(this.selectParent, parent, true)
-      } else if (selected === false) {
-        this.$set(this.select, name, false)
-      } else {
-        var pname = this.id2name[parent]
-        if (!this.newItem[pname]) {
-          this.$set(this.newItem, name, true)
-          if (this.selectable) { this.newItems++ }
-        }
-      }
-
-      this.$set(this.name2id, name, id)
-      this.$set(this.id2name, id, name)
-
-      // this.$set(this.select, name, false)
-      if (this.list[i].parent_id) {
-        if (!this.under[parent.toString()]) {
-          this.$set(this.under, parent.toString(), [])
-          this.$set(this.openItems, 'id' + parent, false)
-        }
-
-        var currentLength = this.under[parent.toString()].length
-        this.$set(this.under[parent.toString()], currentLength, id)
-      } else {
-        this.$set(this.list[i], 'parent_id', 0)
-        this.seeds.push(list[i][idKey])
-        console.log('seed ' + list[i][idKey])
-        // this.addRecursive(list[i][idKey], 0)
-      }
-    }
-
-    console.log('seeds: ' + JSON.stringify(this.seeds))
-    // open parent of selected interests (if applicable)
-    if (this.options && this.options.open) {
-      var PS = Object.keys(this.selectParent)
-      for (var j = 0; j < PS.length; j++) {
-        var pid = PS[j]
-        this.$set(this.openItems, 'id' + pid, true)
-      }
-    }
-
-    for (var k = 0; k < 4; k++) {
-      console.log('seeding ' + k)
-      this.addRecursive(k, 0)
-    }
-    // this.addRecursive(1, 0)
-    // this.addRecursive(2, 0)
-    // this.addRecursive(3, 0)
-
-    console.log('tracked underitems list: ' + JSON.stringify(this.under))
+    this.buildMetaData()
   },
   after_created: function () {
-    for (var k = 0; k < this.seeds; k++) {
-      console.log('seeding ' + k)
-      this.addRecursive(k, 0)
-    }
   },
   computed: {
+    modalID: function () {
+      if (this.options && this.options.modalID) {
+        return this.options.modalID
+      } else {
+        return this.defaultModalID
+      }
+    },
     clear: function () {
       if (this.options && this.options.clear) {
         return true
@@ -221,7 +191,7 @@ export default {
     },
     selectText: function () {
       if (this.options && this.options.selectText) {
-        return this.options.selectText || 'pick'
+        return this.options.selectText || 'toggle'
       } else { return 'choose' }
     },
     selected: function () {
@@ -230,10 +200,18 @@ export default {
       for (var i = 0; i < keys.length; i++) {
         var choice = this.select[keys[i]]
         if (choice) {
+          // list.push(this.id2name[keys[i]])
           list.push(keys[i])
         }
       }
       return list
+    },
+    promptNew: function () {
+      if (this.options && this.options.promptNew) {
+        return true
+      } else {
+        return false
+      }
     },
     nameKey: function () {
       if (this.options && this.options.nameKey) {
@@ -266,6 +244,13 @@ export default {
         return false
       }
     },
+    selectToggle: function () {
+      if (this.options && this.options.selectToggle) {
+        return true
+      } else {
+        return false
+      }
+    },
     selectable: function () {
       if (this.options && this.options.selectable) {
         return true
@@ -290,17 +275,102 @@ export default {
     // },
   },
   methods: {
+    buildMetaData: function (chosen) {
+      var list = this.list || []
+      var seeds = []
+      console.log('build with chosen values: ' + JSON.stringify(chosen))
+      for (var i = 0; i < list.length; i++) {
+        var nameKey = this.options.nameKey || this.nameKey || 'name'
+        var idKey = this.options.idKey || this.idKey || 'id'
+        var parentKey = this.options.parentKey || 'parent_id'
+
+        var name = list[i][nameKey]
+        var id = list[i][idKey]
+        var parent = list[i][parentKey]
+
+        this.$set(this.hash, id, list[i])
+
+        if (!parent) { seeds.push(id) }
+
+        var selected
+        if (chosen) {
+          selected = chosen.indexOf(name) >= 0
+          if (selected) { console.log('preset: ' + name) }
+        } else { selected = list[i].selected && !this.clear }
+
+        this.$set(this.parent, id, parent)
+
+        if (selected) {
+          this.$set(this.select, id, true)
+          this.$set(this.selectParent, parent, true)
+        } else if (selected === false) {
+          this.$set(this.select, id, false)
+        } else {
+          var pname = this.id2name[parent]
+          if (!this.newItem[pname]) {
+            this.$set(this.newItem, name, true)
+            if (this.selectable) { this.newItems++ }
+          }
+        }
+
+        this.$set(this.name2id, name, id)
+        this.$set(this.id2name, id, name)
+
+        if (this.list[i].parent_id) {
+          if (!this.under[parent.toString()]) {
+            this.$set(this.under, parent.toString(), [])
+            this.$set(this.openItems, 'id' + parent, false)
+          }
+
+          var currentLength = this.under[parent.toString()].length
+          this.$set(this.under[parent.toString()], currentLength, id)
+        } else {
+          this.$set(this.list[i], 'parent_id', 0)
+        }
+      }
+
+      console.log('seeds are: ' + JSON.stringify(seeds))
+      this.seeds = seeds
+      // open parent of selected interests (if applicable)
+      if (this.options && this.options.open) {
+        var PS = Object.keys(this.selectParent)
+        for (var j = 0; j < PS.length; j++) {
+          var pid = PS[j]
+          this.$set(this.openItems, 'id' + pid, true)
+        }
+      }
+
+      for (var k = 0; k < seeds.length; k++) {
+        console.log('seeding ' + k)
+        this.addRecursive(seeds[k], 0)
+      }
+
+      console.log('tracked underitems list: ' + JSON.stringify(this.under))
+    },
+    clearList: function () {
+      console.log('CLEAR ' + this.static[0])
+      this.toggle(this.static[0])
+      // for (var i = 0; i < this.seeds.length; i++) {
+      //   if (this.openItems['id' + this.seeds[i]]) {
+      //     console.log('close ' + this.seeds[i])
+      //     this.toggle(this.seeds[i])
+      //   }
+      // }
+    },
+    reopenTree: function () {
+
+    },
     deselectMe: function (item) {
       console.log('deselect ' + JSON.stringify(item.name))
-      this.$set(this.select, item.name, false)
+      this.$set(this.select, item.id, false)
     },
     selectMe: function (item) {
       console.log('select ' + JSON.stringify(item.name))
-      this.$set(this.select, item.name, true)
+      this.$set(this.select, item.id, true)
     },
-    toggle: function (id) {
+    toggleProgeny: function (id) {
       var key = 'id' + id
-      console.log('toggle ' + id)
+      console.log('Toggle ' + id)
       this.$set(this.openItems, key, !this.openItems[key])
 
       if (!this.openItems[key]) {
@@ -309,7 +379,7 @@ export default {
         for (var i = 0; i < under.length; i++) {
           var underid = under[i]
           if (this.openItems['id' + underid]) {
-            this.toggle(underid)
+            this.toggleProgeny(underid)
           }
         }
       }
@@ -321,54 +391,74 @@ export default {
         console.log('no onPick option supplied to RecursiveList')
       }
     },
-    pick: function (id) {
+    toggle: function (item) {
+      var id = null
+      if (item.constructor === Object) {
+        id = item.id
+      } else {
+        id = item
+        item = null
+      }
       var ids = 'id' + id
       var name = this.id2name[id]
 
+      console.log('check for clear: ' + this.static.length + '+' + item)
+      if (this.selectOne && this.static.length && item) {
+        console.log('clearlist ' + this.static[0])
+        this.toggle(this.static[0])
+        // for (var j = 0; j < this.static.length; j++) {
+        //   console.log('turn off ' + this.static[j])
+        //   this.deselectMe(this.static[j])
+        // }
+      }
+
       if (id && name) {
         // first clear sub interests if applicable ..
-        if (this.select[name]) {
+        if (this.select[id]) {
           console.log('deselect ' + id)
           // deselect
           if (this.under[id]) {
             for (var i = 0; i < this.under[id].length; i++) {
               var uid = this.under[id][i]
-              var uname = this.id2name[uid]
-              if (this.select[uname]) {
+              // var uname = this.id2name[uid]
+              if (this.select[uid]) {
                 // this.$set(this.select, uname, false)
-                this.pick(uid)
+                this.toggle(uid)
               }
             }
           }
           this.$set(this.openItems, ids, false)
-          // this.toggle(id)
+          // this.toggleProgeny(id)
         } else {
           console.log('select ' + id)
           // select
           this.$set(this.openItems, ids, true)
 
           // select parent interests automatcially
-          var pid = this.parent[id]
-          var pname = this.id2name[pid]
-          if (pid && !this.select[pname]) {
-            this.pick(pid)
-          }
+          // var pid = this.parent[id]
+          // var pname = this.id2name[pid]
+          // if (pid && !this.select[pname]) {
+          //   this.toggle(pid)
+          // }
         }
 
-        this.$set(this.select, name, !this.select[name])
+        this.$set(this.select, id, !this.select[id])
+        if (this.selectOne) {
+          this.saveList()
+        }
       } else {
-        console.log('error trying to pick ' + id + ':' + name)
+        console.log('error trying to toggle ' + id + ':' + name)
       }
     },
-    pickYes: function (id) {
+    toggleYes: function (id) {
       var name = this.id2name[id]
       // var ids = 'id' + id
 
-      this.$set(this.select, name, false)
-      this.pick(id)
+      this.$set(this.select, id, false)
+      this.toggle(id)
       // if (this.openItems[ids] === false) {
       //   this.$set(this.openItems, ids, true)
-      //   console.log('pick ' + name + ': ' + ids)
+      //   console.log('toggle ' + name + ': ' + ids)
       // }
 
       // console.log('under ? ' + JSON.stringify(this.under[id]))
@@ -385,19 +475,19 @@ export default {
       this.$set(this.newItem, name, null)
       this.newItems--
     },
-    pickNo: function (id) {
+    toggleNo: function (id) {
       var name = this.id2name[id] // interest.name
 
-      console.log('unpick ' + id + name)
-      this.$set(this.select, name, true)
+      console.log('untoggle ' + id + name)
+      this.$set(this.select, id, true)
       this.$set(this.newItem, name, null)
-      this.pick(id)
+      this.toggle(id)
 
       this.newItems--
     },
     addRecursive: function (id, level) {
       var refIndex = id - 1 // tmp
-      if (id) {
+      if (id >= 0) {
         var ids = id.toString()
 
         var index = this.reOrderedList.length || 0
@@ -419,6 +509,27 @@ export default {
       } else {
         console.log('no id specified...')
       }
+    },
+    saveList: function () {
+      console.log('save list ...')
+      // this.$set(this, 'hideList', true)
+      this.hideList = true
+      this.$set(this, 'static', [])
+      var keys = Object.keys(this.select)
+      for (var i = 0; i < keys.length; i++) {
+        if (this.select[keys[i]]) {
+          console.log('save: ' + JSON.stringify(keys[i]))
+          this.static.push(keys[i])
+        }
+      }
+      // this.static = this.selected
+    },
+    showTree: function () {
+      this.hideList = false
+    },
+    editList: function () {
+      console.log('Selected: ' + JSON.stringify(this.selected))
+      this.hideList = false
     }
   }
 }
@@ -442,4 +553,5 @@ export default {
 .recursiveList ul li {
     display: block;
 }
+
 </style>
