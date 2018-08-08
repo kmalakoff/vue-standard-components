@@ -14,7 +14,7 @@ Usage:
       tr(v-if='heading')
         td.heading(colspan=3)
           h2 {{heading}}:
-      tr(v-for="field in fields")
+      tr(v-for="field in fields" v-show="field.type!=='hidden'")
         td.prompt-column
           b {{label(field)}}:
         td.data-column
