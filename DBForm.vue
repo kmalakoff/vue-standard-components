@@ -33,9 +33,9 @@ Usage:
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
     hr
-    button.btn.btn-primary(v-if="onSave && access === 'edit'" @click.prevent="onSave(form)") Save
+    button.btn.btn-primary(v-if="onSave && (access === 'edit' || access === 'append')" @click.prevent="onSave(form)") Save
     hr
-    b Form Input: {{form}}"
+    b Form Input: {{access}} : {{form}}"
 </template>
 
 <script>
