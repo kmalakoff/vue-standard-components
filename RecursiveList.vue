@@ -44,13 +44,12 @@
         ul(v-if='selectOne' style='display:inline-flex')
           li(v-for='picked in static')
             span(v-show = 'picked !== static[0]')  &nbsp; > &nbsp;
-            b {{id2name[picked]}} &nbsp;
-            span(v-if='secondaryPick && secondaryPick.show(hash[picked])')
-              a(href='#' v-on:click='secondaryPick.onPick(hash[picked])')
-                b &nbsp; {{secondaryPick.selectText}}
+            h3 {{id2name[picked]}} &nbsp;
+              span(v-if='secondaryPick && secondaryPick.show(hash[picked])')
+                a(href='#' v-on:click='secondaryPick.onPick(hash[picked])')
+                  b &nbsp; {{secondaryPick.selectText}}
         ul(v-else)
-          li(v-for='picked in static')
-            i {{id2name[picked]}} &nbsp;
+          li(v-for='picked in static') {{id2name[picked]}} &nbsp;
             span(v-if='secondaryPick && secondaryPick.show(hash[picked])')
               a(href='#' v-on:click='secondaryPick.onPick(hash[picked])')
                 b &nbsp; {{secondaryPick.selectText}}
