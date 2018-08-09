@@ -79,7 +79,7 @@
                 span &nbsp; Yes &nbsp;
                 input(v-model='select[item[idKey]]' type='radio' value = 'no' @click.prevent='toggleNo(item.id)')
                 span &nbsp; No &nbsp;
-              input(v-else type='checkbox' v-model='select[item[idKey]]' @click.prevent='toggle(item)')
+              input(v-else type='checkbox' v-model='select[item[idKey]]' v-on:click='toggle(item)')
               span &nbsp;
               span(v-if="select[item[idKey]]")
                 b.selected {{item[nameKey]}} &nbsp; &nbsp;
@@ -160,6 +160,9 @@ export default {
     options: { type: Object }, // idKey, parentKey, open (defaults to: id, parent_id, false)
     secondaryPick: {
       type: Object
+    },
+    onSave: {
+      type: Function
     }
   },
   created: function () {
@@ -406,10 +409,6 @@ export default {
       if (this.selectOne && this.static.length && item) {
         console.log('clearlist ' + this.static[0])
         this.toggle(this.static[0])
-        // for (var j = 0; j < this.static.length; j++) {
-        //   console.log('turn off ' + this.static[j])
-        //   this.deselectMe(this.static[j])
-        // }
       }
 
       if (id && name) {
@@ -420,9 +419,7 @@ export default {
           if (this.under[id]) {
             for (var i = 0; i < this.under[id].length; i++) {
               var uid = this.under[id][i]
-              // var uname = this.id2name[uid]
               if (this.select[uid]) {
-                // this.$set(this.select, uname, false)
                 this.toggle(uid)
               }
             }
@@ -433,13 +430,6 @@ export default {
           console.log('select ' + id)
           // select
           this.$set(this.openItems, ids, true)
-
-          // select parent interests automatcially
-          // var pid = this.parent[id]
-          // var pname = this.id2name[pid]
-          // if (pid && !this.select[pname]) {
-          //   this.toggle(pid)
-          // }
         }
 
         this.$set(this.select, id, !this.select[id])
@@ -522,6 +512,8 @@ export default {
           this.static.push(keys[i])
         }
       }
+      if (this.onSave) { this.onSave(this.static) }
+
       // this.static = this.selected
     },
     showTree: function () {
