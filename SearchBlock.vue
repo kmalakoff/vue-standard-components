@@ -374,7 +374,7 @@ export default {
           { code: 'mmr', vaccine: 'MMR', coverage: 'measles, mumps, rubells' }
         ]}
 
-        console.log('axios returned value(s): ' + JSON.stringify(result))
+        console.log('axios returned SearchBlock value(s): ' + JSON.stringify(result))
 
         var newdata = {}
         var model = _this.search_options.model || _this.scope
