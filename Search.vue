@@ -309,7 +309,7 @@ export default {
 
       axios({url: fullUrl, method: method, data: data})
         .then(function (result, err) {
-          console.log('axios returned value(s): ' + JSON.stringify(result))
+          console.log('axios returned Search Value(s): ' + JSON.stringify(result))
           if (err) {
             console.log('axios call error')
           }
