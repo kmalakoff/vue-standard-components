@@ -78,7 +78,7 @@
                 span &nbsp; Yes &nbsp;
                 input(v-model='select[item[idKey]]' type='radio' value = 'no' @click.prevent='toggleNo(item.id)')
                 span &nbsp; No &nbsp;
-              input(v-else type='checkbox' v-model='select[item[idKey]]' v-on:click='toggle(item)')
+              input(v-else type='checkbox' v-model='select[item[idKey]]' v-on:change='toggle(item)') 
               span &nbsp;
               span(v-if="select[item[idKey]]")
                 b.selected {{item[nameKey]}} &nbsp; &nbsp;
@@ -170,6 +170,9 @@ export default {
   after_created: function () {
   },
   computed: {
+    isSelected: function () {
+      return this.select
+    },
     modalID: function () {
       if (this.options && this.options.modalID) {
         return this.options.modalID
@@ -275,6 +278,8 @@ export default {
     //     return null
     //   }
     // },
+  },
+  watch: {
   },
   methods: {
     buildMetaData: function (chosen) {
@@ -393,6 +398,17 @@ export default {
         console.log('no onPick option supplied to RecursiveList')
       }
     },
+    toggle2: function (item) {
+      var id = null
+      if (item.constructor === Object) {
+        id = item.id
+      } else {
+        id = item
+        item = null
+      }
+      console.log('toggle: ' + id)
+      // this.$set(this.select, id, !this.select[id])
+    },
     toggle: function (item) {
       var id = null
       if (item.constructor === Object) {
@@ -404,6 +420,7 @@ export default {
       var ids = 'id' + id
       var name = this.id2name[id]
 
+      console.log(id + ids + name)
       console.log('check for clear: ' + this.static.length + '+' + item)
       if (this.selectOne && this.static.length && item) {
         console.log('clearlist ' + this.static[0])
@@ -412,18 +429,12 @@ export default {
 
       if (id && name) {
         // first clear sub interests if applicable ..
-        if (this.select[id]) {
+        if (!this.select[id]) {
           console.log('deselect ' + id)
           // deselect
-          if (this.under[id]) {
-            for (var i = 0; i < this.under[id].length; i++) {
-              var uid = this.under[id][i]
-              if (this.select[uid]) {
-                this.toggle(uid)
-              }
-            }
-          }
-          this.$set(this.openItems, ids, false)
+          this.toggleOff(this.under[id])
+
+          // this.$set(this.openItems, ids, false)
           // this.toggleProgeny(id)
         } else {
           console.log('select ' + id)
@@ -431,9 +442,12 @@ export default {
           this.$set(this.openItems, ids, true)
         }
 
-        this.$set(this.select, id, !this.select[id])
+        // this.$set(this.select, id, !this.select[id])
         if (this.selectOne) {
+          console.log('save the list... ')
           this.saveList()
+        } else {
+          console.log('NOT s1')
         }
       } else {
         console.log('error trying to toggle ' + id + ':' + name)
@@ -463,6 +477,25 @@ export default {
 
       this.$set(this.newItem, name, null)
       this.newItems--
+    },
+    toggleOff: function (ids) {
+      if (ids && ids.constructor === Number) {
+        ids = [ids]
+      }
+
+      if (ids && ids.length) {
+        for (var i = 0; i < ids.length; i++) {
+          var uid = ids[i]
+          if (this.select[uid]) {
+            console.log('also toggle ' + uid)
+            this.toggleOff(this.under[uid])
+            this.$set(this.select, uid, false)
+          }
+        }
+      }
+    },
+    toggleOn: function (id) {
+      this.$set(this.select, id, true)
     },
     toggleNo: function (id) {
       var name = this.id2name[id] // interest.name
