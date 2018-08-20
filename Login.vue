@@ -3,23 +3,24 @@
 <template lang='pug'>
   div.col-sm-4.col-sm-offset-4
     h2 Log In
-    div.alert.alert-danger(v-if="error")
-      p {{ error }}
-    div.form-group
-      input(
-        type="text"
-        class="form-control"
-        placeholder="Enter your username"
-        v-model="credentials.username"
-      )
-    div.form-group
-      input(
-        type="password"
-        class="form-control"
-        placeholder="Enter your password"
-        v-model="credentials.password"
-      )
-    button.btn.btn-primary.loginButton( @click="submit()") Log In
+    div.form
+      div.alert.alert-danger(v-if="error")
+        p {{ error }}
+      div.form-group
+        input(
+          type="text"
+          class="form-control"
+          placeholder="Enter your username"
+          v-model="credentials.username"
+        )
+      div.form-group
+        input(
+          type="password"
+          class="form-control"
+          placeholder="Enter your password"
+          v-model="credentials.password"
+        )
+      button.btn.btn-primary.loginButton( @click="submit()") Log In
 </template>
 <script>
 import auth from '../../auth'
