@@ -392,20 +392,25 @@ export default {
   },
   asyncComputed: {
     urlContent: function () {
-      console.log('generate url content from ' + this.url)
-      var _this = this
-      axios({url: this.url, method: 'get'})
-        .then(function (result, err) {
-          console.log('axios returned value(s): ' + JSON.stringify(result))
-          if (err) {
-            console.log('axios call error')
-            return '<h3>Error calling url</h3>'
-          }
-          console.log('got results for ' + _this.url)
-          _this.modalContent = result
-          return _this.modalContent
-        })
-      return 'dynamic content'
+      if (this.url) {
+        console.log('generate url content from ' + this.url)
+        var _this = this
+        console.log('use axios in Modal')
+        axios({url: this.url, method: 'get'})
+          .then(function (result, err) {
+            console.log('axios returned value(s): ' + JSON.stringify(result))
+            if (err) {
+              console.log('axios call error')
+              return '<h3>Error calling url</h3>'
+            }
+            console.log('got results for ' + _this.url)
+            _this.modalContent = result
+            return _this.modalContent
+          })
+        return 'dynamic content'
+      } else {
+        return 'static content'
+      }
     }
   },
   methods: {
