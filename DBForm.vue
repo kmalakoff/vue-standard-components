@@ -199,6 +199,7 @@ export default {
       var DBfieldUrl = this.url
 
       var _this = this
+      console.log('use axios to load table for DBform')
       axios.post(DBfieldUrl, { table: this.table })
         .then(function (result) {
           console.log('R: ' + JSON.stringify(result))
