@@ -78,7 +78,7 @@
                 span &nbsp; Yes &nbsp;
                 input(v-model='select[item[idKey]]' type='radio' value = 'no' @click.prevent='toggleNo(item.id)')
                 span &nbsp; No &nbsp;
-              input(v-else type='checkbox' v-model='select[item[idKey]]' v-on:change='toggle(item)') 
+              input(v-else type='checkbox' v-model='select[item[idKey]]' v-on:change='toggle(item)')
               span &nbsp;
               span(v-if="select[item[idKey]]")
                 b.selected {{item[nameKey]}} &nbsp; &nbsp;
