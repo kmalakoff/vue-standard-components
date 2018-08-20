@@ -1,5 +1,5 @@
 export default {
-  links: ['Public', 'Main', 'User', 'Login'],
+  links: { Public: 'Public', Main: 'Main', User: 'User', Login: 'Login' },
 
   apiUrl: 'http://apiURL/',
 
