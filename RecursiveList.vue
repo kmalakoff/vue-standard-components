@@ -106,6 +106,8 @@
         span &nbsp; &nbsp;
         span.button.btn.btn-primary(@click.prevent='showList()' v-show='hideList') Edit
         p &nbsp;
+        hr
+        b Open: {{JSON.stringify(openItems)}}
   </template>
 <script>
 // import _ from 'lodash'
@@ -124,11 +126,13 @@ export default {
   },
   data () {
     return {
+      open: 'selected',
       openItems: {'idnull': true, 'id0': true},
       hash: {},
       seeds: [],
       under: {},
       rList: [],
+      refIndex: {},
       parent: {},
       reOrderedList: [],
       name2id: {},
@@ -295,6 +299,8 @@ export default {
         var id = list[i][idKey]
         var parent = list[i][parentKey]
 
+        this.refIndex[id] = i
+
         this.$set(this.hash, id, list[i])
 
         if (!parent) { seeds.push(id) }
@@ -302,7 +308,9 @@ export default {
         var selected
         if (chosen) {
           selected = chosen.indexOf(name) >= 0
-          if (selected) { console.log('preset: ' + name) }
+          if (selected) {
+            console.log('preset: ' + name)
+          }
         } else { selected = list[i].selected && !this.clear }
 
         this.$set(this.parent, id, parent)
@@ -310,6 +318,11 @@ export default {
         if (selected) {
           this.$set(this.select, id, true)
           this.$set(this.selectParent, parent, true)
+
+          if (this.open === 'selected' && parent) {
+            console.log('pre-open ' + parent)
+            this.$set(this.openItems, 'id' + parent, true)
+          }
         } else if (selected === false) {
           this.$set(this.select, id, false)
         } else {
@@ -337,6 +350,8 @@ export default {
       }
 
       console.log('seeds are: ' + JSON.stringify(seeds))
+      console.log('under are: ' + JSON.stringify(this.under))
+
       this.seeds = seeds
       // open parent of selected interests (if applicable)
       if (this.options && this.options.open) {
@@ -508,12 +523,13 @@ export default {
       this.newItems--
     },
     addRecursive: function (id, level) {
-      var refIndex = id - 1 // tmp
+      var refIndex = this.refIndex[id] // tmp
       if (id >= 0) {
         var ids = id.toString()
 
         var index = this.reOrderedList.length || 0
 
+        console.log('check for ' + ids + ' in ' + this.rList.join(', '))
         if (this.rList.indexOf(ids) === -1) {
           this.$set(this.rList, this.rList.length, ids)
           var item = this.list[refIndex]
@@ -544,7 +560,15 @@ export default {
           this.static.push(keys[i])
         }
       }
-      if (this.onSave) { this.onSave(this.static) }
+      if (this.onSave) {
+        var labels = []
+        for (var j = 0; j < this.static.length; j++) {
+          var label = this.id2name[this.static[j]]
+          if (!label) { console.log(' no label for id: ' + this.static[j]) }
+          labels.push(label)
+        }
+        this.onSave(this.static, labels)
+      }
 
       // this.static = this.selected
     },
