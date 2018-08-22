@@ -18,8 +18,8 @@ Usage:
         td.prompt-column
           b {{label(field)}}:
         td.data-column
-          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='access' :record='thisRecord')
-        td.extra-column(v-if="access === 'edit'")
+          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord')
+        td.extra-column(v-if="myAccess === 'edit'")
           span &nbsp;
           a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)")
             icon(name='question-circle' color='black' scale='2')
@@ -28,14 +28,16 @@ Usage:
         td.prompt-column
           b {{label(r)}}:
         td.data-column
-          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='access' :record='thisRecord')
+          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord')
     span(v-for='r in include.hidden')
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
     hr
-    button.btn.btn-primary(v-if="onSave && (access === 'edit' || access === 'append')" @click.prevent="onSave(form)") Save
+    button.btn.btn-primary(v-if="onSave && (myAccess === 'edit' || myAccess === 'append')" @click.prevent="onSave(form)") Save
     hr
-    b Form Input: {{access}} : {{form}}"
+    b Form Input: {{myAccess}} : {{form}}
+    hr
+    b Record: {{record}}
 </template>
 
 <script>
@@ -79,6 +81,9 @@ export default {
     },
     record: {
       type: Object
+    },
+    access: {
+      type: String
     }
   },
   created: function () {
@@ -126,8 +131,14 @@ export default {
       console.log('get fields: ' + JSON.stringify(f))
       return f
     },
-    access: function () {
-      return this.options.access
+    myAccess: function () {
+      if (this.access) {
+        return this.access
+      } else if (this.options.access) {
+        return this.options.access
+      } else {
+        return 'read'
+      }
     },
     thisRecord: function () {
       if (this.record) {
