@@ -1,49 +1,33 @@
 <!-- src/components/Login.vue -->
 
 <template lang='pug'>
-  div
-    div.login-box
-      h2 Log In
-      div.form
-        div.alert.alert-danger(v-if="error")
-          p {{ error }}
-        div.form-group
-          input.form-control.input-lg(
-            type="text"
-            placeholder="username"
-            v-model="credentials.username"
-            @blur='checkInput'
-            @focus='inputFocus'
-          )
-        div.form-group
-          input.form-control.input-lg(
-            type="password"
-            placeholder="password"
-            v-model="credentials.password"
-            @blur='checkInput'
-            @focus='inputFocus'
-          )
-        button.btn.btn-primary.btn-lg.loginButton( @click="submit()") Login
+  div.login-box
+    h2 Log In
+    div.form
+      div.alert.alert-danger(v-if="error")
+        p {{ error }}
+      div.form-group
+        input.form-control.input-lg(
+          type="text"
+          placeholder="username"
+          v-model="credentials.username"
+          @blur='checkInput'
+          @focus='inputFocus'
+        )
+      div.form-group
+        input.form-control.input-lg(
+          type="password"
+          placeholder="password"
+          v-model="credentials.password"
+          @blur='checkInput'
+          @focus='inputFocus'
+        )
+      button.btn.btn-primary.btn-lg.loginButton( @click="submit()") Login
+    p &nbsp;
+    div.note.note--down
+      p {{ note }}
+    div.note-mask
       p &nbsp;
-      div.note.note--down
-        p {{ note }}
-      div.note-mask
-        p &nbsp;
-    // div.container
-    //   div.note.note--down
-    //     p {{note}}
-    //     div.login
-    //       header.login--header
-    //         span Log In
-    //       section.login--section
-    //         form.login-form(Wsubmit.prevent="makeAuth")
-    //           fieldset
-    //             input(type=text placeholder='username' required @focus='inputFocus')
-    //             svg.line(viewbox='0 0 100 1')
-    //               path.line--default(d='M0 0 L100 0')
-    //             svg.viewbox.line(viewbox='0 0 100 0')
-    //               path.line--default(d='M0 0 L100 0')
-    //             button.btn(type='submit') Login
 </template>
 <script>
 import auth from '../../auth'
