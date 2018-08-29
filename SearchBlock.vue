@@ -356,6 +356,7 @@ export default {
       console.log('searchBlock data: ' + JSON.stringify(data))
 
       var _this = this
+      console.log('use axios in SearchBlock')
       axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
       console.log('call...')
 

@@ -102,6 +102,8 @@ export default {
 
     var _this = this
     console.log('status = ' + this.status)
+
+    console.log('use axios to post table for dbRecordModal')
     axios.post(DBfieldUrl, { table: this.table })
       .then(function (result) {
         console.log('R: ' + JSON.stringify(result))

@@ -517,6 +517,7 @@ export default {
       var _this = this
       axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
+      console.log('use axios in SearchModal')
       console.log('call...')
       axios({url: fullUrl, method: method, data: data})
         .then(function (result, err) {

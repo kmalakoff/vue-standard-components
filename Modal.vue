@@ -55,7 +55,7 @@ Options (for all modal types)
                   b {{myheader}} ({{type}})
                     span.navbar-right
                       button.btn.btn-danger.btn-xs(@click="closeModal")
-                        icon(name='close')
+                        icon(name='times')
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
@@ -123,7 +123,7 @@ import SearchBlock from './SearchBlock'
 import DataGrid from './DataGrid'
 import DBForm from './DBForm'
 import Login from './Login'
-// import axios from 'axios'
+import axios from 'axios'
 
 export default {
   name: 'Modal',
@@ -388,22 +388,29 @@ export default {
       } else if (this.body) {
         return this.body
       } else { return null }
-    },
+    }
+  },
+  asyncComputed: {
     urlContent: function () {
-      console.log('generate url content from ' + this.url)
-      // var _this = this
-      // axios({url: this.url, method: 'get'})
-      // .then(function (result, err) {
-      //   console.log('axios returned value(s): ' + JSON.stringify(result))
-      //   if (err) {
-      //     console.log('axios call error')
-      //     return '<h3>Error calling url</h3>'
-      //   }
-      //   console.log('got results for ' + _this.url)
-      //   _this.modalContent = result
-      //   return _this.modalContent
-      // })
-      return 'dynamic content'
+      if (this.url) {
+        console.log('generate url content from ' + this.url)
+        var _this = this
+        console.log('use axios in Modal')
+        axios({url: this.url, method: 'get'})
+          .then(function (result, err) {
+            console.log('axios returned value(s): ' + JSON.stringify(result))
+            if (err) {
+              console.log('axios call error')
+              return '<h3>Error calling url</h3>'
+            }
+            console.log('got results for ' + _this.url)
+            _this.modalContent = result
+            return _this.modalContent
+          })
+        return 'dynamic content'
+      } else {
+        return 'static content'
+      }
     }
   },
   methods: {
@@ -429,7 +436,7 @@ export default {
 
       clearTimeout(this.timeoutID)
     },
-    closeModal: function () {
+    closeModal () {
       console.log('close modal...')
       console.log('fade out')
       this.$store.commit('clearModal')
@@ -438,7 +445,7 @@ export default {
       // this.$store.commit('toggleModal', this.id)
       this.$store.dispatch('toggleModal', this.id)
     },
-    save: function (form) {
+    save (form) {
       if (this.options.onSave) {
         console.log('save form: ' + JSON.stringify(form))
         this.options.onSave(form)
@@ -446,11 +453,11 @@ export default {
       } else {
         console.log('save function not supplied')
       }
-    },
-    watch: {
-      'toggle': function () {
-        console.log('changed body')
-      }
+    }
+  },
+  watch: {
+    toggle: function () {
+      console.log('changed body')
     }
   }
 }

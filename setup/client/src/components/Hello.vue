@@ -1,24 +1,14 @@
 <template lang='pug'>
   div.page
-    div.header
-      PublicHeader(left='LH' right='RH' centre='CH')
-    div.subheader.overlay
-      CustomMenu(:links='links' type='url')
-    div.body.container
-      <!-- img.bg -->
-      div.overlay
-        Block(content="main block content...")
-    div.footer.overlay
-      PublicFooter(left="left" centre="<h3>centre</h3>" right="right")
-
+    Sparc
 </template>
 
 <script>
-import config from './../config.js'
-import PublicHeader from './PublicHeader'
-import PublicFooter from './PublicFooter'
-import CustomMenu from './Standard/Menu'
-import Block from './Standard/Block'
+import config from '@/config.js'
+import PublicHeader from '@/components/PublicHeader'
+import PublicFooter from '@/components/PublicFooter'
+import CustomMenu from '@/components/Standard/Menu'
+import Sparc from '@/components/sparc/Main'
 
 var links = config.complexLinks || ['Main']
 
@@ -27,7 +17,7 @@ export default {
   components: {
     PublicHeader,
     CustomMenu,
-    Block,
+    Sparc,
     PublicFooter
   },
   data () {
@@ -44,17 +34,20 @@ export default {
 <style lang="sass?outputStyle=expanded">
 
 /*** Customize Header / Footer Settings: ***/
-$header-height: 80px;
-$header-background-colour: #999;
-$header-padding: 10px 30px;
+$margin-background-colour: white;
+$default-padding: 40px 50px;
+$margin-colour: darkgrey;
+
+$header-height: 200px;
+$header-font-size: 40px;
+
+$footer-height: 100px;
+$footer-font-size: 20px;
 
 $subheader-height: 50px;
-$subheader-background-colour: transparent;
+$submargin-background-colour: transparent;
 
-$footer-height: 90px;
-$footer-colour: black;
-$footer-background-colour: #ccc;
-
+$body-background-colour: #9a9;
 $body-colour: black;
 
 .page {
@@ -65,14 +58,17 @@ $body-colour: black;
 
 .header {
   height: $header-height;
-  background-color: $header-background-colour;
-  padding: $header-padding;
-
+  color: $margin-colour;
+  background-color: $margin-background-colour;
+  padding: $default-padding;
+  font-size: $header-font-size;
 }
 .footer {
-  background-color: $footer-background-colour;
-  color: $footer-colour;
+  background-color: $margin-background-colour;
+  color: $margin-colour;
   height: $footer-height;
+  padding: $default-padding;
+  font-size: $footer-font-size;
   width: 100%;
 
   padding-left: 40px;
@@ -81,8 +77,12 @@ $body-colour: black;
   padding-bottom: 15px;
 }
 
+.a {
+  color: $margin-colour;
+}
+
 .subheader {
-  background-color: $subheader-background-colour;
+  background-color: $submargin-background-colour;
   color: white;
   height: $subheader-height;
   width: 100%;
@@ -92,6 +92,7 @@ $body-colour: black;
 .body {
   padding-top: $subheader-height;
   min-height: calc(100vh - #{$header-height} - #{$footer-height});
+  background-color: $body-background-colour;
   color: $body-colour;
   z-index: 10000;
 }

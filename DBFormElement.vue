@@ -8,7 +8,7 @@
       b {{defaultTo}}
     span(v-else-if="Ftype==='string' || Ftype==='text'")
       b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
-    span(v-else-if="Ftype==='int'")
+    span(v-else-if="Ftype==='int' || Ftype==='integer'")
       b-form-input.input-lg(@change.native="myChange" type='number' :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='varchar'")
       b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'")
@@ -26,7 +26,7 @@
     span(v-else-if="Ftype==='reference'")
       b-form-input(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='hidden'")
-      b-form-input(type='hidden' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
+      b-form-input(v-show=0 type='text' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
     span(v-else)
       b {{Ftype}}?: {{field}}
 
@@ -72,7 +72,7 @@ export default {
     name: function () { return this.field.name },
     mval: function (model) { return this[model] },
     defaultTo: function () {
-      if (this.record) {
+      if (this.record && this.record[this.field.name]) {
         return this.record[this.field.name]
       } else {
         return this.field.default || this.field.value || this.form[this.om]

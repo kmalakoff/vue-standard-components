@@ -305,8 +305,8 @@ export default {
       console.log('search data: ' + JSON.stringify(data))
 
       var _this = this
+      console.log('use axios in Search')
       axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-
       axios({url: fullUrl, method: method, data: data})
         .then(function (result, err) {
           console.log('axios returned Search Value(s): ' + JSON.stringify(result))
