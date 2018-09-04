@@ -1,35 +1,11 @@
-<!-- src/components/Login.vue -->
+<!-- src/components/Register.vue -->
 
 <template lang='pug'>
-  div.login-box
-    h2 Log In
-    div.form
-      div.alert.alert-danger(v-if="error")
-        p {{ error }}
-      div.form-group
-        input.form-control.input-lg(
-          type="text"
-          placeholder="username"
-          v-model="credentials.username"
-          @blur='checkInput'
-          @focus='inputFocus'
-        )
-      div.form-group
-        input.form-control.input-lg(
-          type="password"
-          placeholder="password"
-          v-model="credentials.password"
-          @blur='checkInput'
-          @focus='inputFocus'
-        )
-      button.btn.btn-primary.btn-lg.loginButton( @click="submit()") Login
-    p &nbsp;
-    div.note.note--down
-      p {{ note }}
-    div.note-mask
-      p &nbsp;
+  span
+    Modal(type='record' id='register-modal' :options='registerOptions')
 </template>
 <script>
+import Modal from './Modal'
 import auth from '../../auth'
 export default {
   data () {
@@ -42,8 +18,26 @@ export default {
         password: ''
       },
       error: '',
-      note: ''
+      note: '',
+
+      registerOptions: {
+        openText: 'Sign up',
+        access: 'append',
+        fields: [
+          {name: 'username'},
+          {name: 'email', type: 'text'},
+          {name: 'password', placeholder: 'password', type: 'password'},
+          {name: 'confirmPassword', placeholder: 're-enter password', type: 'password'}
+        ],
+        onSave: this.register,
+        onBlur: this.checkInput,
+        onFocus: this.inputFocus,
+        submitButton: 'Register'
+      }
     }
+  },
+  components: {
+    Modal
   },
   props: {
     onPick: { type: Function }
@@ -57,56 +51,32 @@ export default {
       parent.classList.add('has-error')
       this.note = 'Failed validation'
     },
-    submit () {
+    register () {
       var credentials = {
         username: this.credentials.username,
-        password: this.credentials.password
-      }
-      // We need to pass the component's this context
-      // to properly make use of http in the auth service
-
-      console.log('Authorizing: ' + JSON.stringify(credentials))
-      auth.login(this, credentials, 'secretquote')
-
-      console.log('was ' + this.$store.getters.payload)
-      var payload = localStorage.getItem('payload')
-
-      if (this.demo && payload) {
-        var payloadObject = JSON.parse(payload)
-        payloadObject.user = credentials.username + '*'
-        payload = JSON.stringify(payloadObject)
+        email: this.credentials.email,
+        password: this.credentials.password,
+        confirmPassword: this.credentials.confirmPassword
       }
 
-      this.$store.dispatch('payload', payload)
-
-      console.log('is ' + this.$store.getters.payload)
-
-      var user = payload.user
-      console.log(user + ' Payload: ' + JSON.stringify(payload))
-
-      var access = auth.checkAuth()
-      console.log('access: ' + access)
-
-      var payload2 = auth.payload()
-      console.log(JSON.stringify(payload2))
-
-      if (this.onPick) {
-        this.onPick()
-      }
+      console.log('Registering: ' + JSON.stringify(credentials))
+      auth.register(this, credentials, 'secretquote')
     },
     makeAuth (e) {
       // auth logic
-      this.note = 'Login failed'
+      this.note = 'Register failed'
     },
     inputFocus (e) {
       this.note = ''
       const parent = e.target.parentElement
       parent.classList.remove('has-error')
+      console.log('checkinput')
     },
     inputValidate (e) {
       this.note = ''
       const parent = e.target.parentElement
       parent.classList.add('has-success')
+      console.log('validated')
     }
   },
   watch: {

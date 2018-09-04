@@ -33,7 +33,7 @@ Usage:
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
     hr
-    button.btn.btn-primary(v-if="onSave && (myAccess === 'edit' || myAccess === 'append')" @click.prevent="onSave(form)") Save
+    button.btn.btn-primary(v-if="onSave && (myAccess === 'edit' || myAccess === 'append')" @click.prevent="onSave(form)") {{submitButton}}
     hr
     b Form Input: {{myAccess}} : {{form}}
     hr
@@ -173,6 +173,13 @@ export default {
     },
     default: function (key) {
       return this.form[key] || ''
+    },
+    submitButton: function () {
+      if (this.options.submitButton) {
+        return this.options.submitButton
+      } else {
+        return 'Save'
+      }
     }
   },
   methods: {
