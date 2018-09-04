@@ -1,48 +1,19 @@
 <!-- src/components/Standard/Menu.vue -->
-<!--   hr
-  div
-    div.form-group
-      div.input-group
-        input.form-control.input-lg.full-page(type='text' placeholder='-- Search --')
-        div.input-group-addon
-          span.input-group-btn
-            button.btn.btn-lg.btn-primary.full-page(@click.prevent='searchMethod')
-              icon(name='search')
-          span.input-group-addon(style='background-color: transparent; border: 0px;')
-            span &nbsp; &nbsp;
-            span &nbsp; &nbsp;
-            span(v-if='user')
-              b {{user}}
-            span(v-else)
-              Modal(type='login')
-            span &nbsp; &nbsp;
-            span &nbsp; &nbsp;
-        span.input-group-addon(style='background-color: transparent; border: 0px;')
-          a(href='/' onclick='return false' @click.prevent="toggleBlock")
-              icon(:name='icon' color='black' scale='2')
-          span &nbsp; &nbsp;
-          div(@mouseleave="hideMenu")
-            table.table.popup-table.input-lg(v-if="visibleMenu")
-              tr
-                td
-                  router-link(:to="{name: 'About Us'}")
-                    b About Us
-              tr(v-if='user')
-                td
-                  a(href='#' onclick='return false' @click.prevent='logout')
-                    b Logout -->
 <template lang='pug'>
   div
     span(v-if='payload && payload.user')
       b {{payload.user}}
     span(v-else)
-      Modal(type='login' :options='options')
+      Modal(type='login' id='login-modal' :options='loginOptions')
+      span &nbsp; | &nbsp;
+      Register()
     span &nbsp; &nbsp;
 </template>
 
 <script>
 // require icon supplied by calling component...
 import Modal from './Modal'
+import Register from './Register'
 import 'vue-awesome/icons/bars'
 import 'vue-awesome/icons/search'
 import auth from '../../auth'
@@ -54,11 +25,12 @@ export default {
       holdBlock: {menu: false, search: false},
       visibleBlock: {menu: false, search: false},
 
-      options: { openText: 'Log In' }
+      loginOptions: { openText: 'Log In' }
     }
   },
   components: {
-    Modal
+    Modal,
+    Register
   },
   props: {
     menuIcon: {
