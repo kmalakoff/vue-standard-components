@@ -2,7 +2,7 @@
 
 <template lang='pug'>
   div
-    // b {{field}} : {{Ftype}} {{list(field)}} : {{vModel}} = {{vm}}
+    <!-- b {{field}} : {{Ftype}} {{list(field)}} : {{vModel}} = {{vm}} :: {{vModel}} -->
     span(v-if="access==='read'")
       b {{defaultTo}}
     span(v-else-if="iType")
