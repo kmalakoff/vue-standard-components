@@ -84,6 +84,8 @@
                 input(v-model='select[item[idKey]]' type='radio' value = 'no' @click.prevent='toggleNo(item.id)')
                 span &nbsp; No &nbsp;
               input(v-else type='checkbox' v-model='select[item[idKey]]' v-on:change='toggle(item)')
+              <!-- span(v-if='select[item[idKey]]') Y -->
+              <!-- span(v-else) N               -->
               span &nbsp;
               span(v-if="select[item[idKey]]")
                 b.selected {{item[nameKey]}} &nbsp; &nbsp;
@@ -313,11 +315,14 @@ export default {
   methods: {
     buildMetaData: function (chosen) {
       console.log('parse meta data for ' + this.title)
-      var selected_count = 0
-      var total_count = 0
+      this.selected_count = 0
+      this.total_count = 0
+      this.$set(this, 'select', {})
+      this.$set(this, 'selectParent', {})
 
       var list = this.list || []
       var seeds = []
+      console.log('List: ' + JSON.stringify(list))
       console.log('build with chosen values: ' + JSON.stringify(chosen))
       console.log('initial selection: ' + JSON.stringify(this.selected))
       for (var i = 0; i < list.length; i++) {
