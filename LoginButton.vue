@@ -6,14 +6,14 @@
     span(v-else)
       Modal(type='login' id='login-modal' :options='loginOptions')
       span &nbsp; | &nbsp;
-      Register()
+      Authorization()
     span &nbsp; &nbsp;
 </template>
 
 <script>
 // require icon supplied by calling component...
 import Modal from './Modal'
-import Register from './Register'
+import Authorization from './Authorization'
 import 'vue-awesome/icons/bars'
 import 'vue-awesome/icons/search'
 import auth from '../../auth'
@@ -30,7 +30,7 @@ export default {
   },
   components: {
     Modal,
-    Register
+    Authorization
   },
   props: {
     menuIcon: {
