@@ -62,6 +62,7 @@ export default {
   data () {
     return {
       status: ''
+      // note: ''
     }
   },
   props: {
@@ -75,6 +76,7 @@ export default {
   //   errors () { return store.errors }
   // },
   computed: mapState([
+    'note',
     'count',
     'errorCount',
     'errors',
@@ -88,7 +90,20 @@ export default {
       console.log('clear ' + scope + ' messages')
       this.$store.commit('clearErrors', scope)
     }
+  },
+  watch: {
+    note () {
+      console.log('note changed...')
+      const note = document.querySelector('.note')
+      if (this.note.length) {
+        note.classList.add('note--up')
+      } else {
+        note.classList.remove('note--up')
+        note.classList.add('note--down')
+      }
+    }
   }
+
 }
 </script>
 
@@ -102,4 +117,34 @@ export default {
     width: 50%;
     align: center;
   }
+
+  .note {
+    // color: red;
+    background: #FF9E80;
+    padding: 0.75rem 1.5rem;
+    box-sizing: border-box;
+    position: relative;
+    bottom: 100%;
+    z-index: 0;
+    width: 100%;
+    transition: all .5s ease-out;
+  }
+  .note-mask {
+    // background: #FF9E80;
+    background: #FFFFFF;
+    padding: 0.75rem 1.5rem;
+    box-sizing: border-box;
+    position: relative;
+    bottom: 100%;
+    z-index: 0;
+    transition: all .5s ease-out;
+  }
+  .note--down {
+    transform: translateY(100%);
+  }
+
+  .note--up {
+    transform: translateY(0);
+  }
+
 </style>
