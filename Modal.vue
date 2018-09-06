@@ -59,37 +59,38 @@ Options (for all modal types)
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
-                  div(v-if="type==='search'")
+                  div(v-if="modalType==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
-                  div(v-else-if="type==='record'")
-                    b R: {{JSON.stringify(modalData)}}
+                  div(v-else-if="modalType==='record'")
                     DBForm(:options='options' :onSave='save' :append='append' :record='modalRecord')
                     div(v-if='options.addLinks' v-for='link in options.addLinks')
                       button.btn.btn-primary(@click.prevent="link.onPick(modalData)") {{link.name}}
-                  div(v-else-if="type==='data'")
+                  div(v-else-if="modalType==='data'")
                     div(v-if="modalData && modalData.length")
                       DataGrid(:data="modalData" :options="data_options")
                     div(v-else)
                       b No Data Available
-                  div(v-else-if="type==='raw'")
+                  div(v-else-if="modalType==='raw'")
                     div(v-if='content')
                       b content: {{content}}
                     div(v-else)
                       b No Content Supplied
-                  div(v-else-if="type==='html'")
+                  div(v-else-if="modalType==='html'")
                     div(v-if='htmlContent' v-html="htmlContent")
                     div(v-else)
                       b No HTML Content supplied
-                  div(v-else-if="type==='url'")
+                  div(v-else-if="modalType==='url'")
                     div(v-if='url')
                       span {{modalContent}
                     div(v-else)
                       b No URL or modalContent
-                  div(v-else-if="type==='login'")
+                  div(v-else-if="modalType==='login'")
                     Login(:onPick='closeModal')
                   div(v-else)
                     b no valid type supplied.  Options: (search, record, data, raw, html, url, login ...
                     hr
+                  p &nbsp;
+              Messaging
               div.my-modal-footer
                 slot(name="footer")
                   b {{footer}} &nbsp;
@@ -123,6 +124,7 @@ import SearchBlock from './SearchBlock'
 import DataGrid from './DataGrid'
 import DBForm from './DBForm'
 import Login from './Login'
+import Messaging from './Messaging'
 import axios from 'axios'
 
 export default {
@@ -131,7 +133,8 @@ export default {
     SearchBlock,
     DataGrid,
     DBForm,
-    Login
+    Login,
+    Messaging
   },
   data () {
     return {
@@ -281,6 +284,15 @@ export default {
     },
     body: function () {
       return this.options.body || ''
+    },
+    modalType: function () {
+      if (this.options.type) {
+        return this.options.type
+      } else if (this.type) {
+        return this.type
+      } else {
+        return this.$store.getters.getHash('modalType') || 'content'
+      }
     },
     modalTitle: function () {
       if (this.options.title) {
