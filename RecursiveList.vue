@@ -37,13 +37,15 @@
   <template lang='pug'>
     div.recursiveList
       <!-- b R: {{reOrderedList}} -->
+      span(v-show='title')
+        u
+          h4 {{title}} [{{selected_count}} / {{total_count}} selected]
       Modal(:id='modalID' type='record' :options="options")
       span(v-if="newItems && promptNew")
         b.undecided {{newItems}}
           i New {{options.label}} option(s) available: &nbsp; &nbsp;
             span {{Object.keys(newItem).join(', ')}}
       div(v-if='hideList')
-        span &nbsp; a &nbsp;
         ul(v-if='selectOne')
           li(v-for='picked in static')
             span(v-show = 'picked !== static[0]')  &nbsp; > &nbsp;
@@ -109,10 +111,8 @@
         span &nbsp; &nbsp;
         span.button.btn.btn-primary(@click.prevent='showList()' v-show='hideList') Edit
         p &nbsp;
-        hr
-        b Selected: {{JSON.stringify(selected)}}
-        hr
-        b Open: {{JSON.stringify(openItems)}}
+        <!-- hr -->
+        <!-- b Selected: {{JSON.stringify(selected)}} -->
   </template>
 <script>
 // import _ from 'lodash'
@@ -147,12 +147,18 @@ export default {
       newItems: 0,
       static: ['nothing selected'],
       hideList: false,
-      defaultModalID: 'info-modal'
+      defaultModalID: 'info-modal',
+      selected_count: 0,
+      total_count: 0
     }
   },
   props: {
+    title: { type: String },
     list: { type: Array },
-    selected: { type: Array },
+    selected: {
+      type: Array,
+      default () { return null }
+    },
     onPick: {
       type: Function,
       default () { return null }
@@ -171,6 +177,15 @@ export default {
     },
     onSave: {
       type: Function
+    }
+  },
+  watch: {
+    list: function () {
+      this.buildMetaData()
+      if (this.hide) {
+        console.log('hide list initially... ')
+        this.saveList()
+      }
     }
   },
   created: function () {
@@ -297,6 +312,10 @@ export default {
   },
   methods: {
     buildMetaData: function (chosen) {
+      console.log('parse meta data for ' + this.title)
+      var selected_count = 0
+      var total_count = 0
+
       var list = this.list || []
       var seeds = []
       console.log('build with chosen values: ' + JSON.stringify(chosen))
@@ -305,6 +324,7 @@ export default {
         var nameKey = this.options.nameKey || this.nameKey || 'name'
         var idKey = this.options.idKey || this.idKey || 'id'
         var parentKey = this.options.parentKey || 'parent_id'
+        this.total_count++
 
         var name = list[i][nameKey]
         var id = list[i][idKey]
@@ -318,13 +338,16 @@ export default {
         var selected
         if (chosen) {
           selected = chosen.indexOf(name) >= 0
-        } else {
+        } else if (this.selected) {
           selected = (this.selected.indexOf(id) >= 0 || list[i].selected) && !this.clear
+        } else {
+          selected = list[i].selected && !this.clear
         }
 
         this.$set(this.parent, id, parent)
 
         if (selected) {
+          this.selected_count++
           console.log('pre-select ' + id)
           this.$set(this.select, id, true)
           this.$set(this.selectParent, parent, true)
