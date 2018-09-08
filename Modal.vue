@@ -435,26 +435,16 @@ export default {
       clearTimeout(this.timeoutID)
     },
     openModal () {
-      console.log('open modal...' + this.id)
-      console.log('and fade in')
-      // document.getElementById(this.id).classList.toggle('m-fadeIn')
-      // document.getElementById(this.id).classList.toggle('m-fadeOut')
       if (this.url) {
         console.log('dynamic url content generation')
         console.log(this.urlContent)
       }
-      // this.$store.commit('toggleModal', this.id)
       this.$store.dispatch('toggleModal', this.id)
 
       clearTimeout(this.timeoutID)
     },
     closeModal () {
-      console.log('close modal...')
-      console.log('fade out')
       this.$store.commit('clearModal')
-      // document.getElementById(this.id).classList.toggle('m-fadeOut')
-      // document.getElementById(this.id).classList.toggle('m-fadeIn')
-      // this.$store.commit('toggleModal', this.id)
       this.$store.dispatch('toggleModal', this.id)
     },
     save (form) {
