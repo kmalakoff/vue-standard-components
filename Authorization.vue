@@ -20,6 +20,8 @@
 import Modal from './Modal'
 import DropdownMenu from './DropdownMenu'
 import auth from '../../auth'
+import config from '@/config.js'
+
 export default {
   data () {
     return {
@@ -63,7 +65,9 @@ export default {
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
         submitButton: 'Register'
-      }
+      },
+      apiURL: config.apiURL,
+      status: 'initialized'
     }
   },
   components: {
@@ -101,8 +105,22 @@ export default {
         confirmPassword: form.confirmPassword
       }
 
-      console.log('Registering: ' + JSON.stringify(credentials))
-      auth.signup(this, credentials, 'secretquote')
+      console.log('Registering with credentials: ' + JSON.stringify(credentials))
+      var ok = auth.signup(this.URL + '/register', credentials)
+      console.log('Registered ?: ' + JSON.stringify(ok))
+      // var _this = this
+      // console.log('Registering with credentials: ' + JSON.stringify(credentials))
+      // axios(this.URL + '/register', {method: 'GET', data: credentials})
+      //   .then(function (result, err) {
+      //     if (err) {
+      //       _this.status = 'registration error'
+      //       console.log('set axios error during registration: ' + err)
+      //       _this.$store.commit('setError', {context: 'Registration', err: err})
+      //     } else {
+      //       _this.status = 'registered'
+      //       console.log('registered: ' + JSON.stringify(result))
+      //     }
+      //   })
     },
     login (form) {
       var credentials = {
@@ -111,13 +129,19 @@ export default {
       }
       console.log('Authorizing for login: ' + JSON.stringify(credentials))
 
-      var P = auth.login(this, credentials, 'secretquote')
+      auth.login(this, credentials)
       var payload = localStorage.getItem('payload')
+      // var payload = this.$store.getters.payload
 
       console.log('Payload: ' + JSON.stringify(payload))
-      console.log('auth.login: ' + JSON.stringify(P))
+      // console.log('auth.login: ' + JSON.stringify(P))
 
       this.$store.dispatch('payload', payload)
+
+      // var p1 = this.$store.getters.payload
+      // console.log('p1: ' + JSON.stringify(p1))
+      // var p2 = localStorage.getItem('payload')
+      // console.log('p2: ' + JSON.stringify(p2))
 
       // console.log('is ' + this.$store.getters.payload)
 
