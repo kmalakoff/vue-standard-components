@@ -36,10 +36,12 @@
  -->
   <template lang='pug'>
     div.recursiveList
-      <!-- b R: {{reOrderedList}} -->
+      b S: {{selected}}
       span(v-show='title')
         u
           h4 {{title}} [{{selected_count}} / {{total_count}} selected]
+        span(style='color: green; font-weight: bold' v-show='turnedOn.length') Turned On: {{turnedOn.join(', ')}} &nbsp;
+        span(style='color: red; font-weight: bold' v-show='turnedOff.length') Turned Off: {{turnedOff.join(', ')}} &nbsp;
       Modal(:id='modalID' type='record' :options="options")
       span(v-if="newItems && promptNew")
         b.undecided {{newItems}}
@@ -60,6 +62,9 @@
                 b &nbsp; {{secondaryPick.selectText}}
         br
         div.button.btn.btn-primary(@click.prevent='editList()') Edit
+        span &nbsp;
+        div.button.btn.btn-primary(@click.prevent='saveList(1)') Save Changes
+
       div(v-else)
         ul
           li(v-for="item in reOrderedList" v-show="openItems['id' + item.parent_id] === true")
@@ -151,7 +156,9 @@ export default {
       hideList: false,
       defaultModalID: 'info-modal',
       selected_count: 0,
-      total_count: 0
+      total_count: 0,
+      turnedOn: [],
+      turnedOff: []
     }
   },
   props: {
@@ -183,6 +190,15 @@ export default {
   },
   watch: {
     list: function () {
+      console.log('rebuilding meta data after list change')
+      this.buildMetaData()
+      if (this.hide) {
+        console.log('hide list initially... ')
+        this.saveList()
+      }
+    },
+    selected: function () {
+      console.log('rebuilding meta data after selected change')
       this.buildMetaData()
       if (this.hide) {
         console.log('hide list initially... ')
@@ -192,7 +208,7 @@ export default {
   },
   created: function () {
     this.buildMetaData()
-    console.log(JSON.stringify(this.options))
+    console.log('build meta data with ' + JSON.stringify(this.options))
     if (this.hide) {
       console.log('hide list initially... ')
       this.saveList()
@@ -301,7 +317,7 @@ export default {
 
       // console.log('got ' + key + ' from ' + JSON.stringify(interest))
       var isOpen = this.openItems[key]
-      console.log('returned ' + isOpen + ' for ' + interest.id)
+      // console.log('returned ' + isOpen + ' for ' + interest.id)
       return isOpen
     }
     // onPick: function () {
@@ -314,7 +330,7 @@ export default {
   },
   methods: {
     buildMetaData: function (chosen) {
-      console.log('parse meta data for ' + this.title)
+      console.log('reparse meta data for ' + this.title)
       this.selected_count = 0
       this.total_count = 0
       this.$set(this, 'select', {})
@@ -322,7 +338,7 @@ export default {
 
       var list = this.list || []
       var seeds = []
-      console.log('List: ' + JSON.stringify(list))
+      // console.log('List: ' + JSON.stringify(list))
       console.log('build with chosen values: ' + JSON.stringify(chosen))
       console.log('initial selection: ' + JSON.stringify(this.selected))
       for (var i = 0; i < list.length; i++) {
@@ -353,12 +369,12 @@ export default {
 
         if (selected) {
           this.selected_count++
-          console.log('pre-select ' + id)
+          // console.log('pre-select ' + id)
           this.$set(this.select, id, true)
           this.$set(this.selectParent, parent, true)
 
           if (this.open === 'selected' && parent) {
-            console.log('pre-open ' + parent)
+            // console.log('pre-open ' + parent)
             this.$set(this.openItems, 'id' + parent, true)
           }
         } else if (selected === false) {
@@ -386,13 +402,13 @@ export default {
           var currentLength = this.under[parent.toString()].length
           this.$set(this.under[parent.toString()], currentLength, id)
         } else {
-          console.log('no parent')
+          // console.log('no parent')
           // this.$set(this.list[i], 'parent_id', 0)
         }
       }
 
-      console.log('seeds are: ' + JSON.stringify(seeds))
-      console.log('under are: ' + JSON.stringify(this.under))
+      // console.log('seeds are: ' + JSON.stringify(seeds))
+      // console.log('under are: ' + JSON.stringify(this.under))
 
       this.seeds = seeds
       // open parent of selected interests (if applicable)
@@ -405,7 +421,7 @@ export default {
       }
 
       for (var k = 0; k < seeds.length; k++) {
-        console.log('seeding ' + k)
+        // console.log('seeding ' + k)
         this.addRecursive(seeds[k], 0)
       }
 
@@ -429,7 +445,7 @@ export default {
       this.$set(this.select, item.id, false)
     },
     selectMe: function (item) {
-      console.log('select ' + JSON.stringify(item.name))
+      console.log('SelectMe: ' + JSON.stringify(item.name))
       this.$set(this.select, item.id, true)
     },
     toggleProgeny: function (id) {
@@ -489,13 +505,16 @@ export default {
         if (!this.select[id]) {
           console.log('deselect ' + id)
           // deselect
+          this.trackOff(id)
           this.toggleOff(this.under[id])
-
           // this.$set(this.openItems, ids, false)
           // this.toggleProgeny(id)
         } else {
           console.log('select ' + id)
           // select
+          this.$set(this.select, id, true)
+          this.trackOn(id)
+
           this.$set(this.openItems, ids, true)
         }
 
@@ -540,17 +559,37 @@ export default {
 
       if (ids && ids.length) {
         for (var i = 0; i < ids.length; i++) {
-          var uid = ids[i]
-          if (this.select[uid]) {
-            console.log('also toggle ' + uid)
-            this.toggleOff(this.under[uid])
-            this.$set(this.select, uid, false)
+          var id = ids[i]
+          if (this.select[id]) {
+            console.log('also toggle ' + id)
+            this.toggleOff(this.under[id])
+            this.$set(this.select, id, false)
+
+            this.trackOff(id)
           }
         }
       }
     },
-    toggleOn: function (id) {
-      this.$set(this.select, id, true)
+    trackOff: function (id) {
+      console.log('TURN OFF ' + id)
+      var onIndex = this.turnedOn.indexOf(id)
+      if (onIndex >= 0) {
+        console.log('return on ' + id + ' : ' + onIndex)
+        this.turnedOn.splice(onIndex, 1)
+      } else {
+        console.log('turn off ' + id + ' : ' + onIndex)
+        this.$set(this.turnedOff, this.turnedOff.length, id)
+      }
+    },
+    trackOn: function (id) {
+      var offIndex = this.turnedOff.indexOf(id)
+      if (offIndex >= 0) {
+        console.log('return off ' + id + ' : ' + offIndex)
+        this.turnedOff.splice(offIndex, 1)
+      } else {
+        console.log('turn on ' + id + ' : ' + offIndex)
+        this.$set(this.turnedOn, this.turnedOn.length, id)
+      }
     },
     toggleNo: function (id) {
       var name = this.id2name[id] // interest.name
@@ -588,7 +627,7 @@ export default {
         console.log('no id specified...')
       }
     },
-    saveList: function () {
+    saveList: function (update) {
       console.log('save list ...')
       // this.$set(this, 'hideList', true)
       this.hideList = true
@@ -610,6 +649,14 @@ export default {
         this.onSave(this.static, labels)
       }
 
+      if (update) {
+        console.log('Save changes to database...')
+        this.$set(this, 'turnedOn', [])
+        this.$set(this, 'turnedOff', [])
+      }
+
+      this.selected_count += this.turnedOn.length
+      this.selected_count -= this.turnedOff.length
       // this.static = this.selected
     },
     showTree: function () {
