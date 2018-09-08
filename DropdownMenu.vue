@@ -21,7 +21,7 @@
         icon(v-if="visibleMenu" name='caret-up')
         icon(v-if="!visibleMenu" name='caret-down')
         span &nbsp; {{title}} &nbsp;
-    div
+    div.custom-menu(style='position: absolute')
       table.table.popup-table.input-lg(v-if="visibleMenu" v-on:mouseover="showMenu" v-on:mouseout="hideMenu(1)")
         tr(v-for="option in options" width='100%')
           td.option-label(width='100%')
@@ -167,6 +167,11 @@ export default {
   color: black;
   font-weight: normal;
   text-decoration: none;
+}
+
+.customMenu .custom-menu {
+  postion: absolute; // being overridden for some reason (works if style specified directly above)
+  z-index: 2;
 }
 
  .popup-table {
