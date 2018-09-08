@@ -116,13 +116,13 @@ export default {
     fields: function () {
       var f = []
       if (this.options.fields) {
-        console.log('got fields from options')
+        // console.log('got fields from options')
         f = this.options.fields
       } else if (this.DBfields.length) {
-        console.log('got fields from config')
+        // console.log('got fields from config')
         f = this.DBfields
       } else if (this.thisRecord) {
-        console.log('got fields from keys')
+        // console.log('got fields from keys')
         var keys = Object.keys(this.thisRecord)
         for (var i = keys.length; i < keys.length; i++) {
           f.push({name: keys[i]})
@@ -184,7 +184,7 @@ export default {
   },
   methods: {
     label (field) {
-      console.log('load label for ' + JSON.stringify(field))
+      // console.log('load label for ' + JSON.stringify(field))
       if (!field) {
         return ''
       } else if (field.prompt) {
@@ -192,7 +192,7 @@ export default {
       } else if (field.name) {
         return field.name
       } else {
-        console.log('no label supplied for ' + JSON.stringify(field))
+        // console.log('no label supplied for ' + JSON.stringify(field))
         return ''
       }
     },
