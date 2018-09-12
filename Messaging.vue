@@ -22,11 +22,11 @@
 !-->
 
 <template lang='pug'>
-  div.message-block
+  div.message-block.note.note--down
     div(v-if='errorCount || warningCount || messageCount')
       div(v-for='context,key in errors' align='center')
         div(v-if="errors[key].length")
-          h4 {{errors[key].length}} {{key} Error(s) detected:
+          h4 {{errors[key].length}} {{key}} Error(s) detected:
           div.table.msg-errors.alert-danger(align='center')
             tr
               td
@@ -56,7 +56,7 @@
 
 <script>
 // import store from './../myState.js'
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 
 export default {
   data () {
@@ -75,16 +75,36 @@ export default {
   //   errorCount () { return store.errorCount },
   //   errors () { return store.errors }
   // },
-  computed: mapState([
-    'note',
-    'count',
-    'errorCount',
-    'errors',
-    'warningCount',
-    'warnings',
-    'messageCount',
-    'messages'
-  ]),
+  computed: {
+    messageCount: function () {
+      return this.$store.getters.messageCount || 0
+    },
+    warningCount: function () {
+      return this.$store.getters.warningCount || 0
+    },
+    errorCount: function () {
+      return this.$store.getters.errorCount || 0
+    },
+    messages: function () {
+      return this.$store.getters.messages
+    },
+    warnings: function () {
+      return this.$store.getters.warnings
+    },
+    errors: function () {
+      return this.$store.getters.errors
+    }
+  },
+  //   mapState([
+  //   'note',
+  //   'count',
+  //   'errorCount',
+  //   'errors',
+  //   'warningCount',
+  //   'warnings',
+  //   'messageCount',
+  //   'messages'
+  // ]),
   methods: {
     clear (scope) {
       console.log('clear ' + scope + ' messages')
@@ -101,6 +121,9 @@ export default {
         note.classList.remove('note--up')
         note.classList.add('note--down')
       }
+    },
+    errorCount: function () {
+      console.log('error count changed...')
     }
   }
 
@@ -109,18 +132,22 @@ export default {
 
 <style>
   .message-block {
+    // padding: 20px;
+    text-align: center;
     /*border: 1px solid black*/
+    // background-color: orange;
+    color: black;
   }
   .msg-errors, .msg-warnings, .msg-messages {
     padding: 10px;
     margin: 10px;
-    width: 50%;
+    // width: 50%;
     align: center;
   }
 
   .note {
     // color: red;
-    background: #FF9E80;
+    // background: #FF9E80;
     padding: 0.75rem 1.5rem;
     box-sizing: border-box;
     position: relative;
@@ -131,7 +158,7 @@ export default {
   }
   .note-mask {
     // background: #FF9E80;
-    background: #FFFFFF;
+    // background: #FFFFFF;
     padding: 0.75rem 1.5rem;
     box-sizing: border-box;
     position: relative;
@@ -141,10 +168,12 @@ export default {
   }
   .note--down {
     transform: translateY(100%);
+    z-index: -1;
   }
 
   .note--up {
     transform: translateY(0);
+    z-index: 1;
   }
 
 </style>
