@@ -14,7 +14,7 @@ Options (for all modal types)
 
   Standard:
     - data (array of links triggering function or another modal)
-    - type (search, record, data, raw, html, url, login)
+    - type (search, record, data, raw, html, url)
   Search Modal: (provides search field(s) that enable search via specified api)
     - search (hash with the following options)
       - options (hash input including the following search options)
@@ -84,10 +84,8 @@ Options (for all modal types)
                       span {{modalContent}
                     div(v-else)
                       b No URL or modalContent
-                  div(v-else-if="modalType==='login'")
-                    Login(:onPick='closeModal')
                   div(v-else)
-                    b no valid type supplied.  Options: (search, record, data, raw, html, url, login ...
+                    b no valid type supplied.  Options: (search, record, data, raw, html, url, ....
                     hr
                   p &nbsp;
               Messaging
@@ -123,7 +121,6 @@ Options (for all modal types)
 import SearchBlock from './SearchBlock'
 import DataGrid from './DataGrid'
 import DBForm from './DBForm'
-import Login from './Login'
 import Messaging from './Messaging'
 import axios from 'axios'
 
@@ -133,7 +130,6 @@ export default {
     SearchBlock,
     DataGrid,
     DBForm,
-    Login,
     Messaging
   },
   data () {
@@ -239,6 +235,7 @@ export default {
     // },
   },
   created: function () {
+    console.log('*** defined Modal ***' + this.title)
   },
   computed: {
     recordTable: function () {
@@ -299,10 +296,8 @@ export default {
         return this.options.title
       } else if (this.title) {
         return this.title
-      } else if (this.type === 'login') {
-        return 'Login'
       } else {
-        return this.$store.getters.getHash('modalTitle') || 'my Title'
+        return this.$store.getters.modalTitle || 'my other Title'
       }
     },
     modalData: function () {
@@ -325,11 +320,17 @@ export default {
       }
     },
     modalRecord: function () {
-      if (this.modalData && this.modalData.constructor === Array && this.modalData.length) {
-        console.log('use first data record')
-        return this.modalData[0]
+      if (this.modalData && this.modalData.constructor === Array) {
+        if (this.modalData.length) {
+          console.log('use first data record')
+          return this.modalData[0]
+        } else {
+          return null
+        }
+      } else if (this.modalData && this.modalData.constructor === Object) {
+        console.log('modal record supplied as object')
       } else {
-        console.log('constructor is: ' + this.modalData.constructor + ' : ' + this.modalData.length)
+        console.log('? constructor is: ' + this.modalData.constructor + ' : ' + this.modalData.length)
         return { fields: 'undef' }
       }
     },
@@ -341,8 +342,6 @@ export default {
     openText: function () {
       if (this.options && this.options.openText) {
         return this.options.openText || '+'
-      } else if (this.type === 'login') {
-        return 'Login'
       } else { return '' }
     },
     openIcon: function () {
@@ -356,8 +355,9 @@ export default {
       } else { return 'Close' }
     },
     url: function () {
-      console.log('check for url in: ' + JSON.stringify(this.options))
+      // console.log('check for url in: ' + JSON.stringify(this.options))
       if (this.options.url) {
+        console.log('Modal url: ' + this.options.url)
         return this.options.url
       } else {
         return null
@@ -447,11 +447,17 @@ export default {
       this.$store.commit('clearModal')
       this.$store.dispatch('toggleModal', this.id)
     },
-    save (form) {
+    async save (form) {
       if (this.options.onSave) {
         console.log('save form: ' + JSON.stringify(form))
-        this.options.onSave(form)
-        this.closeModal()
+        var response = await this.options.onSave(form)
+        console.log('save response: ' + JSON.stringify(response))
+        if (response.error) {
+          console.log('error detected onSave')
+          this.$store.dispatch('setError', { context: 'Login', err: response.error })
+        } else {
+          this.closeModal()
+        }
       } else {
         console.log('save function not supplied')
       }
