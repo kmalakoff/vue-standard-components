@@ -70,7 +70,7 @@ export default {
     var defaultTo = this.field.default || this.form[this.om]
 
     this.$set(this.form, this.om, defaultTo)
-    console.log(this.field.name + ' found default: ' + defaultTo)
+    // console.log(this.field.name + ' found default: ' + defaultTo)
   },
   computed: {
     refModel: function () { return this.form[this.vModel] },
