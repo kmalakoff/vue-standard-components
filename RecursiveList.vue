@@ -36,7 +36,7 @@
  -->
   <template lang='pug'>
     div.recursiveList
-      b S: {{selected}}
+      <!-- b S: {{selected}} -->
       span(v-show='title')
         u
           h4 {{title}} [{{selected_count}} / {{total_count}} selected]
@@ -424,8 +424,7 @@ export default {
         // console.log('seeding ' + k)
         this.addRecursive(seeds[k], 0)
       }
-
-      console.log('tracked underitems list: ' + JSON.stringify(this.under))
+      // console.log('tracked underitems list: ' + JSON.stringify(this.under))
     },
     clearList: function () {
       console.log('CLEAR ' + this.static[0])
