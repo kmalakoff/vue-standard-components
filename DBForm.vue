@@ -128,7 +128,7 @@ export default {
           f.push({name: keys[i]})
         }
       }
-      console.log('get fields: ' + JSON.stringify(f))
+      // console.log('get fields: ' + JSON.stringify(f))
       return f
     },
     myAccess: function () {
