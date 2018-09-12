@@ -10,10 +10,11 @@
       <!-- span &nbsp; | &nbsp; -->
       <!-- a(href='#' @click.prevent='logout') -->
         <!-- b Log Out -->
+      Modal(id='profile' type='data')
     div(v-else)
-      Modal(type='record' id='login-modal' :options='loginOptions' :note='note')
+      Modal(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
       span &nbsp; | &nbsp;
-      Modal(type='record' id='register-modal' :options='registerOptions' :note='note')
+      Modal(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
         p &nbsp;
 </template>
 <script>
@@ -36,8 +37,8 @@ export default {
       note: 'asldfj',
 
       userMenu: [
-        { label: 'Profile', loadModal: this.getUser },
-        { label: 'Logout', loadModal: this.logout }
+        { label: 'Profile', loadModal: {data: this.getUser, title: 'User Profile', id: 'profile'} },
+        { label: 'Logout', onClick: this.logout }
       ],
       loginOptions: {
         openText: 'Log in',
@@ -122,54 +123,65 @@ export default {
       //     }
       //   })
     },
-    login (form) {
+    async login (form) {
       var credentials = {
         email: form.email,
         password: form.password
       }
       console.log('Authorizing for login: ' + JSON.stringify(credentials))
 
-      auth.login(this, credentials)
-      var payload = localStorage.getItem('payload')
-      // var payload = this.$store.getters.payload
+      var response = await auth.login(this, credentials)
+      console.log('login response: ' + JSON.stringify(response))
+      if (!response.data) {
+        console.log('no response data ?')
+      } else if (response.data.error) {
+        console.log('Error logging in...' + JSON.stringify(response.data.error))
+        // _this.$store.dispatch('payload', {})
+        var returnval = { error: response.data.error }
+        console.log('return: ' + JSON.stringify(returnval))
+        return returnval
+      } else {
+        // localStorage.setItem('id_token', temp.id)
+        // localStorage.setItem('access_token', temp.access)
+        console.log('new payload: ' + JSON.stringify(response.data))
+        if (response.data && response.data.id) {
+          response.data.userid = response.data.id
+          response.data.password = '***'
+        }
 
-      console.log('Payload: ' + JSON.stringify(payload))
-      // console.log('auth.login: ' + JSON.stringify(P))
+        console.log('cache payload...')
+        // localStorage.setItem('payload', JSON.stringify(response.data))
+        this.$store.dispatch('payload', response.data)
+        // this.user.authenticated = true
 
-      this.$store.dispatch('payload', payload)
-
-      // var p1 = this.$store.getters.payload
-      // console.log('p1: ' + JSON.stringify(p1))
-      // var p2 = localStorage.getItem('payload')
-      // console.log('p2: ' + JSON.stringify(p2))
-
-      // console.log('is ' + this.$store.getters.payload)
-
-      // var user = payload.user
-      // console.log(user + ' Payload: ' + JSON.stringify(payload))
-
-      // var access = auth.checkAuth()
-      // console.log('access: ' + access)
-
-      // var payload2 = auth.payload()
-      // console.log(JSON.stringify(payload2))
-
-      // var token = localStorage.getItem('id_token')
-      // console.log('token: ' + token)
+        console.log('logged in...')
+        return { payload: response.data }
+      }
     },
     logout () {
       this.$store.dispatch('AUTH_LOGOUT')
     },
     getUser () {
-      var data = JSON.parse(this.$store.getters.payload)
-      var keys = Object.keys(data)
+      console.log('get user...')
+
+      var show = ['userid', 'username', 'email', 'access', 'birthdate']
+      var payload = this.$store.getters.payload
+      // var data = JSON.parse(this.$store.getters.payload)
+      // console.log('user data: ' + JSON.stringify(payload))
 
       var D = []
-      for (var i = 0; i < keys.length; i++) {
-        D.push({attribute: keys[i], value: data[keys[i]]})
+      if (payload.constructor === Object) {
+        for (var i = 0; i < show.length; i++) {
+          if (payload[show[i]]) {
+            D.push({attribute: show[i], value: payload[show[i]]})
+          }
+        }
+        console.log('user data: ' + JSON.stringify(D))
+        return D
+      } else {
+        console.log('expected payload object... found ' + payload.constructor)
+        return D
       }
-      console.log('user data: ' + JSON.stringify(D))
-      return D
     },
     makeAuth (e) {
       // auth logic
