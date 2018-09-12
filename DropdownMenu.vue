@@ -135,12 +135,28 @@ export default {
       }
 
       if (opt && opt.loadModal) {
-        var results = opt.loadModal(opt)
+        var data = opt.loadModal.data
+        var title = opt.loadModal.title
+        var id = opt.loadModal.id || 'default-modal'
 
         this.$store.dispatch('clearModal')
         // populate modal...
-        this.$store.dispatch('setModalData', results)
-        this.$store.dispatch('toggleModal', 'searchresults')
+        console.log('loadModal: ' + JSON.stringify(opt.loadModal))
+        if (data.constructor === Function) {
+          data = opt.loadModal.data(opt)
+          console.log('reloaded data to ' + JSON.stringify(data))
+        }
+
+        console.log('load data: ' + JSON.stringify(data))
+        console.log('load title: ' + JSON.stringify(title))
+        if (title) {
+          this.$store.dispatch('setModalTitle', title)
+        }
+        if (data) {
+          this.$store.dispatch('setModalData', data, {title: title})
+          console.log('update data for ' + id)
+          this.$store.dispatch('toggleModal', id)
+        }
       }
     }
   }
