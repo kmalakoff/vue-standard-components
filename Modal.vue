@@ -451,13 +451,18 @@ export default {
       if (this.options.onSave) {
         console.log('save form: ' + JSON.stringify(form))
         var response = await this.options.onSave(form)
-        console.log('save response: ' + JSON.stringify(response))
-        if (response.error) {
-          console.log('error detected onSave')
-          this.$store.dispatch('setError', { context: 'Login', err: response.error })
-        } else {
-          this.closeModal()
-        }
+        console.log('Modal Save Response: ' + JSON.stringify(response))
+        // if (response.data && response.data.success) {
+        //   console.log(response.success)
+        //   this.closeModal()
+        // } else if (response.data & response.data.errors) {
+        //   console.log('error detected onSave: ' + response.error)
+        //   this.$store.dispatch('setError', { context: 'Login', err: response.error })
+        // } else {
+        //   console.log('save response: ' + JSON.stringify(response))
+        //   this.closeModal()
+        // }
+        // this.closeModal()
       } else {
         console.log('save function not supplied')
       }
