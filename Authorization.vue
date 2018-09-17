@@ -98,17 +98,16 @@ export default {
     profile () {
       console.log('verify current profile')
     },
-    register (form) {
+    async register (form) {
       var credentials = {
         username: form.username,
         email: form.email,
         password: form.password,
         confirmPassword: form.confirmPassword
       }
-
       console.log('Registering with credentials: ' + JSON.stringify(credentials))
-      var ok = auth.signup(this.URL + '/register', credentials)
-      console.log('Registered ?: ' + JSON.stringify(ok))
+
+      // console.log('Registered ?: ' + JSON.stringify(ok))
       // var _this = this
       // console.log('Registering with credentials: ' + JSON.stringify(credentials))
       // axios(this.URL + '/register', {method: 'GET', data: credentials})
@@ -122,41 +121,33 @@ export default {
       //       console.log('registered: ' + JSON.stringify(result))
       //     }
       //   })
+      // return ok
+      var response = await auth.signup(this, credentials)
+      console.log('R:' + JSON.stringify(response))
+      return response
     },
     async login (form) {
       var credentials = {
         email: form.email,
         password: form.password
       }
-      console.log('Authorizing for login: ' + JSON.stringify(credentials))
-
+      console.log('login ' + form.email)
       var response = await auth.login(this, credentials)
-      console.log('login response: ' + JSON.stringify(response))
-      if (!response.data) {
-        console.log('no response data ?')
-      } else if (response.data.error) {
-        console.log('Error logging in...' + JSON.stringify(response.data.error))
-        // _this.$store.dispatch('payload', {})
-        var returnval = { error: response.data.error }
-        console.log('return: ' + JSON.stringify(returnval))
-        return returnval
-      } else {
-        // localStorage.setItem('id_token', temp.id)
-        // localStorage.setItem('access_token', temp.access)
-        console.log('new payload: ' + JSON.stringify(response.data))
-        if (response.data && response.data.id) {
-          response.data.userid = response.data.id
-          response.data.password = '***'
-        }
+      return response
+      // console.log('Authorize: ' + JSON.stringify(response))
+      // var LOGIN_URL = 'http://localhost:3333/login'
+      // context.$http.post(LOGIN_URL, creds, (data) => {
+      //   localStorage.setItem('id_token', data.id_token)
+      //   localStorage.setItem('access_token', data.access_token)
 
-        console.log('cache payload...')
-        // localStorage.setItem('payload', JSON.stringify(response.data))
-        this.$store.dispatch('payload', response.data)
-        // this.user.authenticated = true
-
-        console.log('logged in...')
-        return { payload: response.data }
-      }
+      //   this.user.authenticated = true
+      //   // Redirect to a specified route
+      //   // if(redirect) {
+      //   //   router.go(redirect)
+      //   // }
+      // }).error((err) => {
+      //   context.error = err
+      // })
     },
     logout () {
       this.$store.dispatch('AUTH_LOGOUT')
