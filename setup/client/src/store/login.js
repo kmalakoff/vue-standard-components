@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import axios from 'axios'
+// import axios from 'axios'
 // import config from '@/config.js'
 
 Vue.use(Vuex)
@@ -30,23 +30,33 @@ const actions = {
   payload: ({commit, dispatch}, payload) => {
     commit('payload', payload)
   },
-  [AUTH_REQUEST]: ({commit, dispatch}, user) => {
+  [AUTH_REQUEST]: ({commit, dispatch}, response) => {
     return new Promise((resolve, reject) => { // The Promise used for router redirect in login
+      console.log('dispatched request')
       commit(AUTH_REQUEST)
-      axios({ url: 'auth', data: user, method: 'POST' })
-        .then(resp => {
-          const token = resp.data.token
+      if (response.success) {
+        if (response.user) {
+          console.log('payload detected.  Storing payload: ' + JSON.stringify(response.user))
+          commit('payload', response.user)
+        } else if (response.token) {
+          const token = response.token
           localStorage.setItem('user-token', token) // store the token in localstorage
           commit(AUTH_SUCCESS, token)
+
           // you have your token, now log in your user :)
           dispatch(USER_REQUEST)
-          resolve(resp)
-        })
-        .catch(err => {
-          commit(AUTH_ERROR, err)
-          localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
-          reject(err)
-        })
+          resolve(response.user)
+        }
+      } else if (response.errors) {
+        console.log('Error detected: ' + response.errors)
+        localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
+        reject(response.errors)
+      } else {
+        console.log('expecting response user/token or errors.  Got: ' + JSON.stringify(response))
+        localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
+        var err = new Error('no response data returned')
+        reject(err)
+      }
     })
   },
   [AUTH_LOGOUT]: ({commit, dispatch}) => {
