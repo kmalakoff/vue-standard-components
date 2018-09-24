@@ -106,25 +106,13 @@ export default {
         confirmPassword: form.confirmPassword
       }
       console.log('Registering with credentials: ' + JSON.stringify(credentials))
-
-      // console.log('Registered ?: ' + JSON.stringify(ok))
-      // var _this = this
-      // console.log('Registering with credentials: ' + JSON.stringify(credentials))
-      // axios(this.URL + '/register', {method: 'GET', data: credentials})
-      //   .then(function (result, err) {
-      //     if (err) {
-      //       _this.status = 'registration error'
-      //       console.log('set axios error during registration: ' + err)
-      //       _this.$store.commit('setError', {context: 'Registration', err: err})
-      //     } else {
-      //       _this.status = 'registered'
-      //       console.log('registered: ' + JSON.stringify(result))
-      //     }
-      //   })
-      // return ok
       var response = await auth.signup(this, credentials)
-      console.log('R:' + JSON.stringify(response))
-      return response
+      console.log('Register call:' + JSON.stringify(response))
+      if (response.data && response.data.success) {
+        return response.data.user
+      } else if (response.data.errors) {
+        return response.data.errors
+      }
     },
     async login (form) {
       var credentials = {
@@ -133,7 +121,24 @@ export default {
       }
       console.log('login ' + form.email)
       var response = await auth.login(this, credentials)
-      return response
+      console.log('Login call:' + JSON.stringify(response))
+
+      if (response.data && response.data.success) {
+        var payload = response.data
+        if (payload.user && payload.user.id) {
+          payload.user.userid = payload.user.id
+          delete payload.user.id
+          delete payload.user.password
+        }
+        this.$store.dispatch('AUTH_REQUEST', payload)
+
+        return { success: 'Logged in successfully', payload: payload }
+      } else if (response.data.errors) {
+        return { errors: response.data.errors }
+      } else {
+        return 'no response...'
+      }
+      // return response.data
       // console.log('Authorize: ' + JSON.stringify(response))
       // var LOGIN_URL = 'http://localhost:3333/login'
       // context.$http.post(LOGIN_URL, creds, (data) => {
