@@ -1,8 +1,13 @@
 'use strict'
 
 const Model = use('Model')
+const Hash = use('Hash')
 
 class User extends Model {
+  static get table () {
+    return 'user'
+  }
+
   static boot () {
     super.boot()
 
@@ -13,7 +18,11 @@ class User extends Model {
      * Look at `app/Models/Hooks/User.js` file to
      * check the hashPassword method
      */
-    this.addHook('beforeCreate', 'User.hashPassword')
+    // this.addHook('beforeCreate', 'User.hashPassword')
+
+    this.addHook('beforeCreate', async (userInstance) => {
+      userInstance.password = await Hash.make(userInstance.password)
+    })
   }
 
   /**
@@ -27,8 +36,9 @@ class User extends Model {
    * @return {Object}
    */
   tokens () {
-    return this.hasMany('App/Models/Token')
+    return this.hasMany('App/Models/Token', 'user')
   }
+
 }
 
 module.exports = User

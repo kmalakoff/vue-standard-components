@@ -5,13 +5,15 @@ const { validate } = use('Validator')
 
 class AuthController {
 	async register ({request, response}) {
+		const {username, email, password, confirmPassword} = request.all()
 	    const rules = {
 	      username: 'required|unique:user,username',
 	      email: 'required|email|unique:user,email',
 	      password: 'required',
 	      confirmPassword: 'required'
 	    }
-
+	    console.log(JSON.stringify(request.all()))
+		console.log('attempt registration for ' + username + ' : ' + email)
 		const validation = await validate(request.all(), rules)
 		if (validation.fails()) {
 			// session
@@ -23,43 +25,48 @@ class AuthController {
         	}
 			response.json(msg)
 		} else {
-			const user = new User()
-
-	        user.username = request.input('username')
-	        user.email = request.input('email')
-	        user.id = null
+			var user = new User()
+	        user.username = username
+	        user.email = email
+	        user.password = password
+			console.log(JSON.stringify(user))
 	        
-	        const password = request.input('password')
-	        const confirmPassword = request.input('confirmPassword')
-
-	        var verified = await user.encryptPassword(password, confirmPassword)    
-
-	        if (verified) {
-	        	console.log('saving new user: ' + user.username)
+	        if (password && password.length && password === confirmPassword) {
 	        	user.save()
 		        var msg = {
-	    	        success: 'Registration Successful! Now go ahead and login'
-	        	}
-	        	response.json(msg)
-	        } else {
-	        	console.log('failed to verify: ' + verified)
+    		        success: 'Registration Successful! Now go ahead and login',
+    		        user: {email: email, username: username, userid: user.id}
+        		}
+        		response.json(msg)
+	    	} else {
 		        var msg = {
-	    	        error: 'Validation Failed'
-	        	}
-	        	response.json(msg)
-	        }
+    		        errors: 'Inconsistent passwords'
+        		}
+        		response.json(msg)
+	    	}
 	    }
 	}
 
 	async login ({auth, request, response}) {
 		const {email, password} = request.all()
+		console.log('Attempt login for ' + email)
+
 	    const rules = {
-	      email: 'required|email|unique:user,email',
+	      email: 'required|email',
 	      password: 'required'
 	    }
-
-		console.log('attempt login for ' + email)
+	    console.log('Validate: ' + JSON.stringify(rules))
 		const validation = await validate(request.all(), rules)
+
+		try {
+  			var logged_in = await auth.check()
+  			console.log("logged in? " + JSON.stringify(logged_in))
+  			await auth.logout()
+		} catch (error) {
+		  response.send('Missing or invalid jwt token')
+		}
+
+		console.log('continue..')
 		if (validation.fails()) {
 			// session
 			// 	.withErrors(validation.messages())
@@ -70,23 +77,21 @@ class AuthController {
         	}
 			response.json(msg)
 		} else {
-	    	console.log('validate: ' + email + ' : ' + password)
-
-			var user = await auth.attempt(email, password)
-			console.log('user: ' + JSON.stringify(user))
-			response.json(user)
-			// if (user) {
-			// 	user.password = null
-			// 	var payload = user
-			// 	console.log('regenerated payload: ' + JSON.stringify(payload))
-			// 	response.json(payload)
-			// } else {
-	  		//    console.log('failed to verify')
-		 	//        var msg = {
-	  		//   	        error: 'Login Failed'
-	  		//       	}
-	  		//       	response.json(msg)
-			// }
+	    	console.log('Validate: ' + email + ' : ' + password)
+			
+			try {
+				const user = await auth.attempt(email, password)
+				console.log('user: ' + JSON.stringify(user))
+				if (user && user.id) {
+					delete user.password
+					response.json({success: 'Logged in successfully', user: user})				
+				} else {
+					response.json({errors: 'Login Failed'})
+				}
+			} catch (err) {
+				console.log('error logging in')
+				response.json({errors: 'Login Error'})				
+			}
 		}
 	}
 }
