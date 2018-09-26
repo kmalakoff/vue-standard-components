@@ -88,6 +88,7 @@ Options (for all modal types)
                     b no valid type supplied.  Options: (search, record, data, raw, html, url, ....
                     hr
                   p &nbsp;
+                  b.error-msg(v-if='errorMsg') {{errorMsg}}
               Messaging
               div.my-modal-footer
                 slot(name="footer")
@@ -142,7 +143,8 @@ export default {
       generated: {
         body: ''
       },
-      modalContent: ''
+      modalContent: '',
+      errorMsg: ''
     }
   },
   props: {
@@ -452,19 +454,23 @@ export default {
         console.log('save form: ' + JSON.stringify(form))
         var response = await this.options.onSave(form)
         console.log('Modal Save Response: ' + JSON.stringify(response))
-        // if (response.data && response.data.success) {
-        //   console.log(response.success)
-        //   this.closeModal()
-        // } else if (response.data & response.data.errors) {
-        //   console.log('error detected onSave: ' + response.error)
-        //   this.$store.dispatch('setError', { context: 'Login', err: response.error })
-        // } else {
-        //   console.log('save response: ' + JSON.stringify(response))
-        //   this.closeModal()
-        // }
-        // this.closeModal()
+        if (response && response.success) {
+          //   this.ErrMsg = 'Success: ' + response.data.success
+          console.log(response.success)
+          this.closeModal()
+        } else if (response && response.errors) {
+          alert(response.errors)
+          console.log('error detected onSave: ' + response.errors)
+          //   this.ErrMsg = 'Error: ' + response.data.error
+          //   this.$store.dispatch('setError', { context: 'Login', err: response.error })
+        } else {
+          console.log('Please return success or errors on response: ' + JSON.stringify(response))
+          //   this.ErrMsg = 'OK...'
+          this.closeModal()
+        }
       } else {
         console.log('save function not supplied')
+        this.closeModal()
       }
     }
   },
