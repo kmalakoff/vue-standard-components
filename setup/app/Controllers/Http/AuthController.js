@@ -5,94 +5,73 @@ const { validate } = use('Validator')
 
 class AuthController {
 	async register ({request, response}) {
-		const {username, email, password, confirmPassword} = request.all()
+		console.log('registration control...')
 	    const rules = {
 	      username: 'required|unique:user,username',
 	      email: 'required|email|unique:user,email',
 	      password: 'required',
 	      confirmPassword: 'required'
 	    }
-	    console.log(JSON.stringify(request.all()))
-		console.log('attempt registration for ' + username + ' : ' + email)
+
 		const validation = await validate(request.all(), rules)
 		if (validation.fails()) {
 			// session
 			// 	.withErrors(validation.messages())
 			// 	.flashExcept(['password'])
-			console.log('Errors: ' + JSON.stringify(validation.messages()))
-	        var msg = {
-    	        errors: 'Failed validation'
-        	}
-			response.json(msg)
+			response.json({error: 'Failed Validation', messages: validation.messages()})
 		} else {
-			var user = new User()
-	        user.username = username
-	        user.email = email
-	        user.password = password
-			console.log(JSON.stringify(user))
-	        
-	        if (password && password.length && password === confirmPassword) {
-	        	user.save()
-		        var msg = {
-    		        success: 'Registration Successful! Now go ahead and login',
-    		        user: {email: email, username: username, userid: user.id}
-        		}
-        		response.json(msg)
-	    	} else {
-		        var msg = {
-    		        errors: 'Inconsistent passwords'
-        		}
-        		response.json(msg)
-	    	}
+			const user = new User()
+	        const password = request.input('password') || ''
+	        const confirmPassword = request.input('confirmPassword')
+
+	        user.username = request.input('username')
+	        user.email = request.input('email')
+	        user.id = null
+	        user.password = password	        
+
+	        if (password && password === confirmPassword) {
+		        var verified = await user.save()   
+
+		        if (verified) {
+		        	console.log('saving new user: ' + user.username)
+		        	user.save()
+			        var msg = {
+		    	        success: 'Registration Successful! Now go ahead and login'
+		        	}
+		        	response.json({success: 'Registration Successful! Now go ahead and login'})
+		        } else {
+		        	response.json({error: 'Failed to save user'})
+		        }
+		    } else {
+		    	response.json({error: 'password did not match confirmation password...'})
+		    }
 	    }
 	}
 
 	async login ({auth, request, response}) {
 		const {email, password} = request.all()
-		console.log('Attempt login for ' + email)
-
 	    const rules = {
 	      email: 'required|email',
 	      password: 'required'
 	    }
-	    console.log('Validate: ' + JSON.stringify(rules))
+
+		console.log('attempt login for ' + email)
 		const validation = await validate(request.all(), rules)
-
-		try {
-  			var logged_in = await auth.check()
-  			console.log("logged in? " + JSON.stringify(logged_in))
-  			await auth.logout()
-		} catch (error) {
-		  response.send('Missing or invalid jwt token')
-		}
-
-		console.log('continue..')
 		if (validation.fails()) {
-			// session
-			// 	.withErrors(validation.messages())
-			// 	.flashExcept(['password'])
-			console.log('Errors: ' + JSON.stringify(validation.messages()))
-	        var msg = {
-    	        errors: 'Failed validation'
-        	}
-			response.json(msg)
+			console.log('failed validation')
+			response.json({error: 'Failed Login Validation', messages: validation.messages()})
 		} else {
-	    	console.log('Validate: ' + email + ' : ' + password)
-			
-			try {
-				const user = await auth.attempt(email, password)
-				console.log('user: ' + JSON.stringify(user))
-				if (user && user.id) {
-					delete user.password
-					response.json({success: 'Logged in successfully', user: user})				
-				} else {
-					response.json({errors: 'Login Failed'})
-				}
-			} catch (err) {
-				console.log('error logging in')
-				response.json({errors: 'Login Error'})				
-			}
+			console.log('auth attempt completed...')
+			var user = await auth.attempt(email, password)
+			console.log(JSON.stringify(user))
+			response.json(user)
 		}
+	}
+
+	async logout ({auth, request, response}) {
+		var logout = await auth.logout()
+		console.log('logged out...')
+		response.json(logout)
 	}
 }
 
