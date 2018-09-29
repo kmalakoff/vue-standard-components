@@ -1,0 +1,45 @@
+my $proj = $ARGV[0];
+my $route = $ARGV[1];
+my $fix = $ARGV[2];
+
+if (!$proj) {
+  print "**** Usage:\n\tperl .check Standard\n\tperl .check Standard seeds\n\tperl .check Standard seeds fix\n\n";
+  exit;
+}
+ 
+my %checks = (
+	'migrations' => 'database/migrations',
+	'seeds' => 'database/seeds',
+	'models' => 'app/Models',
+	'controllers' => 'app/Controllers',
+	'start' => 'start',
+	'config' => 'config'
+);
+
+my @keys = keys %checks;
+
+if ($route) {
+  @keys = split /,/, $route;
+}
+
+for my $label (@keys) {
+  my $path = $checks{$label};
+  my $source = "client/src/components/$proj/setup/$path/";
+  my $command = "diff -r $source $path/";
+  print "*** $label diffs: ***\n";
+  my $diffs = `$command`;
+
+  if (!$diffs) {
+    print 'no diffs';
+  }
+  else {
+    print $diffs;
+  } 
+
+  if ($fix) {
+    my $command = "cp -R $path/* $source/";
+    print "$command\n";
+    `$command`;
+  }
+  print "\n*********\n\n";
+}
