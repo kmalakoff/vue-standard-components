@@ -1,0 +1,3 @@
+`./node_modules/eslint/bin/eslint.js *.vue --fix`
+`yarn build --prod`
+`cp -R dist/* ../public/`
