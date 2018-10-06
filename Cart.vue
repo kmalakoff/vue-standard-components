@@ -33,9 +33,6 @@
 </template>
 
 <script>
-import PublicHeader from './../PublicHeader'
-import PublicFooter from './../PublicFooter'
-
 import 'vue-awesome/icons/shopping-cart'
 import 'vue-awesome/icons/times'
 import 'vue-awesome/icons/home'
@@ -45,8 +42,6 @@ import 'vue-awesome/icons/home'
 export default {
   name: 'hello',
   components: {
-    PublicHeader,
-    PublicFooter
   },
   data () {
     return {

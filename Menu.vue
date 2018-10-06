@@ -117,11 +117,13 @@ export default {
 </script>
 
 <style scoped lang="sass?outputStyle=expanded">
-
   $menu-background-colour: transparent;
   $menu-colour: #ccc;
   $hover-colour: #FFF;
   $active-colour: #EEE;
+  $dropdown-colour: #f9f9f9;
+  $dropdown-link-colour: #f9f9f9;
+  $dropdown-hover-colour: #f1f1f1;
 
   .menu {
     width: 100%;
@@ -167,21 +169,23 @@ export default {
   .dropdown-content {
       display: none;
       position: absolute;
-      background-color: #f9f9f9;
+      background-color: $dropdown-colour;
       min-width: 160px;
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
       z-index: 1;
   }
 
   .dropdown-content a {
-      color: black;
+      color: $dropdown-link-colour;
       padding: 12px 16px;
       text-decoration: none;
       display: block;
       text-align: left;
   }
 
-  .dropdown-content a:hover {background-color: #f1f1f1}
+  .dropdown-content a:hover {
+    background-color: $dropdown-hover-colour;
+  }
 
   .dropdown:hover .dropdown-content {
       display: block;
