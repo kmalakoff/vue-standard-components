@@ -35,7 +35,7 @@
 -->
 
 <template lang='pug'>
-  div
+  span.menu
     span
     <!-- div.navbar-left -->
       span
@@ -65,7 +65,10 @@
               span(v-else)
                 <!-- Internal links do not need keys -->
                 router-link(:to="{name: link}") {{link}}
-
+          span(v-else-if="link.constructor === String")
+            a(href='#' v-on:click='pick(link)' v-bind:class="[{onMenuItem: link===active}, {offMenuItem: link!==active}]") {{link}}
+          span(v-else)
+            b ?
 </template>
 
 <script>
@@ -101,34 +104,56 @@ export default {
     direction: {
       type: String,
       default: 'vertical'
+    },
+    defaultTab: {
+      type: String,
+      default: ''
     }
   },
   computed: {
-    active: function () { return this.active_block || this.options.default }
+    active: function () {
+      return this.active_block || this.options.default || this.defaultTab
+    }
   },
   methods: {
     activate: function (layer) {
       this.active_block = layer
       console.log('activated ' + this.active_block)
       this.onClick(layer)
+    },
+    pick: function (el) {
+      this.active_block = el
+      if (this.onClick) {
+        console.log('picking ' + el + ': ' + this.active)
+        this.onClick(el)
+      } else {
+        console.log('no pick function supplied...')
+      }
     }
   }
 }
 </script>
 
 <style scoped lang="sass?outputStyle=expanded">
+
   $menu-background-colour: transparent;
-  $menu-colour: #ccc;
-  $hover-colour: #FFF;
-  $active-colour: #EEE;
+  $menu-colour: #999;
+  $hover-colour: black;
+  $active-colour: #333;
   $dropdown-colour: #f9f9f9;
   $dropdown-link-colour: #f9f9f9;
   $dropdown-hover-colour: #f1f1f1;
 
   .menu {
     width: 100%;
+    font-size: 2rem;
   }
-
+  .onMenuItem {
+    color: $active-colour
+  }
+  .offMenuItem {
+    color: $menu-colour
+  }
   ul {
       background-color: $menu-background-colour;
       list-style-type: none;
