@@ -124,6 +124,7 @@ import DataGrid from './DataGrid'
 import DBForm from './DBForm'
 import Messaging from './Messaging'
 import axios from 'axios'
+import 'vue-awesome/icons/times'
 
 export default {
   name: 'Modal',
