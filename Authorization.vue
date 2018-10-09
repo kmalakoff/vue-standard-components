@@ -41,7 +41,7 @@ export default {
         { label: 'Logout', onClick: this.logout }
       ],
       loginOptions: {
-        openText: 'Log in',
+        openButton: 'Log in',
         access: 'append',
         fields: [
           {name: 'email', type: 'text'},
@@ -54,7 +54,7 @@ export default {
       },
 
       registerOptions: {
-        openText: 'Sign up',
+        openButton: 'Sign up',
         access: 'append',
         fields: [
           {name: 'username'},
