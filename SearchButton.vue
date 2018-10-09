@@ -16,9 +16,11 @@
                 span.input-group-btn
                   button.btn.btn-lg.btn-default.full-page(@click.prevent='searchMethod')
                     icon(name='search' color='red' background='blue')
-    Modal(id='searchresults' type='data')
-      span &nbsp; &nbsp;
-
+    Modal(v-if="target === 'modal'" id='searchresults' type='data')
+    div()
+      h2 Results:
+      hr
+      b {{JSON.stringify(results)}}
 </template>
 
 <script>
@@ -35,13 +37,19 @@ export default {
     return {
       holdSearch: false,
       visibleSearch: false,
-
-      searchIcon: {
-        type: String,
-        default: 'search'
-      }
+      results: null
     }
   },
+  props: {
+    searchIcon: {
+      type: String,
+      default: 'search'
+    },    
+    target: {
+      type: String,
+      default: 'inline'
+    }
+  }
   methods: {
     toggleSearch (block) {
       this.visibleSearch = !this.visibleSearch
@@ -78,12 +86,20 @@ export default {
         { name: 'searched for', value: search },
         { name: 'found_eg', value: 'value_eg' }
       ]
-
-      this.$store.dispatch('clearModal')
-      // populate modal...
-      this.$store.dispatch('setModalData', results)
-      this.$store.dispatch('toggleModal', 'searchresults')
-      console.log('results: ' + JSON.stringify(results))
+      if (this.target === 'modal') {
+        this.$store.dispatch('clearModal')
+        // populate modal...
+        this.$store.dispatch('setModalData', results)
+        this.$store.dispatch('toggleModal', 'searchresults')
+        console.log('results: ' + JSON.stringify(results))
+      } else {
+        this.results = [
+          {
+            name: 'example',
+            value: '... returned results from api call ...'
+          }
+        ]
+      }
     }
   }
 }
@@ -92,7 +108,7 @@ export default {
 <style scoped lang="sass?outputStyle=expanded">
 
  .popup-table {
-    position: absolute;
+    position: relative;
     right: 0;
     top: 60px;
     margin: 0px;
