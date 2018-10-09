@@ -49,7 +49,7 @@ export default {
       type: String,
       default: 'inline'
     }
-  }
+  },
   methods: {
     toggleSearch (block) {
       this.visibleSearch = !this.visibleSearch
