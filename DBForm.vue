@@ -34,10 +34,9 @@ Usage:
 
     hr
     button.btn.btn-primary(v-if="onSave && (myAccess === 'edit' || myAccess === 'append')" @click.prevent="onSave(form)") {{submitButton}}
-    hr
-    b Form Input: {{myAccess}} : {{form}}
-    hr
-    b Record: {{record}}
+    div(v-if='debug')
+      hr
+      b Form Input: {{myAccess}} : {{form}}
 </template>
 
 <script>
@@ -84,6 +83,9 @@ export default {
     },
     access: {
       type: String
+    },
+    debug: {
+      type: Boolean
     }
   },
   created: function () {
