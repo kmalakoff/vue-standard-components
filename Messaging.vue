@@ -22,36 +22,17 @@
 !-->
 
 <template lang='pug'>
-  div.message-block.note.note--down
-    div(v-if='errorCount || warningCount || messageCount')
-      div(v-for='context,key in errors' align='center')
-        div(v-if="errors[key].length")
-          h4 {{errors[key].length}} {{key}} Error(s) detected:
-          div.table.msg-errors.alert-danger(align='center')
-            tr
-              td
-                div(v-for='error in errors[key]')
-                  b.msg-errors {{error}}
-              td
-                button(@click.prevent="clear(key)") x
-        div(v-if="warnings[key].length")
-          h4 {{warnings[key].length}} {{key} Warnings(s) found:
-          div.table.msg-warnings.alert-warning(align='center')
-            tr
-              td
-                div(v-for='warning in warnings[key]')
-                  b.msg-warnings {{warnings}}
-              td
-                button(@click.prevent="clear(key)") x
-        div(v-if="messages[key].length")
-          h4 {{messages[key].length}} {{key}} Message(s):
-          div.table.msg-messages.alert-success(align='center')
-            tr
-              td
-                div(v-for='message in messages[key]')
-                  b.msg-messages {{message}}
-              td
-                button(@click.prevent="clear(key)") x
+  div.message-block(v-if='errorCount || warningCount || messageCount')
+    button(@click.prevent="clear(key)") x
+    div.msg-errors(v-if='errorCount')
+      div(v-for='err in errors' align='center')
+        b {{err}}
+    div.msg-warnings(v-if='warningCount')
+      div(v-for='warn in warnings' align='center')
+        b {{warn}}
+    div.msg-messages(v-if='messageCount')
+      div(v-for='msg in messages' align='center')
+        b {{msg}}
 </template>
 
 <script>
@@ -66,8 +47,21 @@ export default {
     }
   },
   props: {
-    verbosity: {
-      type: String
+    msg: {
+      type: Array,
+      default () { return [] }
+    },
+    warn: {
+      type: Array,
+      default () { return [] }
+    },
+    err: {
+      type: Array,
+      default () { return [] }
+    },
+    stored: {
+      type: Boolean,
+      default: true // use stored messages
     }
   },
   // computed: {
@@ -77,51 +71,57 @@ export default {
   // },
   computed: {
     messageCount: function () {
-      return this.$store.getters.messageCount || 0
+      if (this.stored) {
+        return this.$store.getters.messageCount || 0
+      } else {
+        return this.msg.length
+      }
     },
     warningCount: function () {
-      return this.$store.getters.warningCount || 0
+      if (this.stored) {
+        return this.$store.getters.warningCount || 0
+      } else {
+        return this.warn.length
+      }
     },
     errorCount: function () {
-      return this.$store.getters.errorCount || 0
+      if (this.stored) {
+        return this.$store.getters.errorCount || 0
+      } else {
+        return this.err.length
+      }
     },
     messages: function () {
-      return this.$store.getters.messages
+      if (this.stored) {
+        return this.$store.getters.messages
+      } else {
+        return { default: this.msg }
+      }
     },
     warnings: function () {
-      return this.$store.getters.warnings
+      if (this.stored) {
+        return this.$store.getters.warnings
+      } else {
+        return { default: this.warn }
+      }
     },
     errors: function () {
-      return this.$store.getters.errors
+      if (this.stored) {
+        console.log('got stored errors')
+        return this.$store.getters.errors
+      } else {
+        console.log('got immediate errors')
+        return { default: this.err }
+      }
     }
   },
-  //   mapState([
-  //   'note',
-  //   'count',
-  //   'errorCount',
-  //   'errors',
-  //   'warningCount',
-  //   'warnings',
-  //   'messageCount',
-  //   'messages'
-  // ]),
   methods: {
     clear (scope) {
-      console.log('clear ' + scope + ' messages')
-      this.$store.commit('clearErrors', scope)
+      console.log('clear messages')
+      this.$store.dispatch('clearMessages')
     }
   },
   watch: {
-    note () {
-      console.log('note changed...')
-      const note = document.querySelector('.note')
-      if (this.note.length) {
-        note.classList.add('note--up')
-      } else {
-        note.classList.remove('note--up')
-        note.classList.add('note--down')
-      }
-    },
     errorCount: function () {
       console.log('error count changed...')
     }
@@ -132,10 +132,10 @@ export default {
 
 <style>
   .message-block {
-    // padding: 20px;
+    padding: 20px;
     text-align: center;
-    /*border: 1px solid black*/
-    // background-color: orange;
+    border: 1px solid black;
+    background-color: orange;
     color: black;
   }
   .msg-errors, .msg-warnings, .msg-messages {
@@ -143,6 +143,15 @@ export default {
     margin: 10px;
     // width: 50%;
     align: center;
+  }
+  .msg-errors {
+    background-color: lightred;
+  }
+  .msg-warnings {
+    background-color: organge;
+  }
+  .msg-messages {
+    background-color: lightgreen;
   }
 
   .note {
