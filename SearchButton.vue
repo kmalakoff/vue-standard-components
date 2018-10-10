@@ -14,7 +14,7 @@
               span.input-group
                 input.form-control.input-lg.full-page#searchString(type='text' placeholder='-- Search --')
                 span.input-group-btn
-                  button.btn.btn-lg.btn-default.full-page(@click.prevent='searchMethod')
+                  button.btn.btn-lg.btn-default.full-page(@click.prevent='callSearchMethod')
                     icon(name='search' color='red' background='blue')
     Modal(v-if="target === 'modal'" id='searchresults' type='data')
     div()
@@ -36,7 +36,7 @@ export default {
   data () {
     return {
       holdSearch: false,
-      visibleSearch: false,
+      visibleSearch: true,
       results: null
     }
   },
@@ -44,34 +44,59 @@ export default {
     searchIcon: {
       type: String,
       default: 'search'
-    },    
+    },
     target: {
       type: String,
       default: 'inline'
+    },
+    includeInput: {
+      type: Boolean,
+      default: true
+    },
+    searchMethod: {
+      type: Function,
+      default: null
+    }
+  },
+  computed: {
+    callMethod: function (string) {
+      if (this.searchMethod) {
+        return this.searchMethod(string)
+      } else {
+        var results = [
+          { name: 'searched for', value: string },
+          { name: 'found_eg', value: 'value_eg' }
+        ]
+        return results
+      }
     }
   },
   methods: {
     toggleSearch (block) {
-      this.visibleSearch = !this.visibleSearch
-      console.log('toggled hold: ' + this.holdSearch + ': ' + this.visibleSearch)
+      if (!this.includeInput) {
+        this.visibleSearch = this.includeInput || !this.visibleSearch
+        console.log('toggled hold: ' + this.holdSearch + ': ' + this.visibleSearch)
+      }
     },
     hideSearch (block) {
       // Hide menu (delay ignores rapid toggling by mouse out / in movements)
-      var _this = this
-      if (!block) {
-        console.log('no block defined')
-      } else if (this.holdSearch) {
-        this.onexpire = false
-      } else {
-        setTimeout(
-          () => {
-            _this.holdSearch = false
-            this.visibleSearch = this.onexpire
-          }, 1000)
-        this.holdSearch = true
+      if (!this.includeInput) {
+        var _this = this
+        if (!block) {
+          console.log('no block defined')
+        } else if (this.holdSearch) {
+          this.onexpire = false
+        } else {
+          setTimeout(
+            () => {
+              _this.holdSearch = false
+              this.visibleSearch = this.onexpire
+            }, 1000)
+          this.holdSearch = true
+        }
       }
     },
-    searchMethod () {
+    callSearchMethod () {
       var id = document.getElementById('searchString')
       var search = ''
       if (id && id.value) {
@@ -82,10 +107,9 @@ export default {
       }
       console.log('perform search for ' + search)
 
-      var results = [
-        { name: 'searched for', value: search },
-        { name: 'found_eg', value: 'value_eg' }
-      ]
+      var results = this.callMethod(search)
+      console.log('got ' + JSON.stringify(results))
+
       if (this.target === 'modal') {
         this.$store.dispatch('clearModal')
         // populate modal...
@@ -108,10 +132,10 @@ export default {
 <style scoped lang="sass?outputStyle=expanded">
 
  .popup-table {
-    position: relative;
-    right: 0;
-    top: 60px;
-    margin: 0px;
+    // position: relative;
+    // right: 0;
+    // top: 60px;
+    // margin: 0px;
   }
   .popup-table tr {
     /*padding: 5px;*/
