@@ -52,7 +52,7 @@ Options (for all modal types)
             div.my-modal-container
               div.my-modal-header
                 slot(name="header")
-                  b {{myheader}} ({{type}})
+                  b {{myheader}}
                     span.navbar-right
                       button.btn.btn-danger.btn-xs(@click="closeModal")
                         icon(name='times')
@@ -300,7 +300,7 @@ export default {
       } else if (this.title) {
         return this.title
       } else {
-        return this.$store.getters.modalTitle || 'my other Title'
+        return this.$store.getters.modalTitle || ''
       }
     },
     modalData: function () {
