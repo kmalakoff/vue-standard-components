@@ -22,7 +22,7 @@ export default {
       type: String,
       default: ''
     },
-    pick: {
+    onPick: {
       type: Function,
       default () {
         return null
@@ -44,10 +44,10 @@ export default {
       }
     },
     onClick: function (el) {
-      console.log(' pick ' + JSON.stringify(el))
-      if (this.pick) {
+      console.log(' onPick ' + JSON.stringify(el))
+      if (this.onPick) {
         this.show = el
-        this.pick(el)
+        this.onPick(el)
       }
     }
   }
