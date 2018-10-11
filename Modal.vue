@@ -52,7 +52,7 @@ Options (for all modal types)
             div.my-modal-container
               div.my-modal-header
                 slot(name="header")
-                  b {{myheader}} ({{type}})
+                  b {{myheader}}
                     span.navbar-right
                       button.btn.btn-danger.btn-xs(@click="closeModal")
                         icon(name='times')
