@@ -300,7 +300,7 @@ export default {
       } else if (this.title) {
         return this.title
       } else {
-        return this.$store.getters.modalTitle || 'my other Title'
+        return this.$store.getters.modalTitle || ''
       }
     },
     modalData: function () {
