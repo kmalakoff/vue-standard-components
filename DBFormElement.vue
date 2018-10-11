@@ -17,7 +17,7 @@
     // span(v-else-if="Ftype==='password'")
     //   b-form-input.input-lg(@change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
     span(v-else-if="Ftype==='date'")
-      b-form-input.input-lg(@change.native="myChange" type='date' :options="list(field)" placeholder="yyyy-mm-dd" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
+      b-form-input.input-lg(@change.native="myChange" type='date' :options="list(field)" :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
     span(v-else-if="Ftype.match(/^enum/)")
       <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
       b-form-select.input-lg(@change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo')
@@ -73,6 +73,7 @@ export default {
     // console.log(this.field.name + ' found default: ' + defaultTo)
   },
   computed: {
+    datePlaceholder: function () { return this.placeholder || 'YYYY-MM-DD' },
     refModel: function () { return this.form[this.vModel] },
     Ftype: function () { return this.field.type || 'varchar' },
     label: function () { return this.field.placeholder || this.placeholder },
