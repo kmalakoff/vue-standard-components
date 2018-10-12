@@ -13,7 +13,7 @@
       Modal(id='profile' type='data')
     div(v-else)
       Modal(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
-      span &nbsp; | &nbsp;
+      span &nbsp; &nbsp;
       Modal(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
         p &nbsp;
 </template>
@@ -43,10 +43,7 @@ export default {
       loginOptions: {
         openButton: 'Log in',
         access: 'append',
-        fields: [
-          {name: 'email', type: 'text'},
-          {name: 'password', placeholder: 'password', type: 'password'}
-        ],
+        fields: config.loginFields,
         onSave: this.login,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
@@ -56,16 +53,7 @@ export default {
       registerOptions: {
         openButton: 'Sign up',
         access: 'append',
-        fields: [
-          {name: 'username'},
-          {name: 'fullname'},
-          {name: 'address'},
-          {name: 'postal_code', placeholder: 'postal code'},
-          {name: 'birthdate', type: 'date', placeholder: ' Birthdate (yyyy-mm-dd) '},
-          {name: 'email', type: 'text'},
-          {name: 'password', placeholder: 'password', type: 'password'},
-          {name: 'confirmPassword', placeholder: 're-enter password', type: 'password'}
-        ],
+        fields: config.registrationFields,
         onSave: this.register,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
@@ -103,16 +91,18 @@ export default {
       console.log('verify current profile')
     },
     async register (form) {
-      var credentials = {
-        username: form.username,
-        email: form.email,
-        password: form.password,
-        confirmPassword: form.confirmPassword
+      var fields = this.registerOptions.fields
+      console.log('fields: ' + fields.join(', '))
+      var credentials = {}
+      for (var i = 0; i < fields.length; i++) {
+        var f = fields[i]
+        credentials[f.name] = form[f.prompt] || form[f.name]
       }
       console.log('Registering with credentials: ' + JSON.stringify(credentials))
       var response = await auth.signup(this, credentials)
       console.log('Register call:' + JSON.stringify(response))
       if (response.data && response.data.success) {
+        this.$store.dispatch('logMessage', response.data.success)
         return response.data.user
       } else if (response.data.errors) {
         return response.data.errors
@@ -135,7 +125,6 @@ export default {
           delete payload.user.password
         }
         this.$store.dispatch('AUTH_REQUEST', payload)
-
         return { success: 'Logged in successfully', payload: payload }
       } else if (response.data.errors) {
         return { errors: response.data.errors }
