@@ -85,7 +85,8 @@ export default {
       type: String
     },
     debug: {
-      type: Boolean
+      type: Boolean,
+      default: false
     }
   },
   created: function () {
