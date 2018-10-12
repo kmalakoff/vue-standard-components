@@ -184,6 +184,8 @@ export default {
         return this.search_options.search_fields
       } else if (this.options && this.options.fields) {
         return this.options.fields
+      } else if (this.fields) {
+        return this.fields
       } else {
         var keys = Object.keys(this.data[0])
         console.log('defaulting to keys from first record since no fields specified')
@@ -255,11 +257,11 @@ export default {
       // this.$store.getters.getHash('updates')
     },
     pickOne (index) {
-      console.log('pick ' + index)
-      console.log('MS ? ' + this.multiSelect)
+      // console.log('pick index:' + index)
+      // console.log('MS ? ' + this.multiSelect)
 
       console.log('picked: ' + JSON.stringify(this.picked))
-      console.log('data: ' + JSON.stringify(this.data))
+      // console.log('data: ' + JSON.stringify(this.data))
       var item = this.data[index]
       console.log('item: ' + JSON.stringify(item))
       console.log('options: ' + JSON.stringify(this.options))
@@ -288,12 +290,12 @@ export default {
         console.log('TARGET2 = ' + JSON.stringify(this.picked))
       }
 
-      // if (this.onPick) {
-      //   console.log('onPick defined')
-      //   this.onPick(this.picked)
-      // } else {
-      //   console.log('no onpick for DG')
-      // }
+      if (this.onPick) {
+        console.log('onPick defined')
+        this.onPick(this.picked)
+      } else {
+        console.log('no onpick for DG')
+      }
       this.$store.getters.getHash('updates')
 
       return false
