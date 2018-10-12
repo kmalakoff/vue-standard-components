@@ -458,12 +458,12 @@ export default {
         if (response && response.success) {
           //   this.ErrMsg = 'Success: ' + response.data.success
           console.log(response.success)
+          this.$store.dispatch('logMessage', response.success)
           this.closeModal()
         } else if (response && response.errors) {
-          alert(response.errors)
+          // alert(response.errors)
           console.log('error detected onSave: ' + response.errors)
-          //   this.ErrMsg = 'Error: ' + response.data.error
-          //   this.$store.dispatch('setError', { context: 'Login', err: response.error })
+            this.$store.dispatch('logError', response.errors)
         } else {
           console.log('Please return success or errors on response: ' + JSON.stringify(response))
           //   this.ErrMsg = 'OK...'
