@@ -21,6 +21,7 @@
 import Modal from './Modal'
 import DropdownMenu from './DropdownMenu'
 import auth from '../../auth'
+import StandardConfig from './config.js'
 import config from '@/config.js'
 
 export default {
@@ -43,7 +44,7 @@ export default {
       loginOptions: {
         openButton: 'Log in',
         access: 'append',
-        fields: config.loginFields,
+        fields: StandardConfig.loginFields,
         onSave: this.login,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
@@ -53,7 +54,7 @@ export default {
       registerOptions: {
         openButton: 'Sign up',
         access: 'append',
-        fields: config.registrationFields,
+        fields: StandardConfig.registrationFields,
         onSave: this.register,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
