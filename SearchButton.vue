@@ -12,12 +12,12 @@
           td(width='100%')
             div.form-group
               span.input-group
-                input.form-control.input-lg.full-page#searchString(type='text' placeholder='-- Search --')
+                input.form-control.input-lg.full-page#searchString(type='text' :placeholder='searchPrompt')
                 span.input-group-btn
                   button.btn.btn-lg.btn-default.full-page(@click.prevent='callSearchMethod')
                     icon(name='search' color='red' background='blue')
     Modal(v-if="target === 'modal'" id='searchresults' type='data')
-    div()
+    div(v-if='results')
       h2 Results:
       hr
       b {{JSON.stringify(results)}}
@@ -56,6 +56,10 @@ export default {
     searchMethod: {
       type: Function,
       default: null
+    },
+    searchPrompt: {
+      type: String,
+      default: '-- Search --'
     }
   },
   computed: {
