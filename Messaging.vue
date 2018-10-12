@@ -23,7 +23,8 @@
 
 <template lang='pug'>
   div.message-block(v-if='errorCount || warningCount || messageCount')
-    button(@click.prevent="clear(key)") x
+    div.navbar-right
+      button(@click.prevent="clear") x
     div.msg-errors(v-if='errorCount')
       div(v-for='err in errors' align='center')
         b {{err}}
@@ -33,6 +34,8 @@
     div.msg-messages(v-if='messageCount')
       div(v-for='msg in messages' align='center')
         b {{msg}}
+  // div(v-else)
+  //   b No messages ({{errorCount}} : {{errors}})
 </template>
 
 <script>
@@ -132,7 +135,8 @@ export default {
 
 <style>
   .message-block {
-    padding: 20px;
+    padding: 3px;
+    padding-right: 20px;
     text-align: center;
     border: 1px solid black;
     background-color: orange;
