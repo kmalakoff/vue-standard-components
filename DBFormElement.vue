@@ -2,11 +2,11 @@
 
 <template lang='pug'>
   div
-    <!-- b {{field}} : {{Ftype}} {{list(field)}} : {{vModel}} = {{vm}} :: {{vModel}} -->
+    b(v-if='debug') F: {{field}} : {{vModel}} = {{vm}} :: {{vModel}} i? {{iType}} {{field.name}}
     span(v-if="access==='read'")
       b {{defaultTo}}
     span(v-else-if="iType")
-      b-form-input.input-lg(@change.native="myChange" :type='iType' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
+      b-form-input.input-lg(@change.native="myChange" :type='iType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
       // input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
     // span(v-else-if="Ftype==='string' || Ftype==='text'")
     //   b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
@@ -63,7 +63,8 @@ export default {
     form: { type: Object },
     access: { type: String },
     record: { type: Object },
-    options: { type: Object }
+    options: { type: Object },
+    debug: { type: Boolean }
   },
   created: function () {
     // var keys = _.pluck(this.field.default)
