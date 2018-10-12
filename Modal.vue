@@ -461,9 +461,8 @@ export default {
           this.$store.dispatch('logMessage', response.success)
           this.closeModal()
         } else if (response && response.errors) {
-          // alert(response.errors)
           console.log('error detected onSave: ' + response.errors)
-            this.$store.dispatch('logError', response.errors)
+          this.$store.dispatch('logError', response.errors)
         } else {
           console.log('Please return success or errors on response: ' + JSON.stringify(response))
           //   this.ErrMsg = 'OK...'
