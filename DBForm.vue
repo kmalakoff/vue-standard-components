@@ -10,6 +10,8 @@ Usage:
 
 <template lang='pug'>
   div.table-form
+    div(v-if='debug')
+      p Fields: {{DBfields}}
     table.table.form-table
       tr(v-if='heading')
         td.heading(colspan=3)
@@ -18,7 +20,7 @@ Usage:
         td.prompt-column
           b {{label(field)}}:
         td.data-column
-          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord')
+          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :debug='debug')
         td.extra-column(v-if="myAccess === 'edit'")
           span &nbsp;
           a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)")
@@ -47,7 +49,6 @@ import DBFormElement from './DBFormElement'
 import config from '@/config.js'
 
 export default {
-
   data () {
     return {
       url: config.dbUrl,
@@ -251,7 +252,7 @@ export default {
     },
     vModel: function (field) {
       var label = this.label(field)
-      var vModel = label
+      var vModel = field.name || label
       return vModel
     }
   }
