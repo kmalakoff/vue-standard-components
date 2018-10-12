@@ -17,21 +17,25 @@
                   button.btn.btn-lg.btn-default.full-page(@click.prevent='callSearchMethod')
                     icon(name='search' color='red' background='blue')
     Modal(v-if="target === 'modal'" id='searchresults' type='data')
-    div(v-if='results')
+    div(v-if='results && postResults')
       h2 Results:
       hr
-      b {{JSON.stringify(results)}}
+      DataGrid(:data="results" :onPick='onClick')
+       // :type="link.type" :modal="link.modal" :record="data[index]" :link="link")
+
 </template>
 
 <script>
 // require icon supplied by calling component...
 import Modal from './Modal'
+import DataGrid from './DataGrid'
 import 'vue-awesome/icons/search'
 
 export default {
   name: 'SearchButton',
   components: {
-    Modal
+    Modal,
+    DataGrid
   },
   data () {
     return {
@@ -60,20 +64,17 @@ export default {
     searchPrompt: {
       type: String,
       default: '-- Search --'
+    },
+    onClick: {
+      type: Function,
+      default: null
+    },
+    postResults: {
+      type: Boolean,
+      default: null
     }
   },
   computed: {
-    callMethod: function (string) {
-      if (this.searchMethod) {
-        return this.searchMethod(string)
-      } else {
-        var results = [
-          { name: 'searched for', value: string },
-          { name: 'found_eg', value: 'value_eg' }
-        ]
-        return results
-      }
-    }
   },
   methods: {
     toggleSearch (block) {
@@ -100,6 +101,18 @@ export default {
         }
       }
     },
+    callMethod: function (string) {
+      if (this.searchMethod) {
+        console.log('using search method...')
+        return this.searchMethod(string)
+      } else {
+        var results = [
+          { name: 'searched for', value: string },
+          { name: 'found_eg', value: 'value_eg' }
+        ]
+        return results
+      }
+    },
     callSearchMethod () {
       var id = document.getElementById('searchString')
       var search = ''
@@ -121,12 +134,7 @@ export default {
         this.$store.dispatch('toggleModal', 'searchresults')
         console.log('results: ' + JSON.stringify(results))
       } else {
-        this.results = [
-          {
-            name: 'example',
-            value: '... returned results from api call ...'
-          }
-        ]
+        this.results = results
       }
     }
   }
