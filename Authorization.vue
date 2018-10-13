@@ -125,6 +125,7 @@ export default {
           delete payload.user.id
           delete payload.user.password
         }
+        console.log('generated payload: ' + JSON.stringify(payload))
         this.$store.dispatch('AUTH_REQUEST', payload)
         return { success: 'Logged in successfully', payload: payload }
       } else if (response.data.errors) {
@@ -154,16 +155,16 @@ export default {
     getUser () {
       console.log('get user...')
 
-      var show = ['userid', 'username', 'email', 'access', 'birthdate']
-      var payload = this.$store.getters.payload
-      // var data = JSON.parse(this.$store.getters.payload)
-      // console.log('user data: ' + JSON.stringify(payload))
-
+      var payload = this.payload || this.$store.getters.payload
+      var show = Object.keys(this.payload)
       var D = []
       if (payload.constructor === Object) {
         for (var i = 0; i < show.length; i++) {
           if (payload[show[i]]) {
+            console.log('show ' + show[i])
             D.push({attribute: show[i], value: payload[show[i]]})
+          } else {
+            console.log('no ' + show[i])
           }
         }
         console.log('user data: ' + JSON.stringify(D))
