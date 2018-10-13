@@ -458,7 +458,7 @@ export default {
         if (response && response.success) {
           //   this.ErrMsg = 'Success: ' + response.data.success
           console.log(response.success)
-          this.$store.dispatch('logMessage', response.success)
+          // await this.$store.dispatch('logMessage', response.success)
           this.closeModal()
         } else if (response && response.errors) {
           console.log('error detected onSave: ' + response.errors)
