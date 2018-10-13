@@ -139,7 +139,7 @@ export default {
     padding-right: 20px;
     text-align: center;
     border: 1px solid black;
-    background-color: orange;
+    background-color: grey;
     color: black;
   }
   .msg-errors, .msg-warnings, .msg-messages {
