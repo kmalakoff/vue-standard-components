@@ -71,7 +71,7 @@ export default {
     },
     postResults: {
       type: Boolean,
-      default: null
+      default: false
     }
   },
   computed: {
