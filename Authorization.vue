@@ -12,6 +12,10 @@
         <!-- b Log Out -->
       Modal(id='profile' type='data')
     div(v-else)
+      span(v-if='demo')
+        span(v-for='i, user in demo')
+          button.btn.btn-warning(v-on:click='loadDemo(user)') Login as {{user}}
+          span &nbsp; &nbsp;
       Modal(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
       span &nbsp; &nbsp;
       Modal(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
@@ -29,7 +33,6 @@ export default {
     return {
       // We need to initialize the component with any
       // properties that will be used in it
-      demo: true,
       credentials: {
         username: '',
         password: ''
@@ -72,7 +75,11 @@ export default {
     payload: {
       type: Object
     },
-    onPick: { type: Function }
+    onPick: { type: Function },
+    demo: {
+      type: Object,
+      default: null
+    }
   },
   computed: {
     // payload: function () {
@@ -148,6 +155,15 @@ export default {
       // }).error((err) => {
       //   context.error = err
       // })
+    },
+    loadDemo (template) {
+      if (this.demo && this.demo[template]) {
+        var cred = this.demo[template]
+        this.login(cred)
+      } else {
+        console.log(template + ' demo template not defined')
+        console.log(JSON.stringify(this.demo))
+      }
     },
     logout () {
       this.$store.dispatch('AUTH_LOGOUT')
