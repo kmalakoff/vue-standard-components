@@ -139,7 +139,7 @@ export default {
     padding-right: 20px;
     text-align: center;
     border: 1px solid black;
-    background-color: grey;
+    background-color: lightgrey;
     color: black;
   }
   .msg-errors, .msg-warnings, .msg-messages {
@@ -148,13 +148,13 @@ export default {
     // width: 50%;
     align: center;
   }
-  .msg-errors {
+  div.msg-errors {
     background-color: lightred;
   }
-  .msg-warnings {
+  div.msg-warnings {
     background-color: organge;
   }
-  .msg-messages {
+  div.msg-messages {
     background-color: lightgreen;
   }
 
