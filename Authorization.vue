@@ -140,21 +140,6 @@ export default {
       } else {
         return 'no response...'
       }
-      // return response.data
-      // console.log('Authorize: ' + JSON.stringify(response))
-      // var LOGIN_URL = 'http://localhost:3333/login'
-      // context.$http.post(LOGIN_URL, creds, (data) => {
-      //   localStorage.setItem('id_token', data.id_token)
-      //   localStorage.setItem('access_token', data.access_token)
-
-      //   this.user.authenticated = true
-      //   // Redirect to a specified route
-      //   // if(redirect) {
-      //   //   router.go(redirect)
-      //   // }
-      // }).error((err) => {
-      //   context.error = err
-      // })
     },
     loadDemo (template) {
       if (this.demo && this.demo[template]) {
