@@ -4,9 +4,9 @@
   div
     b(v-if='debug') F: {{field}} : {{vModel}} = {{vm}} :: {{vModel}} i? {{iType}} {{field.name}}
     span(v-if="access==='read'")
-      b {{defaultTo}}
+      b D {{defaultTo}} : {{test}}
     span(v-else-if="iType")
-      b-form-input.input-lg(@change.native="myChange" :type='iType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
+      b-form-input.input-lg(@change.native="myChange" :type='iType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus")
       // input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
     // span(v-else-if="Ftype==='string' || Ftype==='text'")
     //   b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
@@ -17,20 +17,20 @@
     // span(v-else-if="Ftype==='password'")
     //   b-form-input.input-lg(@change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
     span(v-else-if="Ftype==='date'")
-      b-form-input.input-lg(@change.native="myChange" type='date' :options="list(field)" :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
+      b-form-input.input-lg(@change.native="myChange" type='date' :options="list(field)" :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
     span(v-else-if="Ftype.match(/^enum/)")
       <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
-      b-form-select.input-lg(@change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo')
+      b-form-select.input-lg(@change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
     // span(v-else-if="Ftype==='boolean'")
     //   b-form-checkbox.input-lg(@change.native="myChange" :value='defaultTo' :default='defaultTo')
     span(v-else-if="Ftype==='decimal'")
-      b-form-input.input-lg(type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
+      b-form-input.input-lg(type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
     span(v-else-if="Ftype==='fixed'")
-      b-form-input.input-lg(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
+      b-form-input.input-lg(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
     span(v-else-if="Ftype==='reference'")
-      b-form-input(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
+      b-form-input(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
     span(v-else-if="Ftype==='hidden'")
-      b-form-input(v-show=0 type='text' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo')
+      b-form-input(v-show=0 type='text' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
     span(v-else)
       b {{Ftype}}?: {{field}}
 
@@ -53,7 +53,8 @@ export default {
   data () {
     return {
       vm: this.field.default,
-      om: this.vModel
+      om: this.vModel,
+      test: ''
     }
   },
   props: {
@@ -102,11 +103,10 @@ export default {
       }
     },
     onFocus: function () {
-      console.log('focus...')
-      if (this.options && this.options.onBlur) {
+      if (this.options && this.options.onFocus) {
         return this.options.onFocus
       } else {
-        return ''
+        return this.nullFunction
       }
     },
     iType: function () {
@@ -123,6 +123,9 @@ export default {
     }
   },
   methods: {
+    nullFunction () {
+      console.log('null function...')
+    },
     saveMe (val) {
       console.log('save Me')
       this.$set(this.form, this.om, this.vm)
@@ -131,7 +134,19 @@ export default {
       console.log('change ' + this.om + ' to ' + evt.target.value)
       this.$set(this.form, this.om, evt.target.value)
       if (this.onBlur) {
-        this.onBlur(evt)
+        this.onBlur(evt, this.om)
+      }
+    },
+    myBlur (evt) {
+      if (this.onBlur) {
+        this.onBlur(evt, this.om)
+      }
+    },
+    myFocus (evt) {
+      if (this.onFocus) {
+        console.log('DBFE focused on ' + this.om)
+        console.log(JSON.stringify(evt))
+        this.onFocus(evt, this.om)
       }
     },
     validate (evt) {
