@@ -110,7 +110,7 @@ export default {
       var response = await auth.signup(this, credentials)
       console.log('Register call:' + JSON.stringify(response))
       if (response.data && response.data.success) {
-        this.$store.dispatch('logMessage', response.data.success)
+        this.$store.dispatch('logMessage', 'Created Account')
         return response.data.user
       } else if (response.data.errors) {
         console.log('error encountered: ' + response.data.errors)
