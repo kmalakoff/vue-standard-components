@@ -456,9 +456,7 @@ export default {
         var response = await this.options.onSave(form)
         console.log('Modal Save Response: ' + JSON.stringify(response))
         if (response && response.success) {
-          //   this.ErrMsg = 'Success: ' + response.data.success
           console.log(response.success)
-          // await this.$store.dispatch('logMessage', response.success)
           this.closeModal()
         } else if (response && response.errors) {
           console.log('error detected onSave: ' + response.errors)
