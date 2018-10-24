@@ -14,7 +14,7 @@
     div(v-else)
       span(v-if='demo')
         span(v-for='i, user in demo')
-          button.btn.btn-warning(v-on:click='loadDemo(user)') Login as {{user}}
+          button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
           span &nbsp; &nbsp;
       Modal(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
       span &nbsp; &nbsp;
@@ -106,14 +106,17 @@ export default {
         var f = fields[i]
         credentials[f.name] = form[f.prompt] || form[f.name]
       }
-      console.log('Registering with credentials: ' + JSON.stringify(credentials))
+      console.log('Registering with credentials: ')
       var response = await auth.signup(this, credentials)
       console.log('Register call:' + JSON.stringify(response))
       if (response.data && response.data.success) {
-        this.$store.dispatch('logMessage', response.data.success)
+        this.$store.dispatch('logMessage', 'Created Account')
         return response.data.user
       } else if (response.data.errors) {
+        console.log('error encountered: ' + response.data.errors)
         return response.data.errors
+      } else {
+        console.log('no response success or errors ?')
       }
     },
     async login (form) {

@@ -28,15 +28,13 @@
         button(@click.prevent="clear") x
       div
         div(v-for='err in errors' align='center')
-          b {{err}}
+          b(v-if='err') {{err}}
     div.msg-warnings(v-if='warningCount')
       div(v-for='warn in warnings' align='center')
-        b {{warn}}
+        b(v-if='warn') {{warn}}
     div.msg-messages(v-if='messageCount')
       div(v-for='msg in messages' align='center')
-        b {{msg}}
-  // div(v-else)
-  //   b No messages ({{errorCount}} : {{errors}})
+        b(v-if='msg') {{msg}}
 </template>
 
 <script>
