@@ -22,12 +22,13 @@
 !-->
 
 <template lang='pug'>
-  div.message-block(v-if='errorCount || warningCount || messageCount')
-    div.navbar-right
-      button(@click.prevent="clear") x
+  div(v-if='errorCount || warningCount || messageCount')
     div.msg-errors(v-if='errorCount')
-      div(v-for='err in errors' align='center')
-        b {{err}}
+      div.navbar-right
+        button(@click.prevent="clear") x
+      div
+        div(v-for='err in errors' align='center')
+          b {{err}}
     div.msg-warnings(v-if='warningCount')
       div(v-for='warn in warnings' align='center')
         b {{warn}}
@@ -139,20 +140,22 @@ export default {
     padding-right: 20px;
     text-align: center;
     border: 1px solid black;
-    background-color: lightgrey;
+    // background-color: lightgrey;
     color: black;
   }
   .msg-errors, .msg-warnings, .msg-messages {
-    padding: 10px;
+    padding: 2rem;
     margin: 10px;
-    // width: 50%;
+    font-size: 2rem;
     align: center;
   }
+
   div.msg-errors {
-    background-color: lightred;
+    background-color: red;
+    line-height: 2rem;
   }
   div.msg-warnings {
-    background-color: organge;
+    background-color: orange;
   }
   div.msg-messages {
     background-color: lightgreen;
