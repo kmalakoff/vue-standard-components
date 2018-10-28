@@ -33,6 +33,11 @@
       - selectText (text for clickable link for secondary pick execution)
       - onPick (method to execute upon selection for individual item)
 
+*** Advanced options: ****
+
+  Dynamically include trigger to open new modal for each item:  supply showSelect, onSelect, selectText
+  - showSelect [boolean]
+  - showSelect [function] - pass function which can return boolean depending on input item record
  -->
   <template lang='pug'>
     div.recursiveList
@@ -104,7 +109,11 @@
             span(v-else)
               b {{item.name}}
 
-            span(v-if='showSelect && showSelect(item)')
+            span(v-if='showSelectFunction && showSelectFunction(item)')
+              a(href='#' v-if='onSelect' @click.prevent='onSelect(item)')
+                b {{selectText}}
+                <!-- icon.midline(name='plus') -->
+            span(v-else-if='showSelect')
               a(href='#' v-if='onSelect' @click.prevent='onSelect(item)')
                 b {{selectText}}
                 <!-- icon.midline(name='plus') -->
@@ -280,6 +289,13 @@ export default {
     showSelect: function () {
       if (this.options && this.options.showSelect) {
         return this.options.showSelect
+      } else {
+        return false
+      }
+    },
+    showSelectFunction: function () {
+      if (this.options && this.options.showSelectFunction) {
+        return this.options.showSelectFunction
       } else {
         return false
       }
