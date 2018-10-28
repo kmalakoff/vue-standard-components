@@ -3,14 +3,27 @@
   Usage:
 
 Options (for all modal types)
+  - type (search, record, data, raw, html, url)
   - id (unique id) - not necessary if only one modal on page
+
+  - options (supply other options within hash of options)
+
   - header
   - body
   - footer
   - openButton (name of button used to open modal)
-  -
+  - openText (alternative to 'openButton' - name of text used to open modal)
 
   Three primary types along with associated input props:
+
+*** simple array of data records: ***
+Modal(type='data', :data='data') // data = [{name: 'John Doe', email: 'john@gmail.com'}, {name: 'Jane Doe', email: 'jane@gmail.com'}]
+
+*** data form for record(s) - referencing field types ***
+Modal(type='record', :options='options') // options = {fields: [{ name: 'Full Name', type: 'text' }, name: 'Birthdate', type: 'date', prompt: 'Date of Birth'}]
+
+Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {example2: 'link to example2'}]
+Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {example2: 'link to example2'}]
 
   Standard:
     - data (array of links triggering function or another modal)
