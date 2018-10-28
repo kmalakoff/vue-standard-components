@@ -105,7 +105,7 @@ export default {
   display: none;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 767px) {
   div.visible-tab a.tabItem {
     display: none;
   }
@@ -115,7 +115,7 @@ export default {
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 767px) {
   div.visible-tab.responsive {
     position: absolute;
     top: 0;
