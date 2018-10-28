@@ -1,10 +1,10 @@
 <template lang='pug'>
   div
-    div.visibleTab#tabBar
+    div.visible-tab#tabBar
       a.tabItem(v-for='item in list' href='#' target='_blank' @click.prevent="onClick(item)")
         b.submenu {{item}}
         span &nbsp; &nbsp;
-      a.icon(href="javascript:void(0);" v-on:click='openMenu()')
+      a.icon(href="javascript:void(0);" v-on:click='openMenu(1)')
         icon(name='bars')
 </template>
  <!-- v-bind:class="[{onPage: show===item}, {offPage: show!==item}]" -->
@@ -35,12 +35,16 @@ export default {
     }
   },
   methods: {
-    openMenu: function () {
+    openMenu: function (force) {
+      console.log('toggle menu...')
+      console.log(JSON.stringify(force))
       var x = document.getElementById('tabBar')
-      if (x.className === 'visibleTab') {
+      if (force && x.className === 'visible-tab') {
         x.className += ' responsive'
+        console.log('make responsive')
       } else {
-        x.className = 'visibleTab'
+        console.log('make UNresponsive')
+        x.className = 'visible-tab'
       }
     },
     onClick: function (el) {
@@ -49,6 +53,7 @@ export default {
         this.show = el
         this.onPick(el)
       }
+      this.openMenu()
     }
   }
 }
@@ -73,12 +78,12 @@ export default {
   color: black;
 }
 
-.visibleTab {
+.visible-tab {
   overflow: hidden;
   background-color: #333;
 }
 
-.visibleTab a {
+.visible-tab a {
   float: left;
   display: block;
   color: #f2f2f2;
@@ -88,7 +93,7 @@ export default {
   font-size: 17px;
 }
 
-.visibleTab a:hover {
+.visible-tab a:hover {
   background-color: #ddd;
   color: black;
 }
@@ -98,13 +103,13 @@ export default {
   color: white;
 }
 
-.visibleTab .icon {
+.visible-tab .icon {
   display: none;
 }
 
 @media screen and (max-width: 768px) {
-  .visibleTab a.tabItem {display: none;}
-  .visibleTab a.icon {
+  .visible-tab a.tabItem {display: none;}
+  .visible-tab a.icon {
     float: right;
     display: block;
     color: red;
@@ -112,14 +117,20 @@ export default {
 }
 
 @media screen and (max-width: 768px) {
-  .visibleTab.responsive {position: relative;}
-  .visibleTab.responsive .icon {
+  .visible-tab.responsive {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+  }
+  .visible-tab.responsive .icon {
     position: absolute;
     right: 0;
     top: 0;
     z-index: 10;
   }
-  .visibleTab.responsive a {
+  .visible-tab.responsive a {
     float: none;
     display: block;
     text-align: left;
