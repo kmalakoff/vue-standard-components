@@ -16,9 +16,9 @@
         span(v-for='i, user in demo')
           button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
           span &nbsp; &nbsp;
-      Modal(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
+      Modal.login-button(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
       span &nbsp; &nbsp;
-      Modal(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
+      Modal.signup-button(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
         p &nbsp;
 </template>
 <script>
@@ -51,7 +51,8 @@ export default {
         onSave: this.login,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
-        submitButton: 'Log Me In'
+        submitButton: 'Log Me In',
+        wideOnMobile: true
       },
 
       registerOptions: {
@@ -61,7 +62,8 @@ export default {
         onSave: this.register,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
-        submitButton: 'Register'
+        submitButton: 'Register',
+        wideOnMobile: true
       },
       apiURL: config.apiURL,
       status: 'initialized'
@@ -219,6 +221,19 @@ export default {
 </script>
 
 <style scoped>
+
+.login-button, .signup-button {
+  display: inline-block;
+  padding-top: 0;
+}
+
+@media screen and (max-width: 767px) {
+  .login-button, .signup-button {
+    display: block;
+    width: 100%;
+    padding-top: 30%;
+  }
+}
 
 .login-box {
   padding: 1rem;
