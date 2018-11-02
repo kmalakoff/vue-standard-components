@@ -50,13 +50,13 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
   span
     span.modal-anchor
     span(v-if='openButton')
-      button.btn.btn-primary(v-on:click="openModal()")
+      button.open-button.btn.btn-lg.btn-primary(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
         span(v-html='openButton')
     span(v-else-if='openText')
       a.modal-link(href='#' onclick='return false' v-on:click="openModal()")
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
-      button.btn.btn-primary(v-on:click="openModal()")
+      button.btn.btn-primary(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
         icon(:name='openIcon')
     span.m-fadeOut(:id="id")
       transition(name="modal")
@@ -254,6 +254,13 @@ export default {
     console.log('*** defined Modal ***' + this.title)
   },
   computed: {
+    wideOnMobile: function () {
+      if (this.options && this.options.wideOnMobile) {
+        return true
+      } else {
+        return false
+      }
+    },
     recordTable: function () {
       if (this.options.table) {
         return this.options.table
@@ -565,6 +572,17 @@ export default {
   float: right;
 }
 
+.wideButton {
+  width: auto;
+}
+
+@media screen and (max-width: 767px) {
+  .wideButton {
+    width: 100%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+  }
+}
 /*
  * the following styles are auto-applied to elements with
  * v-transition="modal" when their visiblity is toggled
