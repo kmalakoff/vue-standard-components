@@ -16,13 +16,25 @@
         span(v-for='i, user in demo')
           button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
           span &nbsp; &nbsp;
-      Modal.login-button(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
-      span &nbsp; &nbsp;
-      Modal.signup-button(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
-        p &nbsp;
+      span.wideScreen
+        Modal.login-modal(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
+        span &nbsp; &nbsp;
+        Modal.signup-modal(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
+          p &nbsp;
+      span.smallScreen
+        div(v-if='!activeForm')
+          button.login-button.btn.btn-primary.btn-lg(v-on:click="activeForm = 'Login'") Login
+          br
+          button.signup-button.btn.btn-primary.btn-lg(v-on:click="activeForm = 'Register'") Register
+        div(v-else)
+          DBForm.login-form(:options='loginOptions' :onSave='login' v-if="activeForm === 'Login'")
+          hr
+          DBForm.signup-form(:options='registerOptions' :onSave='register' v-if="activeForm === 'Register'")
+
 </template>
 <script>
 import Modal from './Modal'
+import DBForm from './DBForm'
 import DropdownMenu from './DropdownMenu'
 import auth from '../../auth'
 import StandardConfig from './config.js'
@@ -33,6 +45,7 @@ export default {
     return {
       // We need to initialize the component with any
       // properties that will be used in it
+      activeForm: '',
       credentials: {
         username: '',
         password: ''
@@ -52,7 +65,8 @@ export default {
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
         submitButton: 'Log Me In',
-        wideOnMobile: true
+        wideOnMobile: true,
+        onCancel: this.cancel
       },
 
       registerOptions: {
@@ -63,7 +77,8 @@ export default {
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
         submitButton: 'Register',
-        wideOnMobile: true
+        wideOnMobile: true,
+        onCancel: this.cancel
       },
       apiURL: config.apiURL,
       status: 'initialized'
@@ -71,6 +86,7 @@ export default {
   },
   components: {
     Modal,
+    DBForm,
     DropdownMenu
   },
   props: {
@@ -203,6 +219,9 @@ export default {
       const parent = e.target.parentElement
       parent.classList.add('has-success')
       console.log('validated')
+    },
+    cancel () {
+      this.activeForm = ''
     }
   }
   // watch: {
@@ -222,16 +241,37 @@ export default {
 
 <style scoped>
 
-.login-button, .signup-button {
+.login-modal, .signup-modal {
   display: inline-block;
   padding-top: 0;
 }
 
+.login-button, .signup-button {
+  margin-top: 10%;
+  width: 100%;
+}
+
+.smallScreen {
+  display: none;
+}
+.wideScreen {
+  display: block
+}
+
 @media screen and (max-width: 767px) {
-  .login-button, .signup-button {
-    display: block;
+  .login-modal, .signup-modal {
     width: 100%;
     padding-top: 30%;
+  }
+  .login-form, .signup-form {
+    width: 100%;
+    padding-top: 30%;
+  }
+  .smallScreen {
+    display: block
+  }
+  .wideScreen {
+    display: none
   }
 }
 
