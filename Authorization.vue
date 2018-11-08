@@ -16,9 +16,9 @@
         span(v-for='i, user in demo')
           button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
           span &nbsp; &nbsp;
-      Modal.login-button(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
+      Modal.login-button.input-lg(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
       span &nbsp; &nbsp;
-      Modal.signup-button(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
+      Modal.signup-button.input-lg(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
         p &nbsp;
 </template>
 <script>
