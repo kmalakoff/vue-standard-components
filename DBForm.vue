@@ -17,7 +17,7 @@ Usage:
         td.heading(colspan=3)
           h2 {{heading}}:
       tr(v-for="field in fields" v-show="field.type!=='hidden'")
-        td.prompt-column
+        td.prompt-column(v-if='prompt')
           b {{label(field)}}:
         td.data-column
           DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :debug='debug')
@@ -27,7 +27,7 @@ Usage:
             icon(name='question-circle' color='black' scale='2')
           b &nbsp;
       tr(v-for="r in include.visible")
-        td.prompt-column
+        td.prompt-column(v-if='prompt')
           b {{label(r)}}:
         td.data-column
           DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord')
@@ -51,7 +51,7 @@ import config from '@/config.js'
 export default {
   data () {
     return {
-      url: config.dbUrl,
+      url: config.apiUrl,
       DBfields: [],
       form: {},
       idfield: { name: 'id', type: 'fixed' }
@@ -184,6 +184,13 @@ export default {
       } else {
         return 'Save'
       }
+    },
+    prompt: function () {
+      if (this.options.prompt) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {
@@ -218,11 +225,9 @@ export default {
       }
     },
     loadTable () {
-      var DBfieldUrl = this.url
-
       var _this = this
       console.log('use axios to load table for DBform')
-      axios.post(DBfieldUrl, { table: this.table })
+      axios.post(this.url, { table: this.table })
         .then(function (result) {
           console.log('R: ' + JSON.stringify(result))
           _this.DBfields = result.data
