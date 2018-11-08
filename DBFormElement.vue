@@ -3,6 +3,8 @@
 <template lang='pug'>
   div
     b(v-if='debug') F: {{field}} : {{vModel}} = {{vm}} :: {{vModel}} i? {{iType}} {{field.name}}
+    span(v-if="promptPosition==='top' || Ftype==='date'")
+      b {{field.prompt || field.name}}:
     span(v-if="access==='read'")
       b D {{defaultTo}} : {{test}}
     span(v-else-if="iType")
@@ -17,7 +19,7 @@
     // span(v-else-if="Ftype==='password'")
     //   b-form-input.input-lg(@change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
     span(v-else-if="Ftype==='date'")
-      b-form-input.input-lg(@change.native="myChange" type='date' :options="list(field)" :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
+      b-form-input.input-lg(@change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
     span(v-else-if="Ftype.match(/^enum/)")
       <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
       b-form-select.input-lg(@change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
@@ -65,11 +67,19 @@ export default {
     access: { type: String },
     record: { type: Object },
     options: { type: Object },
+    defaultPrompt: {
+      type: String,
+      default: '-- select --'
+    },
+    promptPosition: {
+      type: String,
+      default: null
+    },
     debug: { type: Boolean }
   },
   created: function () {
     // var keys = _.pluck(this.field.default)
-    var defaultTo = this.field.default || this.form[this.om]
+    var defaultTo = this.field.default || this.form[this.om] || null
 
     this.$set(this.form, this.om, defaultTo)
     // console.log(this.field.name + ' found default: ' + defaultTo)
@@ -85,7 +95,7 @@ export default {
       if (this.record && this.record[this.field.name]) {
         return this.record[this.field.name]
       } else {
-        return this.field.default || this.field.value || this.form[this.om]
+        return this.field.default || this.field.value || this.form[this.om] || null
       }
     },
     addClass: function () {
@@ -170,10 +180,25 @@ export default {
     list: function (field) {
       var regex = /^enum\(['"]?(.*?)['"]?\)/
       var list = this.Ftype.match(regex)
+      var prompt = field.prompt || field.name
+
+      if (prompt) {
+        prompt = '- select ' + prompt + ' -'
+      } else {
+        prompt = this.options.defaultPrompt
+      }
+
+      var List = [{value: null, text: prompt}]
       if (list) {
         var elements = list[1].split(/['"]\s*,\s*['"]/)
-        return elements
-      } else { return null }
+        for (var i = 0; i < elements.length; i++) {
+          List.push({value: elements[i], text: elements[i]})
+          List.text = elements[i]
+        }
+        return List
+      } else {
+        return {placeholder: 'Pick Date'}
+      }
     },
     isNumber: function (field) {
       var name = this.model
