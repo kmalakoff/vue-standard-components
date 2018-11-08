@@ -17,7 +17,7 @@ Usage:
         td.heading(colspan=3)
           h2 {{heading}}:
       tr(v-for="field in fields" v-show="field.type!=='hidden'")
-        td.prompt-column
+        td.prompt-column(v-if='prompt')
           b {{label(field)}}:
         td.data-column
           DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :debug='debug')
@@ -27,7 +27,7 @@ Usage:
             icon(name='question-circle' color='black' scale='2')
           b &nbsp;
       tr(v-for="r in include.visible")
-        td.prompt-column
+        td.prompt-column(v-if='prompt')
           b {{label(r)}}:
         td.data-column
           DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord')
@@ -36,6 +36,8 @@ Usage:
 
     hr
     button.btn.btn-primary(v-if="onSave && (myAccess === 'edit' || myAccess === 'append')" @click.prevent="onSave(form)") {{submitButton}}
+    span &nbsp; &nbsp;
+    button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
     div(v-if='debug')
       hr
       b Form Input: {{myAccess}} : {{form}}
@@ -184,6 +186,19 @@ export default {
       } else {
         return 'Save'
       }
+    },
+    prompt: function () {
+      if (this.options.prompt) {
+        return true
+      } else {
+        return false
+      }
+    },
+    cancelButton: function () {
+      return this.options.cancelButton || 'Cancel'
+    },
+    onCancel: function () {
+      return this.options.onCancel || null
     }
   },
   methods: {
