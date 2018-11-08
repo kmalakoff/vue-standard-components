@@ -52,7 +52,7 @@ export default {
   },
   data () {
     return {
-      showCart: false,
+      showCart: true,
       total: 0,
       sizes: true // include if size information is included in itemized list
     }

@@ -53,7 +53,7 @@ import config from '@/config.js'
 export default {
   data () {
     return {
-      url: config.dbUrl,
+      url: config.apiUrl,
       DBfields: [],
       form: {},
       idfield: { name: 'id', type: 'fixed' }
@@ -233,11 +233,9 @@ export default {
       }
     },
     loadTable () {
-      var DBfieldUrl = this.url
-
       var _this = this
       console.log('use axios to load table for DBform')
-      axios.post(DBfieldUrl, { table: this.table })
+      axios.post(this.url, { table: this.table })
         .then(function (result) {
           console.log('R: ' + JSON.stringify(result))
           _this.DBfields = result.data

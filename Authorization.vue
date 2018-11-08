@@ -30,7 +30,6 @@
           DBForm.login-form(:options='loginOptions' :onSave='login' v-if="activeForm === 'Login'")
           hr
           DBForm.signup-form(:options='registerOptions' :onSave='register' v-if="activeForm === 'Register'")
-
 </template>
 <script>
 import Modal from './Modal'

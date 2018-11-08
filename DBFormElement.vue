@@ -6,7 +6,7 @@
     span(v-if="promptPosition==='top' || Ftype==='date'")
       b {{field.prompt || field.name}}:
     span(v-if="access==='read'")
-      b D {{defaultTo}} : {{test}}
+      b {{defaultTo}}
     span(v-else-if="iType")
       b-form-input.input-lg(@change.native="myChange" :type='iType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus")
       // input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')

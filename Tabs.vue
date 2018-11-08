@@ -2,8 +2,13 @@
   div
     div.visible-tab#tabBar
       a.tabItem(v-for='item in list' href='#' target='_blank' @click.prevent="onClick(item)")
-        b.submenu {{item}}
-        span &nbsp; &nbsp;
+        div(v-if="item.constructor === String")
+          b.submenu {{item}}
+          span &nbsp; &nbsp;
+        div(v-else if="item.constructor === 'Object")
+          icon(:name='item.icon')
+        div(v-else)
+          b.submenu ?: {{item.constructor}}
       a.icon(href="javascript:void(0);" v-on:click='openMenu(1)')
         icon(name='bars')
 </template>
@@ -49,6 +54,10 @@ export default {
     },
     onClick: function (el) {
       console.log(' onPick ' + JSON.stringify(el))
+      if (el.constructor === Object) {
+        el = el.name
+        console.log('convert object to ' + el)
+      }
       if (this.onPick) {
         this.show = el
         this.onPick(el)

@@ -50,13 +50,13 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
   span
     span.modal-anchor
     span(v-if='openButton')
-      button.open-button.btn.btn-lg.btn-primary(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
+      button.open-button.btn.btn-lg.btn-default(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
         span(v-html='openButton')
     span(v-else-if='openText')
       a.modal-link(href='#' onclick='return false' v-on:click="openModal()")
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
-      button.btn.btn-primary(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
+      button.btn.btn-default(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
         icon(:name='openIcon')
     span.m-fadeOut(:id="id")
       transition(name="modal")
@@ -77,7 +77,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                   div(v-else-if="modalType==='record'")
                     DBForm(:options='options' :onSave='save' :append='append' :record='modalRecord')
                     div(v-if='options.addLinks' v-for='link in options.addLinks')
-                      button.btn.btn-primary(@click.prevent="link.onPick(modalData)") {{link.name}}
+                      button.btn.btn-default(@click.prevent="link.onPick(modalData)") {{link.name}}
                   div(v-else-if="modalType==='data'")
                     div(v-if="modalData && modalData.length")
                       DataGrid(:data="modalData" :options="data_options")
