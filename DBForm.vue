@@ -12,6 +12,7 @@ Usage:
   div.table-form
     div(v-if='debug')
       p Fields: {{DBfields}}
+      hr
     table.table.form-table
       tr(v-if='heading')
         td.heading(colspan=3)
@@ -30,7 +31,7 @@ Usage:
         td.prompt-column(v-if='prompt')
           b {{label(r)}}:
         td.data-column
-          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord')
+          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :debug='debug')
     span(v-for='r in include.hidden')
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
@@ -38,7 +39,7 @@ Usage:
     button.btn.btn-primary(v-if="onSave && (myAccess === 'edit' || myAccess === 'append')" @click.prevent="onSave(form)") {{submitButton}}
     span &nbsp; &nbsp;
     button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
-    div(v-if='debug')
+    div(v-if='debug || 1')
       hr
       b Form Input: {{myAccess}} : {{form}}
 </template>
@@ -122,19 +123,40 @@ export default {
     fields: function () {
       var f = []
       if (this.options.fields) {
-        // console.log('got fields from options')
+        console.log('got fields from options')
         f = this.options.fields
       } else if (this.DBfields.length) {
-        // console.log('got fields from config')
+        console.log('got fields from config')
         f = this.DBfields
       } else if (this.thisRecord) {
-        // console.log('got fields from keys')
+        console.log('got fields from keys')
         var keys = Object.keys(this.thisRecord)
         for (var i = keys.length; i < keys.length; i++) {
           f.push({name: keys[i]})
         }
       }
-      // console.log('get fields: ' + JSON.stringify(f))
+
+      if (this.thisRecord) {
+        for (var j = 0; j < f.length; j++) {
+          if (this.thisRecord[f[j].name]) {
+            console.log('set ' + f[j].name)
+            if (f[j].type === 'checkbox' || f[j].type === 'boolean') {
+              if (typeof f[j].default === 'undefined') {
+                this.$set(this.form, f[j].name, false)
+              } else {
+                this.$set(this.form, f[j].name, this.thisRecord[f[j].default])
+              }
+            } else if (f[j].type === 'date') {
+              var defaultDate = this.thisRecord[f[j].name] || f[j].default || ''
+              this.$set(this.form, f[j].name, defaultDate.substring(0, 9))
+            } else {
+              var defaultTo = this.thisRecord[f[j].name] || f[j].default || null
+              this.$set(this.form, f[j].name, defaultTo)
+            }
+          }
+        }
+      }
+      console.log('initiate form: ' + JSON.stringify(this.form))
       return f
     },
     myAccess: function () {
