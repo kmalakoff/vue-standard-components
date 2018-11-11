@@ -88,6 +88,12 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                       b content: {{content}}
                     div(v-else)
                       b No Content Supplied
+                  div(v-else-if="modalType==='confirm'")
+                    input.input-lg(type='checkbox' name='confirm' v-on:click='save')
+                    b &nbsp; &nbsp; {{prompt}}
+                  div(v-else-if="modalType==='input'")
+                    b &nbsp; &nbsp; {{prompt}}
+                    input.input-lg(type='text' name='input' v-model='input' v-on:click='save')
                   div(v-else-if="modalType==='html'")
                     div(v-if='htmlContent' v-html="htmlContent")
                     div(v-else)
@@ -215,7 +221,7 @@ export default {
     },
     append: {
       type: Array
-    }
+    },
     // title: {
     //   type: String,
     //   default: ''
@@ -227,9 +233,11 @@ export default {
     //   type: Array,
     //   default () { return [] }
     // },
-    // prompt: {
-    //   type: String
-    // },
+    prompt: {
+      // use for 'confirmation' and 'input' types
+      type: String,
+      default: 'OK ?'
+    }
     // action: {
     //   type: Function
     // },
