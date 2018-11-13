@@ -39,7 +39,7 @@ Usage:
     button.btn.btn-primary(v-if="onSave && (myAccess === 'edit' || myAccess === 'append')" @click.prevent="onSave(form)") {{submitButton}}
     span &nbsp; &nbsp;
     button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
-    div(v-if='debug || 1')
+    div(v-if='debug')
       hr
       b Form Input: {{myAccess}} : {{form}}
 </template>
