@@ -94,10 +94,10 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     div(v-else)
                       b No Content Supplied
                   div(v-else-if="modalType==='confirm'")
-                    b(v-if='prompt') {{prompt}}
+                    h4(v-if='myPrompt') {{myPrompt}}
                     DBForm(:options='confirmOptions', :onSave='save')
                   div(v-else-if="modalType==='input'")
-                    b &nbsp; &nbsp; {{prompt}}
+                    b(v-if='myPrompt') &nbsp; &nbsp; {{myPrompt}}
                     input.input-lg(type='text' name='input' v-model='input' v-on:click='save')
                   div(v-else-if="modalType==='html'")
                     div(v-if='htmlContent' v-html="htmlContent")
@@ -244,8 +244,7 @@ export default {
     // },
     prompt: {
       // use for 'confirmation' and 'input' types
-      type: String,
-      default: 'OK ?'
+      type: String
     }
     // action: {
     //   type: Function
