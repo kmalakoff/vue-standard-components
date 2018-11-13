@@ -11,7 +11,7 @@ Usage:
 <template lang='pug'>
   div.table-form
     div(v-if='debug')
-      p Fields: {{DBfields}}
+      p DBFields: {{DBfields}}
       hr
     table.table.form-table
       tr(v-if='heading')
