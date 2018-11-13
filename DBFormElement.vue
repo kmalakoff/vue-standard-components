@@ -2,39 +2,48 @@
 
 <template lang='pug'>
   div
-    b(v-if='debug') F: {{field}} : {{vModel}} = {{vm}} :: {{vModel}} i? {{iType}} {{field.name}}
+    b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}}/{{otherType}} ({{field.name}} = {{defaultTo}})
+      br
     span(v-if="promptPosition==='top' || Ftype==='date'")
       b {{field.prompt || field.name}}:
+
     span(v-if="access==='read'")
       b {{defaultTo}}
-    span(v-else-if="iType")
-      b-form-input.input-lg(@change.native="myChange" :type='iType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus")
-      // input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
-    // span(v-else-if="Ftype==='string' || Ftype==='text'")
-    //   b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.prevent='onBlur' @focus.prevent='onFocus')
-    // span(v-else-if="Ftype==='int' || Ftype==='integer'")
-    //   b-form-input.input-lg(@change.native="myChange" type='number' :placeholder="placeholder" :value='defaultTo' :default='defaultTo')
-    // span(v-else-if="Ftype==='varchar'")
-    //   b-form-input.input-lg(@change.native="myChange" type='text' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'")
-    // span(v-else-if="Ftype==='password'")
-    //   b-form-input.input-lg(@change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
-    span(v-else-if="Ftype==='date'")
-      b-form-input.input-lg(@change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
-    span(v-else-if="Ftype.match(/^enum/)")
+
+    span(v-else-if="inputType")
+      b-form-input.input-lg(@change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus")
+
+    span(v-else-if="otherType==='checkbox'")
+      b-form-checkbox.input-lg(@change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.name' value=true unchecked-value=false)
+        span &nbsp; &nbsp; {{field.prompt || field.name}}
+
+    span(v-else-if="otherType==='radio'")
+      b-form-radio-group(@change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.prompt' :options='field.options')
+
+    span(v-else-if="otherType==='date'")
+      <!-- b-form-input.input-lg(@change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus") -->
+      b-form-input.input-lg(@change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus" :v-model='vModel')
+    span(v-else-if="otherType==='enum'")
       <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
       b-form-select.input-lg(@change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
-    // span(v-else-if="Ftype==='boolean'")
-    //   b-form-checkbox.input-lg(@change.native="myChange" :value='defaultTo' :default='defaultTo')
-    span(v-else-if="Ftype==='decimal'")
+
+    span(v-else-if="otherType==='decimal'")
       b-form-input.input-lg(type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
-    span(v-else-if="Ftype==='fixed'")
+
+    span(v-else-if="otherType==='fixed'")
       b-form-input.input-lg(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
-    span(v-else-if="Ftype==='reference'")
+
+    span(v-else-if="otherType==='reference'")
       b-form-input(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
-    span(v-else-if="Ftype==='hidden'")
+
+    span(v-else-if="otherType==='hidden'")
       b-form-input(v-show=0 type='text' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+
+    // span(v-else-if="otherType==='password'")
+    //   b-form-input.input-lg(@change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
+
     span(v-else)
-      b {{Ftype}}?: {{field}}
+      b {{Ftype}}?: {{otherType}} : {{field}}
 
 </template>
 
@@ -56,7 +65,8 @@ export default {
     return {
       vm: this.field.default,
       om: this.vModel,
-      test: ''
+      test: '',
+      bd: '1999-02-04'
     }
   },
   props: {
@@ -119,16 +129,36 @@ export default {
         return this.nullFunction
       }
     },
-    iType: function () {
+    inputType: function () {
       switch (this.Ftype) {
+        case 'number' : return 'number'
         case 'int' : return 'number'
         case 'integer' : return 'number'
         case 'varchar' : return 'text'
         case 'text' : return 'text'
         case 'string' : return 'string'
-        case 'boolean' : return 'checkbox'
         case 'password' : return 'password'
         default: return false
+      }
+    },
+    otherType: function () {
+      if (this.Ftype.match(/^enum/)) {
+        return 'enum'
+      } else {
+        switch (this.Ftype) {
+          case 'boolean' : return 'checkbox'
+          case 'confirm' : return 'checkbox'
+          case 'checkbox' : return 'checkbox'
+          case 'radio' : return 'radio'
+          case 'decimal' : return 'decimal'
+          case 'float' : return 'decimal'
+          case 'date' : return 'date'
+          case 'time' : return 'time'
+          case 'fixed' : return 'fixed'
+          case 'reference' : return 'reference'
+          case 'hidden' : return 'hidden'
+          default: return false
+        }
       }
     }
   },
@@ -141,8 +171,13 @@ export default {
       this.$set(this.form, this.om, this.vm)
     },
     myChange (evt) {
-      console.log('change ' + this.om + ' to ' + evt.target.value)
-      this.$set(this.form, this.om, evt.target.value)
+      if (typeof evt.target.checked === 'undefined') {
+        console.log('change ' + this.om + ' to ' + evt.target.value)
+        this.$set(this.form, this.om, evt.target.value)
+      } else {
+        console.log('change ' + this.om + ' to boolean: ' + evt.target.checked)
+        this.$set(this.form, this.om, evt.target.checked)
+      }
       if (this.onBlur) {
         this.onBlur(evt, this.om)
       }
@@ -178,7 +213,7 @@ export default {
     },
 
     list: function (field) {
-      var regex = /^enum\(['"]?(.*?)['"]?\)/
+      var regex = /^(enum|radio)\(['"]?(.*?)['"]?\)/
       var list = this.Ftype.match(regex)
       var prompt = field.prompt || field.name
 
