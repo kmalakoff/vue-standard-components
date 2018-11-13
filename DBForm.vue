@@ -65,7 +65,8 @@ export default {
   },
   props: {
     options: {
-      type: Object
+      type: Object,
+      default () { return {} }
     },
     model: {
       type: String
@@ -148,7 +149,7 @@ export default {
               }
             } else if (f[j].type === 'date') {
               var defaultDate = this.thisRecord[f[j].name] || f[j].default || ''
-              this.$set(this.form, f[j].name, defaultDate.substring(0, 9))
+              this.$set(this.form, f[j].name, defaultDate.substring(0, 10))
             } else {
               var defaultTo = this.thisRecord[f[j].name] || f[j].default || null
               this.$set(this.form, f[j].name, defaultTo)
