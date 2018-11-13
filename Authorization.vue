@@ -4,13 +4,13 @@
   div
     <!-- b V:  -->
     <!-- a (href='#' @click.prevent='profile') Profile -->
-    div(v-if='userid')
-      DropdownMenu(:options='userMenu' :title='payload.username')
+    div.user-icon(v-if='userid')
+      DropdownMenu.user-dropdown(:options='userMenu' :title='payload.username')
       <!-- span {{payload.username}} -->
       <!-- span &nbsp; | &nbsp; -->
       <!-- a(href='#' @click.prevent='logout') -->
         <!-- b Log Out -->
-      Modal(id='profile' type='data')
+      Modal.user-modal(id='profile' type='data')
     div(v-else)
       span(v-if='demo')
         span(v-for='i, user in demo')
@@ -239,6 +239,12 @@ export default {
 </script>
 
 <style scoped>
+
+.user-icon {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
 
 .login-modal, .signup-modal {
   display: inline-block;
