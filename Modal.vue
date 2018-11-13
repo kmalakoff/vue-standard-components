@@ -44,6 +44,11 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
       - model
       - access_type (view, edit, search, append)
 
+  Confirm Modal: (provide confirmation before performing action)
+    - data (data hash to pass back to onSave function)
+    - onSave (function)
+    - prompt
+    - saveButton (text for save button)
 -->
 
 <template id=this.id lang='pug'>
@@ -89,8 +94,8 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     div(v-else)
                       b No Content Supplied
                   div(v-else-if="modalType==='confirm'")
-                    input.input-lg(type='checkbox' name='confirm' v-on:click='save')
-                    b &nbsp; &nbsp; {{prompt}}
+                    b(v-if='prompt') {{prompt}}
+                    DBForm(:options='confirmOptions', :onSave='save')
                   div(v-else-if="modalType==='input'")
                     b &nbsp; &nbsp; {{prompt}}
                     input.input-lg(type='text' name='input' v-model='input' v-on:click='save')
@@ -164,7 +169,11 @@ export default {
         body: ''
       },
       modalContent: '',
-      errorMsg: ''
+      errorMsg: '',
+      confirmOptions: {
+        submitButton: 'I Agree',
+        access: 'append'
+      }
     }
   },
   props: {
@@ -260,6 +269,23 @@ export default {
   },
   created: function () {
     console.log('*** defined Modal ***' + this.title)
+    if (this.options && this.options.confirm) {
+      var fields = []
+      var confirm = this.options.confirm
+      var keys = Object.keys(confirm)
+      for (var i = 0; i < keys.length; i++) {
+        fields.push({name: keys[i], type: 'checkbox', prompt: confirm[keys[i]]})
+      }
+
+      if (this.record) {
+        var Fkeys = Object.keys(this.record)
+        for (var j = 0; j < Fkeys.length; j++) {
+          var f = Fkeys[j]
+          fields.push({name: f, default: this.record[f], type: 'hidden'})
+        }
+      }
+      this.$set(this.confirmOptions, 'fields', fields)
+    }
   },
   computed: {
     wideOnMobile: function () {
@@ -382,6 +408,11 @@ export default {
         return this.options.openIcon || 'no'
       } else { return '' }
     },
+    saveButton: function () {
+      if (this.options && this.options.saveButton) {
+        return this.options.saveButton
+      } else { return 'Save' }
+    },
     closeButton: function () {
       if (this.options && this.options.closeButton) {
         return this.options.closeButton || 'no'
@@ -394,6 +425,15 @@ export default {
         return this.options.url
       } else {
         return null
+      }
+    },
+    myPrompt: function () {
+      if (this.prompt) {
+        return this.prompt
+      } else if (this.options && this.options.prompt) {
+        return this.options.prompt
+      } else {
+        return 'Okay ?'
       }
     },
     // links: function () {
