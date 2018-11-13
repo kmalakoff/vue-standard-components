@@ -65,7 +65,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
             div.my-modal-container
               div.my-modal-header
                 slot(name="header")
-                  b {{myheader}}
+                  b {{myheader}} &nbsp; &nbsp;
                     span.navbar-right
                       button.btn.btn-danger.btn-xs(@click="closeModal")
                         icon(name='times')
@@ -84,8 +84,8 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     div(v-else)
                       b No Data Available
                   div(v-else-if="modalType==='raw'")
-                    div(v-if='content')
-                      b content: {{content}}
+                    div(v-if='contents')
+                      b {{contents}}
                     div(v-else)
                       b No Content Supplied
                   div(v-else-if="modalType==='confirm'")
@@ -283,6 +283,8 @@ export default {
       } else if (this.content) {
         console.log('content defined')
         return this.content
+      } else if (this.options.content) {
+        return this.options.content
       } else {
         console.log('content undefined')
         return 'content undefined'
