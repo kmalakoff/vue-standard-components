@@ -4,8 +4,12 @@
   div
     b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}}/{{otherType}} ({{field.name}} = {{defaultTo}})
       br
-    span(v-if="promptPosition==='top' || Ftype==='date'")
-      b {{field.prompt || field.name}}:
+    span(v-if="promptPosition==='top'")
+      b {{field.prompt || field.name}}: &nbsp; &nbsp;
+    span(v-else-if="Ftype==='date' && !options.prompt")
+      b {{field.prompt || field.name}}: &nbsp; &nbsp; // prompt does not appear for placeholder
+    span(v-else-if="access==='read'")
+      b {{field.prompt || field.name}}: &nbsp; &nbsp;
 
     span(v-if="access==='read'")
       b {{defaultTo}}
@@ -43,8 +47,7 @@
     //   b-form-input.input-lg(@change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
 
     span(v-else)
-      b {{Ftype}}?: {{otherType}} : {{field}}
-
+      b {{Ftype}} ?: {{otherType}} : {{field}}
 </template>
 
 <script>
