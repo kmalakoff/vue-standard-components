@@ -581,7 +581,6 @@ export default {
   display: flex !important;
   margin: auto !important;
   max-width: 980px !important;
-  padding: 64px !important;
   width: 100% !important;
 }
 
@@ -594,9 +593,8 @@ export default {
   flex: 1 !important;
   width: 100% !important;
   margin: auto;
-  /*padding: 20px 30px;*/
   background-color: #fff;
-  /*border-radius: 2px;*/
+  border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
   transition: all .3s ease;
   font-family: Helvetica, Arial, sans-serif;
@@ -626,17 +624,27 @@ export default {
   float: right;
 }
 
-.wideButton {
-  width: auto;
+/* Responsive design - mobile first */
+
+.my-modal-wrapper {
+  padding: 0px;
 }
 
-@media screen and (max-width: 767px) {
+.wideButton {
+  width: 100%;
+  padding: 15px;
+  height: 100%;
+}
+
+@media screen and (min-width: 768px) {
   .wideButton {
-    width: 100%;
-    padding-top: 5%;
-    padding-bottom: 5%;
+    width: auto;
+  }
+  .my-modal-wrapper {
+    padding: 64px !important;
   }
 }
+
 /*
  * the following styles are auto-applied to elements with
  * v-transition="modal" when their visiblity is toggled
