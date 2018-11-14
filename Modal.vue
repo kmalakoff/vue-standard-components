@@ -55,15 +55,15 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
   span
     span.modal-anchor
     span(v-if='openButton')
-      button.open-button.btn.btn-lg.btn-default(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
+      button.open-button.btn(v-on:click="openModal()" :class='options.buttonClass' v-bind:class="[{wideButton: wideOnMobile}]")
         span(v-html='openButton')
     span(v-else-if='openText')
       a.modal-link(href='#' onclick='return false' v-on:click="openModal()")
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
-      button.btn.btn-default(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
+      button.btn.btn-default(v-on:click="openModal()" :class='options.buttonClass' v-bind:class="[{wideButton: wideOnMobile}]")
         icon(:name='openIcon')
-    span.m-fadeOut(:id="id")
+    span(:class='initClass' :id="id")
       transition(name="modal")
         div.my-modal-mask
           div.my-modal-wrapper
@@ -245,6 +245,9 @@ export default {
     prompt: {
       // use for 'confirmation' and 'input' types
       type: String
+    },
+    confirm: {
+      type: Array
     }
     // action: {
     //   type: Function
@@ -268,12 +271,17 @@ export default {
   },
   created: function () {
     console.log('*** defined Modal ***' + this.title)
-    if (this.options && this.options.confirm) {
+    if (this.confirm || this.options.confirm) {
       var fields = []
-      var confirm = this.options.confirm
-      var keys = Object.keys(confirm)
-      for (var i = 0; i < keys.length; i++) {
-        fields.push({name: keys[i], type: 'checkbox', prompt: confirm[keys[i]]})
+      var confirm = this.confirm || this.options.confirm
+
+      for (var i = 0; i < confirm.length; i++) {
+        var fld = confirm[i]
+        if (fld.constructor === String) {
+          fld = {name: fld}
+        }
+        if (!fld.type) { fld.type = 'checkbox' }
+        fields.push(fld)
       }
 
       if (this.record) {
@@ -378,7 +386,9 @@ export default {
       }
     },
     modalRecord: function () {
-      if (this.modalData && this.modalData.constructor === Array) {
+      if (this.record) {
+        return this.record
+      } else if (this.modalData && this.modalData.constructor === Array) {
         if (this.modalData.length) {
           console.log('use first data record')
           return this.modalData[0]
