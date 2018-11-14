@@ -7,7 +7,7 @@
     span(v-if="promptPosition==='top'")
       b {{field.prompt || field.name}}: &nbsp; &nbsp;
     span(v-else-if="Ftype==='date' && !options.prompt")
-      b {{field.prompt || field.name}}: &nbsp; &nbsp; // prompt does not appear for placeholder
+      b {{field.prompt || field.name}}: &nbsp; &nbsp;
     span(v-else-if="access==='read'")
       b {{field.prompt || field.name}}: &nbsp; &nbsp;
 
