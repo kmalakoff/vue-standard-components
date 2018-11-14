@@ -149,7 +149,7 @@ export default {
   }
 
   div.msg-errors {
-    background-color: red;
+    background-color: pink;
     line-height: 2rem;
   }
   div.msg-warnings {
