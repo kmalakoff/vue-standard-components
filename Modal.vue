@@ -417,11 +417,6 @@ export default {
         return this.options.openIcon || 'no'
       } else { return '' }
     },
-    saveButton: function () {
-      if (this.options && this.options.saveButton) {
-        return this.options.saveButton
-      } else { return 'Save' }
-    },
     closeButton: function () {
       if (this.options && this.options.closeButton) {
         return this.options.closeButton || 'no'
