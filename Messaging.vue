@@ -30,9 +30,13 @@
         div(v-for='err in errors' align='center')
           b(v-if='err') {{err}}
     div.msg-warnings(v-if='warningCount')
+      div.navbar-right
+        button(@click.prevent="clear") x
       div(v-for='warn in warnings' align='center')
         b(v-if='warn') {{warn}}
     div.msg-messages(v-if='messageCount')
+      div.navbar-right
+        button(@click.prevent="clear") x
       div(v-for='msg in messages' align='center')
         b(v-if='msg') {{msg}}
 </template>
@@ -110,7 +114,31 @@ export default {
     errors: function () {
       if (this.stored) {
         console.log('got stored errors')
-        return this.$store.getters.errors
+        var errs = this.$store.getters.errors
+        var errors = []
+        for (var i = 0; i < errs.length; i++) {
+          var err = errs[i]
+          if (err && err.constructor === Array) {
+            for (var j = 0; j < err.length; j++) {
+              errors.push(err[j])
+            }
+          } else {
+            errors.push(err)
+          }
+        }
+        for (var k = 0; k < errors.length; k++) {
+          var error = errors[k]
+          if (error && error.constructor === Object) {
+            if (error.message) {
+              errors[k] = errors[k].message
+            } else if (error.error) {
+              errors[k] = errors[k].error
+            } else {
+              errors[k] = JSON.stringify(error)
+            }
+          }
+        }
+        return errors
       } else {
         console.log('got immediate errors')
         return { default: this.err }
