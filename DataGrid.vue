@@ -16,7 +16,7 @@ Advanced Options:
 -->
 
 <template lang='pug'>
-  div.data-grid
+  div.data-grid(v-if='show')
     table.table-bordered.ResultsGrid(v-if='dynamicData && dynamicData.length')
       thead
         tr(v-show="data_header")
@@ -87,7 +87,8 @@ export default {
   },
   data () {
     return {
-      showModal: false
+      showModal: false,
+      show: true
     }
   },
   props: {
@@ -96,6 +97,9 @@ export default {
       default: 'data-grid'
     },
     header: {
+      type: String
+    },
+    title: {
       type: String
     },
     headerClass: {
@@ -205,6 +209,8 @@ export default {
     data_header: function () {
       if (this.header) {
         return this.header
+      } else if (this.title) {
+        return this.title
       } else if (this.options && this.options.title) {
         return this.options.title
       } else { return '' }
@@ -346,6 +352,7 @@ export default {
 
   .GridHeader {
     text-align: center;
+    padding: 5px;
     background-color: darkgreen;
     color: white;
   }
