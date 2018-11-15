@@ -2,7 +2,7 @@
 
 <template lang='pug'>
   div
-    b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}}/{{otherType}} ({{field.name}} = {{defaultTo}})
+    b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
       br
     span(v-if="promptPosition==='top'")
       b {{field.prompt || field.name}}: &nbsp; &nbsp;
@@ -88,7 +88,10 @@ export default {
       type: String,
       default: null
     },
-    debug: { type: Boolean }
+    debug: {
+      type: Boolean,
+      default: false
+    }
   },
   created: function () {
     // var keys = _.pluck(this.field.default)
@@ -228,7 +231,7 @@ export default {
 
       var List = [{value: null, text: prompt}]
       if (list) {
-        var elements = list[1].split(/['"]\s*,\s*['"]/)
+        var elements = list[2].split(/['"]\s*,\s*['"]/)
         for (var i = 0; i < elements.length; i++) {
           List.push({value: elements[i], text: elements[i]})
           List.text = elements[i]
