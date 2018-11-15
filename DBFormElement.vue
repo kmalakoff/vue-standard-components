@@ -8,7 +8,7 @@
       b {{field.prompt || field.name}}: &nbsp; &nbsp;
     span(v-else-if="Ftype==='date' && !options.prompt")
       b {{field.prompt || field.name}}: &nbsp; &nbsp;
-    span(v-else-if="access==='read'")
+    span(v-else-if="access==='read' && !options.prompt")
       b {{field.prompt || field.name}}: &nbsp; &nbsp;
 
     span(v-if="access==='read'")
