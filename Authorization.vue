@@ -131,6 +131,7 @@ export default {
         return response.data.user
       } else if (response.data.errors) {
         console.log('error encountered: ' + response.data.errors)
+        this.$store.dispatch('logError', response.data.errors)
         return response.data.errors
       } else {
         console.log('no response success or errors ?')
@@ -205,7 +206,7 @@ export default {
       const parent = e.target.parentElement
       console.log('found ')
       parent.classList.add('has-error')
-      this.note = 'Failed validation'
+      this.note = 'Failed Validation'
     },
     inputFocus (e) {
       this.note = ''
