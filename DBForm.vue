@@ -18,6 +18,8 @@ Usage:
         td.heading(colspan=3)
           h2 {{heading}}:
       tr(v-for="field in fields" v-show="field.type!=='hidden'")
+        td(v-if='options.confirmFields')
+          b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
         td.prompt-column(v-if='prompt')
           b {{label(field)}}:
         td.data-column
@@ -36,10 +38,10 @@ Usage:
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
     hr
-    button.btn.btn-primary(v-if="onSave && (myAccess === 'edit' || myAccess === 'append')" @click.prevent="onSave(form)") {{submitButton}}
+    button.btn(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass') {{submitButton}}
     span &nbsp; &nbsp;
     button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
-    div(v-if='debug')
+    div(v-if='debug || 1')
       hr
       b Form Input: {{myAccess}} : {{form}}
 </template>
@@ -115,6 +117,10 @@ export default {
 
     for (var i = 0; i < DBfields.length; i++) {
       this.$set(this.DBfields, i, DBfields[i])
+    }
+
+    if (this.options.confirmFields) {
+      this.$set(this.form, 'confirmed', {})
     }
   },
   computed: {
@@ -290,6 +296,16 @@ export default {
       var label = this.label(field)
       var vModel = field.name || label
       return vModel
+    },
+    confirm (evt) {
+      console.log('confirm...')
+      if (evt.target.type === 'checkbox') {
+        if (evt.target.checked) {
+          this.$set(this.form.confirmed, evt.target.name, true)
+        } else {
+          this.$set(this.form.confirmed, evt.target.name, false)
+        }
+      }
     }
   }
 }
