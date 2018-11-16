@@ -16,7 +16,7 @@ Usage:
     table.table.form-table
       tr(v-if='heading')
         td.heading(colspan=3)
-          h2 {{heading}}:
+          h2 {{heading}}
       tr(v-for="field in fields" v-show="field.type!=='hidden'")
         td(v-if='options.confirmFields')
           b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
@@ -38,7 +38,7 @@ Usage:
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
 
     hr
-    button.btn(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass') {{submitButton}}
+    button.btn(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
     span &nbsp; &nbsp;
     button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
     div(v-if='debug || 1')
@@ -188,6 +188,8 @@ export default {
         var camel = _.capitalize(this.table)
         console.log('camel case = ' + camel)
         return camel
+      } else if (this.options.formPrompt) {
+        return this.options.formPrompt
       } else { return null }
     },
     include: function () {
@@ -306,6 +308,13 @@ export default {
           this.$set(this.form.confirmed, evt.target.name, false)
         }
       }
+    },
+    disabled: function (form) {
+      if (this.options.disableSubmit) {
+        return this.options.disableSubmit(form)
+      } else {
+        return false
+      }
     }
   }
 }
@@ -329,7 +338,7 @@ export default {
     width: 10%;
   }
   table tr td.heading {
-    background-color: #ccc;
+    // background-color: #ccc;
     text-align: center;
   }
   table tr td.data-column {
