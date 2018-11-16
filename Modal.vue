@@ -529,14 +529,26 @@ export default {
         console.log('save form: ' + JSON.stringify(form))
         var response = await this.options.onSave(form)
         console.log('Modal Save Response: ' + JSON.stringify(response))
-        if (response && response.success) {
+
+        if (this.options.quiet) {
+          // suppressing response messaging
+        } else if (response && response.success) {
           console.log(response.success)
           this.closeModal()
         } else if (response && response.errors) {
           console.log('error detected onSave: ' + response.errors)
           this.$store.dispatch('logError', response.errors)
+        } else if (response && response.data) {
+          // Response directly from axios call
+          if (response.data.message) {
+            this.$store.dispatch('logMessage', response.data.message)
+          } else if (response.data.errors) {
+            this.$store.dispatch('logError', response.data.errors)
+          } else {
+            console.log('expected message or errors')
+          }
         } else {
-          console.log('Please return success or errors on response: ' + JSON.stringify(response))
+          console.log('Please return success/message/warning/errors or response from axios call on response: ' + JSON.stringify(response))
           //   this.ErrMsg = 'OK...'
           this.closeModal()
         }
