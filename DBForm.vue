@@ -41,7 +41,7 @@ Usage:
     button.btn(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
     span &nbsp; &nbsp;
     button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
-    div(v-if='debug || 1')
+    div(v-if='debug')
       hr
       b Form Input: {{myAccess}} : {{form}}
 </template>
