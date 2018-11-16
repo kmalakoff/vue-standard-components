@@ -65,7 +65,9 @@ export default {
         onFocus: this.inputFocus,
         submitButton: 'Log Me In',
         wideOnMobile: true,
-        onCancel: this.cancel
+        onCancel: this.cancel,
+        buttonClass: 'btn-primary',
+        submitButtonClass: 'btn-success'
       },
 
       registerOptions: {
@@ -77,7 +79,9 @@ export default {
         onFocus: this.inputFocus,
         submitButton: 'Register',
         wideOnMobile: true,
-        onCancel: this.cancel
+        onCancel: this.cancel,
+        buttonClass: 'btn-primary',
+        submitButtonClass: 'btn-success'
       },
       apiURL: config.apiURL,
       status: 'initialized'
