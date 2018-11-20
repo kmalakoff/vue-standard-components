@@ -10,13 +10,15 @@ console.log('loaded user controller...')
 Logger.warning('got warning')
 
 class UserController {
-	userProfile ({request, response}) {
+	async userProfile ({request, response}) {
 		console.log('generate the user profile...')
+		console.log('user: ' + JSON.stringify(auth.user))
+
 		Logger.warning('generate user profile...')
 		response.json({msg: 'generate user profile'})
 	}
 
-	* userList ({request, response}) {
+	async userList ({request, response}) {
 		console.log('generate user list...')
 		response.send('generate user lists')
 	}
