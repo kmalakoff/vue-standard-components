@@ -132,7 +132,8 @@ export default {
       console.log('Register call:' + JSON.stringify(response))
       if (response.data && response.data.success) {
         this.$store.dispatch('logMessage', 'Created Account')
-        return response.data.user
+        this.$store.dispatch('AUTH_REQUEST', response.data)
+        return response.data
       } else if (response.data.errors) {
         console.log('error encountered: ' + response.data.errors)
         this.$store.dispatch('logError', response.data.errors)
@@ -151,15 +152,8 @@ export default {
       console.log('Login call:' + JSON.stringify(response))
 
       if (response.data && response.data.success) {
-        var payload = response.data
-        if (payload.user && payload.user.id) {
-          payload.user.userid = payload.user.id
-          delete payload.user.id
-          delete payload.user.password
-        }
-        console.log('generated payload: ' + JSON.stringify(payload))
-        this.$store.dispatch('AUTH_REQUEST', payload)
-        return { success: 'Logged in successfully', payload: payload }
+        this.$store.dispatch('AUTH_REQUEST', response.data)
+        return { success: 'Logged in successfully' }
       } else if (response.data.errors) {
         return { errors: response.data.errors }
       } else {
