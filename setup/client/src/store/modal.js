@@ -14,8 +14,6 @@ const state = {
 
 const getters = {
   modalData: state => {
-    console.log('retrieve modal Data: ' + JSON.stringify(state.modal.data)) // modalData)
-    console.log('type: ' + state.modal.data.constructor)
     return state.modal.data // modalHash['info-modal3']
     // return state.modalData
   },
@@ -26,8 +24,6 @@ const getters = {
     return state.modalUpdates
   },
   modalHash: state => key => {
-    console.log(' Get ' + key + ' modal: ')
-    console.log(JSON.stringify(state.modalHash[key]))
     if (key) {
       return state.hash[key]
     } else { return state.modal.data }
@@ -39,12 +35,10 @@ const actions = {
     state.commit('incUpdates')
   },
   setModalData (state, data, options) {
-    console.log('load info modal with data: ' + JSON.stringify(data))
-    console.log('options: ' + JSON.stringify(options))
     state.commit('loadInfoModal', data, options)
   },
   clearModal (state) {
-    console.log('clearing')
+    console.log('clearing modal')
     state.commit('clearModal')
     state.modalUpdates = state.modalUpdates + 1
   },
@@ -64,43 +58,32 @@ const mutations = {
     state.modalUpdates++
   },
   toggleModal (state, id) {
-    console.log('state toggle modal: ' + id)
     var el = document.getElementById(id)
     if (el) {
-      console.log('found')
-      console.log('class0: ' + el.className)
       el.classList.toggle('m-fadeIn')
       el.classList.toggle('m-fadeOut')
-      console.log('class0: ' + el.className)
-
-      console.log('active: ' + state.activeModal)
-      console.log(JSON.stringify(state.modal.data))
 
       if (state.activeModal && state.activeModal !== id) {
         console.log('retrieve active modal: ' + state.activeModal)
         var el2 = document.getElementById(state.activeModal)
         if (el2) {
-          console.log('toggle alt ' + state.activeModal)
           el2.classList.toggle('m-fadeIn')
           el2.classList.toggle('m-fadeOut')
           state.waitingModal = state.activeModal
         }
         state.activeModal = id
       } else if (state.activeModal === id) {
-        console.log('toggle id: ' + state.activeModal)
+        console.log('toggle modal on id: ' + state.activeModal)
         if (state.waitingModal) {
           console.log('reopen ' + state.waitingModal)
           var el3 = document.getElementById(state.waitingModal)
 
-          console.log('class1: ' + el3.className)
           state.activeModal = state.waitingModal
           state.waitingModal = ''
           el3.classList.toggle('m-fadeIn')
           el3.classList.toggle('m-fadeOut')
-
-          console.log('class2: ' + el3.className)
         } else {
-          console.log('toggle: ' + state.activeModal)
+          console.log('toggle active modal: ' + state.activeModal)
           state.activeModal = ''
         }
       } else {
@@ -110,7 +93,6 @@ const mutations = {
       }
     } else { console.log('no element ' + id) }
     state.modalUpdates = state.modalUpdates + 1
-    console.log('State modal Data: ' + JSON.stringify(state.modal.data))
   },
   appendModal (state, records) {
     console.log('appendModal ' + JSON.stringify(records))
@@ -137,18 +119,14 @@ const mutations = {
     } else if (data.constructor === Object) {
       if (!append) {
         console.log('clear previous Object Data...')
-        console.log(key + ' cleared from: ' + JSON.stringify(state.modalHash))
         Vue.set(state.modalHash, key, {})
-        console.log('cleared...')
       }
       // var m = state.modalHash[key].length || 0
-      console.log('set ' + key)
       Vue.set(state.modalHash, key, data)
     }
 
     Vue.set(state.modal, 'data', data)
 
-    console.log(JSON.stringify(data))
     console.log(key + ': ' + JSON.stringify(state.modalHash[key]))
     state.modalUpdates = state.modalUpdates + 1
   },

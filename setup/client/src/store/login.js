@@ -6,71 +6,84 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export const AUTH_REQUEST = 'AUTH_REQUEST'
-export const AUTH_SUCCESS = 'AUTH_SUCCESS'
-export const AUTH_ERROR = 'AUTH_ERROR'
-export const AUTH_LOGOUT = 'AUTH_LOGOUT'
-
-export const USER_REQUEST = 'USER_REQUEST'
-export const LOAD_DEMO = 'LOAD_DEMO'
-
 const state = {
-  token: localStorage.getItem('user-token') || '',
+  token: '',
   status: '',
-  payloadData: {access: 'public'}
+  expiration: 10, // expiration in minutes
+  payloadData: null
 }
 
 const getters = {
+  loggedIn: state => (state.status === 'success' || state.status === 'logged in'),
   isAuthenticated: state => !!state.token,
   authStatus: state => state.status,
-  payload: state => state.payloadData
+  payload: state => {
+    var payload = state.payloadData || localStorage.getItem('payload')
+    if (payload) {
+      var expires = localStorage.getItem('payload-expires') || 0
+      var now = Date.now()
+      if (now > expires) {
+        console.log('expired...')
+        return {access: 'public'}
+      } else {
+        console.log('retrieved payload: ' + JSON.stringify(payload))
+        return payload
+      }
+    } else {
+      return {access: 'public'}
+    }
+  },
+  token: state => state.token,
+  localToken: state => localStorage.getItem('user-token')
 }
 
 const actions = {
-  payload: ({commit, dispatch}, payload) => {
-    commit('payload', payload)
+  AUTH_PAYLOAD: ({commit, dispatch}, payload) => {
+    commit('AUTH_PAYLOAD', payload)
   },
-  [AUTH_REQUEST]: ({commit, dispatch}, response) => {
+  AUTH_REQUEST: ({commit, dispatch}, response) => {
     return new Promise((resolve, reject) => { // The Promise used for router redirect in login
       console.log('dispatched request')
-      commit(AUTH_REQUEST)
       if (response.success) {
-        if (response.user) {
-          console.log('payload detected.  Storing payload: ' + JSON.stringify(response.user))
-          commit('payload', response.user)
-        } else if (response.token) {
-          const token = response.token
-          localStorage.setItem('user-token', token) // store the token in localstorage
-          commit(AUTH_SUCCESS, token)
-
-          // you have your token, now log in your user :)
-          dispatch(USER_REQUEST)
-          resolve(response.user)
+        if (response.token) {
+          const token = response.token || ''
+          const payload = response.payload || {}
+          commit('AUTH_PAYLOAD', payload)
+          commit('AUTH_TOKEN', token)
+          resolve(response)
+        } else if (response.payload) {
+          commit('AUTH_PAYLOAD', response.payload)
+          resolve(response)
+        } else {
+          console.log('no token or payload supplied')
+          var err1 = new Error('no token or payload supplied')
+          reject(err1)
         }
       } else if (response.errors) {
         console.log('Error detected: ' + response.errors)
-        localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
-        reject(response.errors)
+        commit('AUTH_CLEAR')
+        var err2 = new Error(response.errors)
+        reject(err2)
       } else {
         console.log('expecting response user/token or errors.  Got: ' + JSON.stringify(response))
-        localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
-        var err = new Error('no response data returned')
-        reject(err)
+        commit('AUTH_CLEAR')
+        var err3 = new Error('no response data returned')
+        reject(err3)
       }
     })
   },
-  [AUTH_LOGOUT]: ({commit, dispatch}) => {
+  AUTH_LOGOUT: ({commit, dispatch}) => {
     return new Promise((resolve, reject) => {
       console.log('auth logout...')
-      commit(AUTH_LOGOUT)
-      localStorage.removeItem('user-token') // clear your user's token from localstorage
-      commit('payload', {})
+      commit('AUTH_CLEAR')
+      commit('AUTH_LOGOUT')
       resolve()
     })
   },
-  [LOAD_DEMO]: ({commit, dispatch}) => {
+  LOAD_DEMO: ({commit, dispatch}) => {
     return new Promise((resolve, reject) => {
-      commit(LOAD_DEMO)
+      var payload = {user: 'Demo', id: 3}
+      commit('AUTH_PAYLOAD', payload)
       resolve()
     })
   }
@@ -78,29 +91,36 @@ const actions = {
 
 // basic mutations, showing loading, success, error to reflect the api call status and the token when loaded
 const mutations = {
-  payload: (state, payload) => {
+  AUTH_PAYLOAD: (state, payload) => {
     state.payloadData = payload
-    console.log('defined payload')
+    console.log('payload:' + JSON.stringify(payload))
+    var now = new Date()
+    var expires = now + state.expiration * 60
+    console.log('... expires after ' + state.expiration + ' minutes')
+
+    localStorage.setItem('payload', JSON.stringify(payload)) // clear your user's token from localstorage
+    localStorage.setItem('payload-expires', expires) // clear your user's token from localstorage
+    localStorage.removeItem('user-token')
   },
-  [AUTH_REQUEST]: (state) => {
-    state.status = 'loading'
-  },
-  [AUTH_SUCCESS]: (state, token) => {
+  AUTH_TOKEN: (state, token) => {
     state.status = 'success'
     state.token = token
+    localStorage.setItem('user-token', token) // clear your user's token from localstorage
   },
-  [AUTH_ERROR]: (state) => {
+  AUTH_ERROR: (state) => {
     state.status = 'error'
   },
-  [AUTH_LOGOUT]: (state) => {
+  AUTH_LOGOUT: (state) => {
     state.status = 'logged out'
     state.token = null
   },
-  [LOAD_DEMO]: (state) => {
-    state.status = 'success'
-    state.payloadData = {user: 'Demo', id: 123}
-    console.log('loaded demo payload...')
-    console.log('Demo Status: ' + state.status)
+  AUTH_CLEAR: (state) => {
+    localStorage.setItem('user-token', '')
+    localStorage.setItem('payload', {access: 'public'})
+    localStorage.removeItem('payload-expires')
+    state.payloadData = {access: 'public'}
+    console.log('cleared local payload & token states')
+    console.log(state.payloadData)
   }
 }
 // })
