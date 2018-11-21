@@ -270,7 +270,6 @@ export default {
     // },
   },
   created: function () {
-    console.log('*** defined Modal ***' + this.title)
     if (this.confirm || this.options.confirm) {
       var fields = []
       var confirm = this.confirm || this.options.confirm
@@ -528,6 +527,9 @@ export default {
       if (this.options.onSave) {
         console.log('save form: ' + JSON.stringify(form))
         var response = await this.options.onSave(form)
+        if (response.data) { 
+          response = response.data
+        }
         console.log('Modal Save Response: ' + JSON.stringify(response))
 
         if (this.options.quiet) {
