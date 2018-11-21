@@ -212,12 +212,12 @@ export default {
       type: Boolean
     },
 
-    // openButton: {
-    //   type: String
-    // },
-    // closeButton: {
-    //   type: String
-    // },
+    button: {
+      type: String
+    },
+    text: {
+      type: String
+    },
     record: {
       type: Object
     },
@@ -373,6 +373,8 @@ export default {
         var storedData = this.$store.getters.getHash(this.stored)
         console.log('dynamically loaded ' + this.options.stored + ' data: ' + JSON.stringify(storedData))
         return storedData || []
+      } else if (this.record) {
+        return [this.record]
       } else if (this.data) {
         console.log('static data: ' + JSON.stringify(this.data))
         return this.data || []
@@ -402,12 +404,16 @@ export default {
       }
     },
     openButton: function () {
-      if (this.options && this.options.openButton) {
+      if (this.button) {
+        return this.button
+      } else if (this.options && this.options.openButton) {
         return this.options.openButton || '+'
       } else { return '' }
     },
     openText: function () {
-      if (this.options && this.options.openText) {
+      if (this.text) {
+        return this.text
+      } else if (this.options && this.options.openText) {
         return this.options.openText || '+'
       } else { return '' }
     },
@@ -527,7 +533,7 @@ export default {
       if (this.options.onSave) {
         console.log('save form: ' + JSON.stringify(form))
         var response = await this.options.onSave(form)
-        if (response.data) { 
+        if (response.data) {
           response = response.data
         }
         console.log('Modal Save Response: ' + JSON.stringify(response))
