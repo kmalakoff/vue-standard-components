@@ -1,4 +1,4 @@
-`cp -R ./../Standard/setup/* ./../../../`
+`cp -R ./../Standard/setup/* ./../../../../`
 
 
 
