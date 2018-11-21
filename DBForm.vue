@@ -11,7 +11,7 @@ Usage:
 <template lang='pug'>
   div.table-form
     div(v-if='debug')
-      p DBFields: {{DBfields}}
+      p Fields: {{fields}}
       hr
     table.table.form-table
       tr(v-if='heading')
@@ -24,7 +24,7 @@ Usage:
           b {{label(field)}}:
         td.data-column
           DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :debug='debug')
-        td.extra-column(v-if="myAccess === 'edit'")
+        td.extra-column(v-if="0 && myAccess === 'edit'")
           span &nbsp;
           a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)")
             icon(name='question-circle' color='black' scale='2')
@@ -99,24 +99,60 @@ export default {
   created: function () {
     var DBfields = []
 
+    console.log('confirm field list...')
     if (this.table) {
       // load fields dynamically from table..
       // Construction
+      console.log('.. from table')
       if (config.forms && config.forms[this.table]) {
         DBfields = config.forms[this.table]
       } else {
         console.log('Error retrieving configuration for ' + this.table)
         console.log('(Include form hash for ' + this.table + ' in /src/config.js file)')
       }
-    } else if (this.fields) {
+    } else if (this.fields && this.fields.length) {
+      console.log('.. from specified list')
       DBfields = this.fields
+    } else if (this.thisRecord) {
+      var f1 = []
+      console.log('load record: ' + JSON.stringify(this.thisRecord))
+      // console.log('got fields from keys')
+      var keys = Object.keys(this.thisRecord)
+      for (var i = 0; i < keys.length; i++) {
+        f1.push({name: keys[i], type: 'text'})
+      }
+      DBfields = f1
+      console.log('initiate fields: ' + JSON.stringify(keys))
     } else {
       console.log('Error retrieving configuration (require fields or table spec)')
       console.log(JSON.stringify(this.options))
     }
 
-    for (var i = 0; i < DBfields.length; i++) {
-      this.$set(this.DBfields, i, DBfields[i])
+    if (DBfields && DBfields.length && this.thisRecord) {
+      var f = DBfields
+      for (var j = 0; j < f.length; j++) {
+        console.log('field = ' + f[j].name)
+        if (this.thisRecord[f[j].name]) {
+          if (f[j].type === 'checkbox' || f[j].type === 'boolean') {
+            if (typeof f[j].default === 'undefined') {
+              this.$set(this.form, f[j].name, false)
+            } else {
+              this.$set(this.form, f[j].name, this.thisRecord[f[j].default])
+            }
+          } else if (f[j].type === 'date') {
+            var defaultDate = this.thisRecord[f[j].name] || f[j].default || ''
+            this.$set(this.form, f[j].name, defaultDate.substring(0, 10))
+          } else {
+            var defaultTo = this.thisRecord[f[j].name] || f[j].default || null
+            this.$set(this.form, f[j].name, defaultTo)
+          }
+        }
+      }
+      console.log('initiate form: ' + JSON.stringify(this.form))
+    }
+
+    for (var k = 0; k < DBfields.length; k++) {
+      this.$set(this.DBfields, k, DBfields[k])
     }
 
     if (this.options.confirmFields) {
@@ -130,39 +166,13 @@ export default {
     fields: function () {
       var f = []
       if (this.options.fields) {
-        // console.log('got fields from options')
+        console.log('got fields from options')
+        console.log(JSON.stringify(this.options.fields))
         f = this.options.fields
       } else if (this.DBfields.length) {
-        // console.log('got fields from config')
+        console.log('got fields from config')
         f = this.DBfields
-      } else if (this.thisRecord) {
-        // console.log('got fields from keys')
-        var keys = Object.keys(this.thisRecord)
-        for (var i = keys.length; i < keys.length; i++) {
-          f.push({name: keys[i]})
-        }
       }
-
-      if (this.thisRecord) {
-        for (var j = 0; j < f.length; j++) {
-          if (this.thisRecord[f[j].name]) {
-            if (f[j].type === 'checkbox' || f[j].type === 'boolean') {
-              if (typeof f[j].default === 'undefined') {
-                this.$set(this.form, f[j].name, false)
-              } else {
-                this.$set(this.form, f[j].name, this.thisRecord[f[j].default])
-              }
-            } else if (f[j].type === 'date') {
-              var defaultDate = this.thisRecord[f[j].name] || f[j].default || ''
-              this.$set(this.form, f[j].name, defaultDate.substring(0, 10))
-            } else {
-              var defaultTo = this.thisRecord[f[j].name] || f[j].default || null
-              this.$set(this.form, f[j].name, defaultTo)
-            }
-          }
-        }
-      }
-      console.log('initiate form: ' + JSON.stringify(this.form))
       return f
     },
     myAccess: function () {
