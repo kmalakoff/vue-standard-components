@@ -66,7 +66,7 @@ export default {
         submitButton: 'Log Me In',
         wideOnMobile: true,
         onCancel: this.cancel,
-        buttonClass: 'btn-primary',
+        buttonClass: config.defaultButtonClass,
         submitButtonClass: 'btn-success'
       },
 
@@ -80,7 +80,7 @@ export default {
         submitButton: 'Register',
         wideOnMobile: true,
         onCancel: this.cancel,
-        buttonClass: 'btn-primary',
+        buttonClass: config.defaultButtonClass,
         submitButtonClass: 'btn-success'
       },
       apiURL: config.apiURL,
