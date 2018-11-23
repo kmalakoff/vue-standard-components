@@ -541,7 +541,8 @@ export default {
       clearTimeout(this.timeoutID)
     },
     closeModal () {
-      this.$store.commit('clearModal')
+      this.$store.dispatch('clearModal')
+      this.$store.dispatch('clearAll')
       this.$store.dispatch('toggleModal', this.id)
     },
     async save (form) {
