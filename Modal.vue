@@ -542,7 +542,7 @@ export default {
     },
     closeModal () {
       this.$store.dispatch('clearModal')
-      this.$store.dispatch('clearAll')
+      this.$store.dispatch('clearMessages')
       this.$store.dispatch('toggleModal', this.id)
     },
     async save (form) {
