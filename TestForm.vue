@@ -117,7 +117,7 @@ export default {
       this.myFields.push({name: 'confirm', type: 'checkbox', prompt: 'I agree to this stuff...'})
       this.confirmed = true
     }
-    this.$store.dispatch('clearMessages')
+    // this.$store.dispatch('clearMessages')
   },
   methods: {
     annotate: function (model) {
