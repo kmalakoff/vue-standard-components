@@ -83,7 +83,7 @@ export default {
         buttonClass: Custom.defaultButtonClass,
         submitButtonClass: 'btn-success'
       },
-      apiUrl: Custom.apiUrl,
+      apiUrl: Custom.apiURL,
       status: 'initialized'
     }
   },
