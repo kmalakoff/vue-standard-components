@@ -113,8 +113,8 @@ export default {
     },
     errors: function () {
       if (this.stored) {
-        console.log('got stored errors')
         var errs = this.$store.getters.errors
+        console.log('got ' + errs.length + ' stored errors')
         var errors = []
         for (var i = 0; i < errs.length; i++) {
           var err = errs[i]
