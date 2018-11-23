@@ -40,7 +40,7 @@ Usage:
     hr
     button.btn(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
     span &nbsp; &nbsp;
-    button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
+    button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel()") {{cancelButton}}
     div(v-if='debug')
       hr
       b Form Input: {{myAccess}} : {{form}}
@@ -235,9 +235,6 @@ export default {
     },
     cancelButton: function () {
       return this.options.cancelButton || 'Cancel'
-    },
-    onCancel: function () {
-      return this.options.onCancel || null
     }
   },
   methods: {
@@ -322,6 +319,14 @@ export default {
         return this.options.disableSubmit(form)
       } else {
         return false
+      }
+    },
+    onCancel: function () {
+      console.log('cancel form')
+      if (this.options.cancelForm) {
+        this.options.cancelForm()
+      } else if (this.options.onCancel) {
+        this.options.onCancel()
       }
     }
   }
