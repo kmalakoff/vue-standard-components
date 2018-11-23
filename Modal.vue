@@ -70,13 +70,18 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
             div.my-modal-container
               div.my-modal-header
                 slot(name="header")
-                  b {{myheader}} &nbsp; &nbsp;
+                  h2.heading(v-if='myheader') {{myheader}} &nbsp; &nbsp;
                     span.navbar-right
                       button.btn.btn-danger.btn-xs(@click="closeModal")
                         icon(name='times')
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
+                  span.navbar-right(v-if='!myheader')
+                    button.btn.btn-danger.btn-xs(@click="closeModal")
+                      icon(name='times')
+                  h2.title(v-if='modalTitle') {{modalTitle}}
+
                   div(v-if="modalType==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="modalType==='record'")
@@ -474,16 +479,14 @@ export default {
       return this.status
     },
     myheader: function () {
-      if (this.modalTitle) {
-        return this.modalTitle
-      } else if (this.header) {
+      if (this.header) {
         return this.header
       } else if (this.options && this.options.header) {
         return this.options.header
       } else if (this.options && this.options.model) {
         return this.options.model
       } else {
-        return 'Title'
+        return ''
       }
     },
     modalBody: function () {
@@ -651,6 +654,12 @@ export default {
   float: right;
 }
 
+.heading {
+  text-align: left;
+}
+.title {
+  text-align: center;
+}
 /* Responsive design - mobile first */
 
 .my-modal-wrapper {
