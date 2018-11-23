@@ -17,9 +17,9 @@
           button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
           span &nbsp; &nbsp;
       span.wideScreen
-        Modal.login-modal(type='record' id='login-modal' title='Login' :options='loginOptions' :note='note')
+        Modal.login-modal(type='record' id='login-modal' :title='loginTitle' :options='loginOptions' :note='note')
         span &nbsp; &nbsp;
-        Modal.signup-modal(type='record' id='register-modal' title='Register' :options='registerOptions' :note='note')
+        Modal.signup-modal(type='record' id='register-modal' :title='regTitle' :options='registerOptions' :note='note')
           p &nbsp;
       span.smallScreen
         div(v-if='!activeForm')
@@ -30,6 +30,8 @@
           DBForm.login-form(:options='loginOptions' :onSave='login' v-if="activeForm === 'Login'")
           hr
           DBForm.signup-form(:options='registerOptions' :onSave='register' v-if="activeForm === 'Register'")
+        p.error(v-if='authError') {{authError}}
+
 </template>
 <script>
 import Modal from './Modal'
@@ -50,6 +52,7 @@ export default {
         password: ''
       },
       error: '',
+      authError: '',
       note: 'asldfj',
 
       userMenu: [
@@ -121,6 +124,20 @@ export default {
       } else {
         return null
       }
+    },
+    loginTitle: function () {
+      if (this.authError) {
+        return this.authError
+      } else {
+        return 'Login'
+      }
+    },
+    regTitle: function () {
+      if (this.authError) {
+        return this.authError
+      } else {
+        return 'Register'
+      }
     }
   },
   methods: {
@@ -175,7 +192,8 @@ export default {
         return { success: true }
       } else if (response.data && response.data.error) {
         console.log('log error: ' + response.data.error)
-        this.$store.dispatch('logError', response.data.error)
+        this.authError = response.data.error
+        // this.$store.dispatch('logError', response.data.error)
         return { error: response.data.error }
       } else {
         this.$store.dispatch('logWarning', 'unrecognized response')
@@ -230,6 +248,7 @@ export default {
     },
     inputFocus (e) {
       this.note = ''
+      this.authError = ''
       const parent = e.target.parentElement
       parent.classList.remove('has-error')
       console.log('checkinput')
@@ -241,6 +260,8 @@ export default {
       console.log('validated')
     },
     cancel () {
+      console.log('cancel this form')
+      this.authError = ''
       this.activeForm = ''
     }
   }
@@ -260,6 +281,12 @@ export default {
 </script>
 
 <style scoped>
+.error {
+  padding: 10%;
+  text-align: center;
+  color: red;
+  font-weight: bold;
+}
 
 .user-icon {
   position: absolute;
