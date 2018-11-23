@@ -415,9 +415,11 @@ export default {
     },
     btnClass: function () {
       if (this.options.buttonClass) {
-        return this.options.buttonClass
-      } else {
+        console.log('use ' + this.options.buttonClass)
         return 'btn-lg btn-primary'
+        // return this.options.buttonClass
+      } else {
+        return 'btn-lg btn-info'
       }
     },
     openText: function () {
@@ -550,7 +552,6 @@ export default {
           response = response.data
         }
         console.log('Modal Save Response: ' + JSON.stringify(response))
-
         if (this.options.quiet) {
           // suppressing response messaging
         } else if (response && response.success) {
