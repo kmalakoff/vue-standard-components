@@ -56,7 +56,7 @@ import config from '@/config.js'
 export default {
   data () {
     return {
-      url: config.apiUrl,
+      url: config.apiURL,
       DBfields: [],
       form: {},
       idfield: { name: 'id', type: 'fixed' }
