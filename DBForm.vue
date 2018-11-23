@@ -131,7 +131,6 @@ export default {
     if (DBfields && DBfields.length && this.thisRecord) {
       var f = DBfields
       for (var j = 0; j < f.length; j++) {
-        console.log('field = ' + f[j].name)
         if (this.thisRecord[f[j].name]) {
           if (f[j].type === 'checkbox' || f[j].type === 'boolean') {
             if (typeof f[j].default === 'undefined') {
