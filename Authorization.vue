@@ -104,6 +104,10 @@ export default {
     noConfirm: {
       type: Boolean,
       default: false
+    },
+    testInput: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -132,6 +136,7 @@ export default {
         credentials[f.name] = form[f.prompt] || form[f.name]
       }
 
+      console.log('confirm ? ' + this.noConfirm + ' : ' + this.testInput)
       if (this.noConfirm) {
         credentials.confirmPassword = credentials.password
       }
@@ -152,6 +157,7 @@ export default {
       return this.initializeSession(response)
     },
     initializeSession (response, onSuccess) {
+      console.log('initialize session for ' + response)
       this.$store.dispatch('AUTH_LOGOUT')
       if (response.data && response.data.success) {
         if (onSuccess) {
@@ -168,6 +174,7 @@ export default {
         }
         return { success: true }
       } else if (response.data && response.data.error) {
+        console.log('log error: ' + response.data.error)
         this.$store.dispatch('logError', response.data.error)
         return { error: response.data.error }
       } else {
