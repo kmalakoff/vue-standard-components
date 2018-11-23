@@ -55,13 +55,13 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
   span
     span.modal-anchor
     span(v-if='openButton')
-      button.open-button.btn(v-on:click="openModal()" :class='options.buttonClass' v-bind:class="[{wideButton: wideOnMobile}]")
+      button.open-button.btn(v-on:click="openModal()" :class='btnClass' v-bind:class="[{wideButton: wideOnMobile}]")
         span(v-html='openButton')
     span(v-else-if='openText')
       a.modal-link(href='#' onclick='return false' v-on:click="openModal()")
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
-      button.btn.btn-default(v-on:click="openModal()" :class='options.buttonClass' v-bind:class="[{wideButton: wideOnMobile}]")
+      button.btn.btn-default(v-on:click="openModal()" :class='btnClass' v-bind:class="[{wideButton: wideOnMobile}]")
         icon(:name='openIcon')
     span(:class='initClass' :id="id")
       transition(name="modal")
@@ -211,7 +211,6 @@ export default {
     toggle: {
       type: Boolean
     },
-
     button: {
       type: String
     },
@@ -291,6 +290,10 @@ export default {
         }
       }
       this.$set(this.confirmOptions, 'fields', fields)
+    }
+
+    if (this.options.onCancel || this.options.cancelButton) {
+      this.options.onCancel = this.cancel
     }
   },
   computed: {
@@ -410,6 +413,13 @@ export default {
         return this.options.openButton || '+'
       } else { return '' }
     },
+    btnClass: function () {
+      if (this.options.buttonClass) {
+        return this.options.buttonClass
+      } else {
+        return 'btn-lg btn-primary'
+      }
+    },
     openText: function () {
       if (this.text) {
         return this.text
@@ -482,6 +492,9 @@ export default {
       } else if (this.body) {
         return this.body
       } else { return null }
+    },
+    cancel: function () {
+      return this.closeModal
     }
   },
   asyncComputed: {
