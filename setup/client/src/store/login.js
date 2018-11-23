@@ -41,44 +41,16 @@ const actions = {
   AUTH_PAYLOAD: ({commit, dispatch}, payload) => {
     commit('AUTH_PAYLOAD', payload)
   },
-  AUTH_REQUEST: ({commit, dispatch}, response) => {
-    return new Promise((resolve, reject) => { // The Promise used for router redirect in login
-      console.log('dispatched request')
-      if (response.success) {
-        if (response.token) {
-          const token = response.token || ''
-          const payload = response.payload || {}
-          commit('AUTH_PAYLOAD', payload)
-          commit('AUTH_TOKEN', token)
-          resolve(response)
-        } else if (response.payload) {
-          commit('AUTH_PAYLOAD', response.payload)
-          resolve(response)
-        } else {
-          console.log('no token or payload supplied')
-          var err1 = new Error('no token or payload supplied')
-          reject(err1)
-        }
-      } else if (response.errors) {
-        console.log('Error detected: ' + response.errors)
-        commit('AUTH_CLEAR')
-        var err2 = new Error(response.errors)
-        reject(err2)
-      } else {
-        console.log('expecting response user/token or errors.  Got: ' + JSON.stringify(response))
-        commit('AUTH_CLEAR')
-        var err3 = new Error('no response data returned')
-        reject(err3)
-      }
-    })
+  AUTH_TOKEN: ({commit, dispatch}, response) => {
+    commit('AUTH_PAYLOAD', payload)
+  },
+  AUTH_CLEAR: ({commit, dispatch}, response) => {
+    commit('AUTH_CLEAR', payload)
   },
   AUTH_LOGOUT: ({commit, dispatch}) => {
-    return new Promise((resolve, reject) => {
-      console.log('auth logout...')
-      commit('AUTH_CLEAR')
-      commit('AUTH_LOGOUT')
-      resolve()
-    })
+    console.log('auth logout...')
+    commit('AUTH_CLEAR')
+    commit('AUTH_LOGOUT')
   },
   LOAD_DEMO: ({commit, dispatch}) => {
     return new Promise((resolve, reject) => {
