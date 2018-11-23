@@ -158,6 +158,7 @@ export default {
         credentials.confirmPassword = credentials.password
       }
       console.log('Registering with credentials: ')
+      console.log('cred: ' + JSON.stringify(credentials))
       var response = await auth.signup(this, credentials)
       console.log('Register call:' + JSON.stringify(response))
       return this.initializeSession(response, 'Created Account')
