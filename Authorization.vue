@@ -36,8 +36,8 @@ import Modal from './Modal'
 import DBForm from './DBForm'
 import DropdownMenu from './DropdownMenu'
 import auth from '../../auth'
-import StandardConfig from './config.js'
-import config from '@/config.js'
+import Standard from './config.js'
+import Custom from '@/config.js'
 
 export default {
   data () {
@@ -59,31 +59,31 @@ export default {
       loginOptions: {
         openButton: 'Log in',
         access: 'append',
-        fields: StandardConfig.loginFields,
+        fields: Standard.loginFields,
         onSave: this.login,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
         submitButton: 'Log Me In',
         wideOnMobile: true,
         onCancel: this.cancel,
-        buttonClass: config.defaultButtonClass,
+        buttonClass: Custom.defaultButtonClass,
         submitButtonClass: 'btn-success'
       },
 
       registerOptions: {
         openButton: 'Sign up',
         access: 'append',
-        fields: StandardConfig.registrationFields,
+        fields: Standard.registrationFields,
         onSave: this.register,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
         submitButton: 'Register',
         wideOnMobile: true,
         onCancel: this.cancel,
-        buttonClass: config.defaultButtonClass,
+        buttonClass: Custom.defaultButtonClass,
         submitButtonClass: 'btn-success'
       },
-      apiURL: config.apiURL,
+      apiUrl: Custom.apiUrl,
       status: 'initialized'
     }
   },
@@ -100,6 +100,10 @@ export default {
     demo: {
       type: Object,
       default: null
+    },
+    noConfirm: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -127,20 +131,14 @@ export default {
         var f = fields[i]
         credentials[f.name] = form[f.prompt] || form[f.name]
       }
+
+      if (this.noConfirm) {
+        credentials.confirmPassword = credentials.password
+      }
       console.log('Registering with credentials: ')
       var response = await auth.signup(this, credentials)
       console.log('Register call:' + JSON.stringify(response))
-      if (response.data && response.data.success) {
-        this.$store.dispatch('logMessage', 'Created Account')
-        this.$store.dispatch('AUTH_REQUEST', response.data)
-        return response.data
-      } else if (response.data.errors) {
-        console.log('error encountered: ' + response.data.errors)
-        this.$store.dispatch('logError', response.data.errors)
-        return response.data.errors
-      } else {
-        console.log('no response success or errors ?')
-      }
+      return this.initializeSession(response, 'Created Account')
     },
     async login (form) {
       var credentials = {
@@ -149,15 +147,32 @@ export default {
       }
       console.log('login ' + form.email)
       var response = await auth.login(this, credentials)
-      console.log('Login call:' + JSON.stringify(response))
+      console.log('Login response:' + JSON.stringify(response))
 
+      return this.initializeSession(response)
+    },
+    initializeSession (response, onSuccess) {
+      this.$store.dispatch('AUTH_LOGOUT')
       if (response.data && response.data.success) {
-        this.$store.dispatch('AUTH_REQUEST', response.data)
-        return { success: 'Logged in successfully' }
-      } else if (response.data.errors) {
-        return { errors: response.data.errors }
+        if (onSuccess) {
+          this.$store.dispatch('logMessage', onSuccess)
+        }
+
+        if (response.data.token) {
+          console.log('token: ' + response.data.token)
+          this.$store.dispatch('AUTH_TOKEN', response.data.token)
+        }
+        if (response.data.payload) {
+          console.log('payload: ' + JSON.stringify(response.data.payload))
+          this.$store.dispatch('AUTH_PAYLOAD', response.data.payload)
+        }
+        return { success: true }
+      } else if (response.data && response.data.error) {
+        this.$store.dispatch('logError', response.data.error)
+        return { error: response.data.error }
       } else {
-        return 'no response...'
+        this.$store.dispatch('logWarning', 'unrecognized response')
+        return 'no recognized response...'
       }
     },
     loadDemo (template) {
