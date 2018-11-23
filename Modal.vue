@@ -543,18 +543,8 @@ export default {
         } else if (response && response.success) {
           console.log(response.success)
           this.closeModal()
-        } else if (response && response.errors) {
-          console.log('error detected onSave: ' + response.errors)
-          this.$store.dispatch('logError', response.errors)
-        } else if (response && response.data) {
-          // Response directly from axios call
-          if (response.data.message) {
-            this.$store.dispatch('logMessage', response.data.message)
-          } else if (response.data.errors) {
-            this.$store.dispatch('logError', response.data.errors)
-          } else {
-            console.log('expected message or errors')
-          }
+        } else if (response && response.error) {
+          console.log('error encountered: ' + response.error)
         } else {
           console.log('Please return success/message/warning/errors or response from axios call on response: ' + JSON.stringify(response))
           //   this.ErrMsg = 'OK...'
