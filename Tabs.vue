@@ -68,7 +68,11 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="sass?outputStyle=expanded" scoped>
+
+$tab-background: transparent;
+$tab-text-colour: black;
+
 .onPage {
   color: black;
   font-weight: bold;
@@ -89,13 +93,13 @@ export default {
 
 .visible-tab {
   overflow: hidden;
-  background-color: #333;
+  background-color: $tab-background
 }
 
 .visible-tab a {
   float: left;
   display: block;
-  color: #f2f2f2;
+  color: $tab-text-colour;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -103,17 +107,21 @@ export default {
 }
 
 .visible-tab a:hover {
-  background-color: #ddd;
+  background-color: lightgrey;
   color: black;
 }
 
 .active {
-  background-color: #4CAF50;
+  background-color: blue;
   color: white;
 }
 
 .visible-tab .icon {
   display: none;
+}
+
+a.tabItem {
+  display: inline-block;
 }
 
 @media screen and (max-width: 767px) {
