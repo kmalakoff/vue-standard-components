@@ -170,20 +170,20 @@ export default {
       }
       console.log('login ' + form.email)
       var response = await auth.login(this, credentials)
-      console.log('Login response:' + JSON.stringify(response))
+      // console.log('Login response:' + JSON.stringify(response))
 
       return this.initializeSession(response)
     },
     initializeSession (response, onSuccess) {
-      console.log('initialize session for ' + response)
-      this.$store.dispatch('AUTH_LOGOUT')
+      // console.log('initialize session for ' + response)
+      this.$store.dispatch('AUTH_LOGOUT') // clear any existing user sessions first
       if (response.data && response.data.success) {
         if (onSuccess) {
           this.$store.dispatch('logMessage', onSuccess)
         }
 
         if (response.data.token) {
-          console.log('token: ' + response.data.token)
+          // console.log('token: ' + response.data.token)
           this.$store.dispatch('AUTH_TOKEN', response.data.token)
         }
         if (response.data.payload) {
