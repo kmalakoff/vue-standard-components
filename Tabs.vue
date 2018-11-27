@@ -1,7 +1,7 @@
 <template lang='pug'>
   div
     div.visible-tab#tabBar
-      a.tabItem(v-for='item in list' href='#' target='_blank' @click.prevent="onClick(item)")
+      a.tabItem(v-for='item in list' href='#' target='_blank' @click.prevent="onClick(item)" v-bind:class="[{active: show === item}]")
         div(v-if="item.constructor === String")
           b.submenu {{item}}
           span &nbsp; &nbsp;
@@ -37,6 +37,16 @@ export default {
   data () {
     return {
       show: this.default
+    }
+  },
+  created: function () {
+    console.log('create tabs')
+    this.show = this.default
+  },
+  watch: {
+    default: function () {
+      console.log('changed default to ' + this.default)
+      this.show = this.default
     }
   },
   methods: {
@@ -107,13 +117,15 @@ $tab-text-colour: black;
 }
 
 .visible-tab a:hover {
-  background-color: lightgrey;
+  background-color: silver;
   color: black;
+  font-weight: bold;
 }
 
 .active {
-  background-color: blue;
-  color: white;
+  background-color: lightgrey;
+  color: black;
+  font-weight: normal;
 }
 
 .visible-tab .icon {
