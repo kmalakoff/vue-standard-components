@@ -42,12 +42,13 @@
   <template lang='pug'>
     div.recursiveList
       <!-- b S: {{selected}} -->
+      Modal(id='recursive-list-item' type='record' :record='record' :options='modalOptions')
+      hr
       span(v-show='title')
         u
           h4 {{title}} [{{selected_count}} / {{total_count}} selected]
         span(style='color: green; font-weight: bold' v-show='turnedOn.length') Turned On: {{turnedOn.join(', ')}} &nbsp;
         span(style='color: red; font-weight: bold' v-show='turnedOff.length') Turned Off: {{turnedOff.join(', ')}} &nbsp;
-      Modal(:id='modalID' type='record' :options="options")
       span(v-if="newItems && promptNew")
         b.undecided {{newItems}}
           i New {{options.label}} option(s) available: &nbsp; &nbsp;
@@ -159,6 +160,7 @@ export default {
       id2name: {},
       select: {},
       selectParent: {},
+      depth: {},
       newItem: {},
       newItems: 0,
       static: ['nothing selected'],
@@ -235,6 +237,13 @@ export default {
     },
     isSelected: function () {
       return this.select
+    },
+    toDepth: function () {
+      if (this.open && typeof parseInt(this.open) !== 'undefined') {
+        return parseInt(this.open)
+      } else {
+        return null
+      }
     },
     modalID: function () {
       if (this.options && this.options.modalID) {
@@ -345,12 +354,18 @@ export default {
     // },
   },
   methods: {
+    use: function (i) {
+      this.$set(this, 'record', this.records[i])
+      this.$store.dispatch('toggleModal', 'recursive-list-item')
+      return null
+    },
     buildMetaData: function (chosen) {
       console.log('reparse meta data for ' + this.title)
       this.selected_count = 0
       this.total_count = 0
       this.$set(this, 'select', {})
       this.$set(this, 'selectParent', {})
+      this.$set(this, 'depth', {})
 
       var list = this.list || []
       var seeds = []
@@ -366,6 +381,11 @@ export default {
         var name = list[i][nameKey]
         var id = list[i][idKey]
         var parent = list[i][parentKey]
+        if (typeof this.depth[parent] === 'undefined') {
+          this.$set(this.depth, id, 0)
+        } else {
+          this.$set(this.depth, id, this.depth[parent] + 1)
+        }
 
         this.refIndex[id] = i
 
@@ -405,7 +425,14 @@ export default {
 
         if (this.open === 'all') {
           this.$set(this.openItems, 'id' + parent, true)
+        } else if (this.toDepth) {
+          if (this.depth[id] <= this.toDepth) {
+            this.$set(this.openItems, 'id' + parent, true)
+          } else {
+            this.$set(this.openItems, 'id' + parent, false)
+          }
         }
+
         this.$set(this.name2id, name, id)
         this.$set(this.id2name, id, name)
 
@@ -428,7 +455,7 @@ export default {
 
       this.seeds = seeds
       // open parent of selected interests (if applicable)
-      if (this.options && this.options.open) {
+      if (this.options && this.options.open === 'selected') {
         var PS = Object.keys(this.selectParent)
         for (var j = 0; j < PS.length; j++) {
           var pid = PS[j]
@@ -687,6 +714,15 @@ export default {
 
 <style>
 /*@import '/static/css/Standard.css';*/
+
+.flex-container {
+  flex-direction: row;
+  width: 100%;
+}
+.flex-item {
+  padding: 5px;
+  width: 10%;
+}
 
 .selected {
   color: blue;
