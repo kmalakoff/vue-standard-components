@@ -5,17 +5,18 @@
     b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
       br
     span(v-if="promptPosition==='top'")
-      b {{field.prompt || field.name}}: &nbsp; &nbsp;
+      b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
     span(v-else-if="Ftype==='date' && !options.prompt")
-      b {{field.prompt || field.name}}: &nbsp; &nbsp;
+      b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
     span(v-else-if="access==='read' && !options.prompt")
-      b {{field.prompt || field.name}}: &nbsp; &nbsp;
-
+      b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
     span(v-if="access==='read'")
       b {{defaultTo}}
 
     span(v-else-if="inputType")
-      b-form-input.input-lg(@change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus")
+      b-form-input.input-lg(@change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus" aria-describedby='helpfb errfb' :state='checkField')
+      <!-- br -->
+      <!-- b-form-invalid-feedback(id='errfb') Invalid input -->
 
     span(v-else-if="otherType==='checkbox'")
       b-form-checkbox.input-lg(@change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.name' value=true unchecked-value=false)
@@ -166,9 +167,17 @@ export default {
           default: return false
         }
       }
+    },
+    checkField: function () {
+      return true
     }
   },
   methods: {
+    errid (name) {
+      var id = name + '-error'
+      console.log('errid field: ' + id)
+      return id
+    },
     nullFunction () {
       console.log('null function...')
     },
@@ -189,6 +198,10 @@ export default {
       }
     },
     myBlur (evt) {
+      if (this.field.validate) {
+        console.log('Validate: ' + JSON.stringify(this.field))
+      }
+
       if (this.onBlur) {
         this.onBlur(evt, this.om)
       }
@@ -252,3 +265,9 @@ export default {
 
 }
 </script>
+<style>
+.mandatory {
+  outline: solid red 1px;
+  color: red;
+}
+</style>
