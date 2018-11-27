@@ -146,19 +146,16 @@ export default {
     },
     async register (form) {
       var fields = this.registerOptions.fields
-      console.log('fields: ' + fields.join(', '))
       var credentials = {}
       for (var i = 0; i < fields.length; i++) {
         var f = fields[i]
         credentials[f.name] = form[f.prompt] || form[f.name]
       }
 
-      console.log('confirm ? ' + this.noConfirm + ' : ' + this.testInput)
       if (this.noConfirm) {
         credentials.confirmPassword = credentials.password
       }
       console.log('Registering with credentials: ')
-      console.log('cred: ' + JSON.stringify(credentials))
       var response = await auth.signup(this, credentials)
       console.log('Register call:' + JSON.stringify(response))
       return this.initializeSession(response, 'Created Account')
