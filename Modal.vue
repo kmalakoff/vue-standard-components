@@ -177,6 +177,7 @@ export default {
       errorMsg: '',
       confirmOptions: {
         submitButton: 'I Agree',
+        buttonClass: 'btn-success',
         access: 'append'
       }
     }
