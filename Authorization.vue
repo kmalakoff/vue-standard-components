@@ -38,7 +38,7 @@ import Modal from './Modal'
 import DBForm from './DBForm'
 import DropdownMenu from './DropdownMenu'
 import auth from '../../auth'
-import Standard from './config.js'
+// import Standard from './config.js'
 import Custom from '@/config.js'
 
 export default {
@@ -62,7 +62,7 @@ export default {
       loginOptions: {
         openButton: 'Log in',
         access: 'append',
-        fields: Standard.loginFields,
+        fields: Custom.loginFields,
         onSave: this.login,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
@@ -76,7 +76,7 @@ export default {
       registerOptions: {
         openButton: 'Sign up',
         access: 'append',
-        fields: Standard.registrationFields,
+        fields: Custom.registrationFields,
         onSave: this.register,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
@@ -158,7 +158,6 @@ export default {
         credentials.confirmPassword = credentials.password
       }
       console.log('Registering with credentials: ')
-      console.log('cred: ' + JSON.stringify(credentials))
       var response = await auth.signup(this, credentials)
       console.log('Register call:' + JSON.stringify(response))
       return this.initializeSession(response, 'Created Account')
