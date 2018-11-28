@@ -177,6 +177,7 @@ export default {
       errorMsg: '',
       confirmOptions: {
         submitButton: 'I Agree',
+        buttonClass: 'btn-success',
         access: 'append'
       }
     }
@@ -545,7 +546,6 @@ export default {
     },
     async save (form) {
       if (this.options.onSave) {
-        console.log('save form: ' + JSON.stringify(form))
         var response = await this.options.onSave(form)
         if (response.data) {
           response = response.data

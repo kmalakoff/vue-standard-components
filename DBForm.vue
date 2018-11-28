@@ -21,7 +21,7 @@ Usage:
         td(v-if='options.confirmFields')
           b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
         td.prompt-column(v-if='prompt')
-          b {{label(field)}}:
+          b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{label(field)}}:
         td.data-column
           DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :debug='debug')
         td.extra-column(v-if="0 && myAccess === 'edit'")
@@ -41,6 +41,8 @@ Usage:
     button.btn(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
     span &nbsp; &nbsp;
     button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel()") {{cancelButton}}
+    br
+    p.mandatoryPrompt(v-if='disabledMessage') {{disabledMessage}}
     div(v-if='debug')
       hr
       b Form Input: {{myAccess}} : {{form}}
@@ -235,6 +237,15 @@ export default {
     },
     cancelButton: function () {
       return this.options.cancelButton || 'Cancel'
+    },
+    defaultDisabledMessage: function () {
+      if (this.options.disabledSubmitMessage) {
+        return this.disabledSubmitMessage
+      } else if (this.options.confirmFields) {
+        return 'all mandatory confirmation fields must be selected'
+      } else if (this.options.disableSubmit) {
+        return 'input requirements not met'
+      }
     }
   },
   methods: {
@@ -316,9 +327,36 @@ export default {
     },
     disabled: function (form) {
       if (this.options.disableSubmit) {
-        return this.options.disableSubmit(form)
-      } else {
-        return false
+        console.log('disable submit if applicable: ' + JSON.stringify(form))
+        var failed = false
+        var checked = 0
+        for (var i = 0; i < this.fields.length; i++) {
+          var verify = ''
+
+          if (this.options.confirmFields) {
+            verify = form.confirmed[this.fields[i].name]
+          } else if (this.options.disableSubmit) {
+            verify = form[this.fields[i].name]
+          }
+
+          if (this.fields[i].mandatory && !verify) {
+            console.log('failed on ' + this.fields[i].name)
+            failed = true
+          } else if (this.fields[i].mandatory) {
+            console.log(this.fields[i].mandatory + ' passed ' + this.fields[i].name + ' = ' + verify)
+            checked++
+          }
+        }
+
+        console.log(failed + ' failed; checked ' + checked)
+        var validated = !failed && checked
+
+        if (!validated) {
+          this.disabledMessage = this.defaultDisabledMessage
+        } else {
+          this.disabledMessage = ''
+        }
+        return !validated
       }
     },
     onCancel: function () {
@@ -360,4 +398,9 @@ export default {
   table tr td.extra-column {
     width: 10%;
   }
+
+  .mandatoryPrompt {
+    color: red;
+  }
+
 </style>
