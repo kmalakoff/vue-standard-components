@@ -1,0 +1,103 @@
+/* Define colour and border specs for Standard/Tab elements */
+
+$tab-background: transparent;
+$tab-text-colour: #666;
+$tab-separator: ''; // may benefit from standard width specs (flexbox: ?)
+
+$active-colour: black;
+$active-background: lightgray;
+
+$hover-background: silver;
+$hover-colour: black;
+
+$active-border-top: '';
+$active-border-bottom: '';
+
+$full-border-bottom: solid lightgray 2px;
+$full-border-top: solid lightgray 2px;
+
+.tabBar {
+  height: 100%;
+  width: 100%;
+  border-bottom: $full-border-bottom;
+  border-top: $full-border-top;
+}
+
+.visible-tab {
+  overflow: hidden;
+  background-color: $tab-background;
+  float: right;
+}
+
+/*
+.tabBar.flexbox-container {
+  flexbox-direction: row;
+}
+.visible-tab.flex-item {
+  width: 400px;
+  height: auto;
+}
+*/
+
+.visible-tab a {
+  float: left;
+  display: block;
+  color: $tab-text-colour;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  border-left: $tab-separator;
+  border-right: $tab-separator;
+}
+
+.visible-tab a:hover {
+  background-color: $hover-background;
+  color: $hover-colour;
+  font-weight: bold;
+}
+
+a.activetab {
+  color: $active-colour;  
+  background-color: $active-background;
+  font-weight: normal;
+  border-bottom: $active-border-bottom;
+  border-top: $active-border-top;
+}
+
+.visible-tab .icon {
+  display: none;
+}
+
+a.tabItem {
+  display: inline-block;
+}
+
+@media screen and (max-width: 767px) {
+  .visible-tab a.tabItem {display: none;}
+  .visible-tab a.icon {
+    float: right;
+    display: block;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .visible-tab.responsive {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+  }
+  .visible-tab.responsive .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 10;
+  }
+  .visible-tab.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+}
