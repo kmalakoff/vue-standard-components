@@ -1,7 +1,7 @@
 <template lang='pug'>
-  div
+  div.tabBar
     div.visible-tab#tabBar
-      a.tabItem(v-for='item in list' href='#' target='_blank' @click.prevent="onClick(item)" v-bind:class="[{active: show === item}]")
+      a.tabItem(v-for='item in list' href='#' target='_blank' @click.prevent="onClick(item)" v-bind:class="[{activetab: show === item}]")
         div(v-if="item.constructor === String")
           b.submenu {{item}}
           span &nbsp; &nbsp;
@@ -80,89 +80,4 @@ export default {
 
 <style lang="sass?outputStyle=expanded" scoped>
 
-$tab-background: transparent;
-$tab-text-colour: black;
-
-.onPage {
-  color: black;
-  font-weight: bold;
-  // background-color: grey !important;
-}
-.onPage:hover {
-  color: black;
-  // background-color: grey !important;
-}
-.offPage {
-  // background-color: grey !important;
-  color: grey;
-}
-.offPage:hover {
-  // background-color: darkgrey !important;
-  color: black;
-}
-
-.visible-tab {
-  overflow: hidden;
-  background-color: $tab-background
-}
-
-.visible-tab a {
-  float: left;
-  display: block;
-  color: $tab-text-colour;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-
-.visible-tab a:hover {
-  background-color: silver;
-  color: black;
-  font-weight: bold;
-}
-
-.active {
-  background-color: lightgrey;
-  color: black;
-  font-weight: normal;
-}
-
-.visible-tab .icon {
-  display: none;
-}
-
-a.tabItem {
-  display: inline-block;
-}
-
-@media screen and (max-width: 767px) {
-  .visible-tab a.tabItem {display: none;}
-  .visible-tab a.icon {
-    float: right;
-    display: block;
-    color: red;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  .visible-tab.responsive {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 5;
-  }
-  .visible-tab.responsive .icon {
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 10;
-  }
-  .visible-tab.responsive a {
-    float: none;
-    display: block;
-    text-align: left;
-  }
-}
 </style>
