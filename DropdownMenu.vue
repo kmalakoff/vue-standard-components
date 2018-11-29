@@ -13,7 +13,6 @@
     {label: 'Logout', onClick: 'logout'}
   ]
 -->
-
 <template lang='pug'>
   div.customMenu
     a(href='/' onclick='return false' v-on:mouseover="showMenu" v-on:mouseout="hideMenu(1)" v-on:click='toggleMenu')
@@ -23,13 +22,13 @@
         span &nbsp; {{title}} &nbsp;
     div.custom-menu(style='position: absolute')
       table.table.popup-table.input-lg(v-if="visibleMenu" v-on:mouseover="showMenu" v-on:mouseout="hideMenu(1)")
-        tr(v-for="option in options" width='100%')
-          td.option-label(width='100%')
+        tr.option-row(v-for="option, i in options" width='100%')
+          td.option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]")
+            <!-- button(v-bind:class="[{option0: i===0}, {optionN: i===options.length}]") -->
             a(href='/' onclick='return false' @click.prevent="runMethod(option)")
               span.option-label {{option.label}}
     Modal(v-if='modal' :id='modal' type='data')
       span &nbsp; &nbsp;
-
 </template>
 
 <script>
@@ -165,8 +164,44 @@ export default {
 
 <style scoped lang="sass?outputStyle=expanded">
 
+/* Colour settings */
+
+ /* match btn-primary + hover below */
+.option-cell {
+  background-color: #337ab7;
+}
+.option-cell:hover {
+  background-color: #286090;
+}
 .option-label {
-  text-align: left
+  color: white;
+}
+.customMenu a {
+  color: blue;
+}
+.customMenu a:hover {
+  color: red;
+}
+
+/* Other seeings */
+
+.custom-menu {
+  right: 10px;
+}
+.option-cell {
+  width: 100%;
+  text-align: left;
+  padding:10px;
+}
+.firstOption {
+  border-bottom: 1px solid black;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+.lastOption {
+  border-top: 1px solid black;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 
 .menu-title {
@@ -175,12 +210,10 @@ export default {
 
 .customMenu {
   text-align: right;
+
 }
-.customMenu a {
-  color: grey;
-}
+
 .customMenu a:hover {
-  color: black;
   font-weight: normal;
   text-decoration: none;
 }
@@ -190,12 +223,15 @@ export default {
   z-index: 2;
 }
 
+.menu-option {
+
+}
+
  .popup-table {
     position: right;
     right: 0;
     top: 60px;
     margin: 0px;
-    background-color: #ddd;
   }
   .popup-table tr {
     /*padding: 5px;*/
@@ -203,7 +239,6 @@ export default {
   .popup-table tr td {
     /*padding: 0px;*/
     /*padding-left: 15px;*/
-    border: 1px solid black;
   }
 
   .popup-table a{
