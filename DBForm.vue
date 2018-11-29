@@ -42,7 +42,7 @@ Usage:
     span &nbsp; &nbsp;
     button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel()") {{cancelButton}}
     br
-    p.mandatoryPrompt(v-if='disabledMessage') {{disabledMessage}}
+    p.mandatoryPrompt(v-if='error') {{error}}
     div(v-if='debug')
       hr
       b Form Input: {{myAccess}} : {{form}}
@@ -61,7 +61,8 @@ export default {
       url: config.apiURL,
       DBfields: [],
       form: {},
-      idfield: { name: 'id', type: 'fixed' }
+      idfield: { name: 'id', type: 'fixed' },
+      error: ''
     }
   },
   components: {
@@ -352,9 +353,9 @@ export default {
         var validated = !failed && checked
 
         if (!validated) {
-          this.disabledMessage = this.defaultDisabledMessage
+          this.error = this.defaultDisabledMessage
         } else {
-          this.disabledMessage = ''
+          this.error = ''
         }
         return !validated
       }
