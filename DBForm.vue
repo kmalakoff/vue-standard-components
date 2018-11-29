@@ -20,7 +20,7 @@ Usage:
       tr(v-for="field in fields" v-show="field.type!=='hidden'")
         td(v-if='options.confirmFields')
           b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
-        td.prompt-column(v-if='prompt')
+        td.prompt-column(v-if="prompt || myAccess==='read'")
           b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{label(field)}}:
         td.data-column
           DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :debug='debug')
@@ -30,17 +30,16 @@ Usage:
             icon(name='question-circle' color='black' scale='2')
           b &nbsp;
       tr(v-for="r in include.visible")
-        td.prompt-column(v-if='prompt')
+        td.prompt-column(v-if="prompt || myAccess==='read'")
           b {{label(r)}}:
         td.data-column
           DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :debug='debug')
     span(v-for='r in include.hidden')
       DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
-
     hr
-    button.btn(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
+    button.btn.btn-primary.btn-lg(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
     span &nbsp; &nbsp;
-    button.btn.btn-danger(v-if="onCancel" @click.prevent="onCancel()") {{cancelButton}}
+    button.btn.btn-danger.btn-lg(v-if="onCancel" @click.prevent="onCancel()") {{cancelButton}}
     br
     p.mandatoryPrompt(v-if='error') {{error}}
     div(v-if='debug')
@@ -387,7 +386,8 @@ export default {
 
   table tr td.prompt-column {
     text-align: right;
-    width: 10%;
+    width: 30%;
+    padding: 10px;
   }
   table tr td.heading {
     // background-color: #ccc;
