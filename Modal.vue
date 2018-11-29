@@ -547,7 +547,7 @@ export default {
     async save (form) {
       if (this.options.onSave) {
         var response = await this.options.onSave(form)
-        if (response.data) {
+        if (response && response.data) {
           response = response.data
         }
         console.log('Modal Save Response: ' + JSON.stringify(response))
