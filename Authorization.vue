@@ -39,7 +39,7 @@ import DBForm from './DBForm'
 import DropdownMenu from './DropdownMenu'
 import auth from '../../auth'
 // import Standard from './config.js'
-import Custom from '@/config.js'
+import Config from '@/config.js'
 
 export default {
   data () {
@@ -62,31 +62,31 @@ export default {
       loginOptions: {
         openButton: 'Log in',
         access: 'append',
-        fields: Custom.loginFields,
+        fields: Config.loginFields,
         onSave: this.login,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
         submitButton: 'Log Me In',
         wideOnMobile: true,
         onCancel: this.cancel,
-        buttonClass: Custom.defaultButtonClass,
+        buttonClass: Config.defaultButtonClass,
         submitButtonClass: 'btn-success'
       },
 
       registerOptions: {
         openButton: 'Sign up',
         access: 'append',
-        fields: Custom.registrationFields,
+        fields: Config.registrationFields,
         onSave: this.register,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
         submitButton: 'Register',
         wideOnMobile: true,
         onCancel: this.cancel,
-        buttonClass: Custom.defaultButtonClass,
+        buttonClass: Config.defaultButtonClass,
         submitButtonClass: 'btn-success'
       },
-      apiUrl: Custom.apiURL,
+      apiUrl: Config.apiURL,
       status: 'initialized'
     }
   },
@@ -167,35 +167,46 @@ export default {
       }
       console.log('login ' + form.email)
       var response = await auth.login(this, credentials)
-      // console.log('Login response:' + JSON.stringify(response))
+        .catch(function (error) {
+          var msg = '' + error
+          console.log(msg)
+          return {error: msg}
+        })
+      console.log('Login response:' + JSON.stringify(response))
 
       return this.initializeSession(response)
     },
     initializeSession (response, onSuccess) {
       // console.log('initialize session for ' + response)
       this.$store.dispatch('AUTH_LOGOUT') // clear any existing user sessions first
-      if (response.data && response.data.success) {
-        if (onSuccess) {
-          this.$store.dispatch('logMessage', onSuccess)
-        }
+      if (response.error) {
+        this.$store.dispatch('logError', response.error)
+      } else if (response.data) {
+        if (response.data && response.data.success) {
+          if (onSuccess) {
+            this.$store.dispatch('logMessage', onSuccess)
+          }
 
-        if (response.data.token) {
-          // console.log('token: ' + response.data.token)
-          this.$store.dispatch('AUTH_TOKEN', response.data.token)
+          if (response.data.token) {
+            // console.log('token: ' + response.data.token)
+            this.$store.dispatch('AUTH_TOKEN', response.data.token)
+          }
+          if (response.data.payload) {
+            console.log('payload: ' + JSON.stringify(response.data.payload))
+            this.$store.dispatch('AUTH_PAYLOAD', response.data.payload)
+          }
+          return { success: true }
+        } else if (response.data && response.data.error) {
+          console.log('log error: ' + response.data.error)
+          this.authError = response.data.error
+          // this.$store.dispatch('logError', response.data.error)
+          return { error: response.data.error }
+        } else {
+          this.$store.dispatch('logWarning', 'unrecognized data response')
+          return 'no recognized response...'
         }
-        if (response.data.payload) {
-          console.log('payload: ' + JSON.stringify(response.data.payload))
-          this.$store.dispatch('AUTH_PAYLOAD', response.data.payload)
-        }
-        return { success: true }
-      } else if (response.data && response.data.error) {
-        console.log('log error: ' + response.data.error)
-        this.authError = response.data.error
-        // this.$store.dispatch('logError', response.data.error)
-        return { error: response.data.error }
       } else {
-        this.$store.dispatch('logWarning', 'unrecognized response')
-        return 'no recognized response...'
+        this.$store.dispatch('logWarning', 'unrecognized respose')
       }
     },
     loadDemo (template) {
