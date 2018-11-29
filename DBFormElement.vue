@@ -4,15 +4,19 @@
   div
     b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
       br
-    span(v-if="promptPosition==='top'")
+    span(v-if="promptPosition==='top' && access !=='read'")
+      <!-- b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
+      br
+    span(v-else-if="Ftype==='date' && !options.prompt && access !=='read'")
       b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
-    span(v-else-if="Ftype==='date' && !options.prompt")
-      b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
-    span(v-else-if="access==='read' && !options.prompt")
-      b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
-    span(v-if="access==='read'")
-      b {{defaultTo}}
+      br
+    <!-- span(v-else-if="access==='read' && !options.prompt") -->
+      <!-- b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
+      <!-- br -->
 
+    span(v-if="access==='read'")
+      b.fieldValue(v-if="otherType==='date'") {{defaultTo.substring(0,10)}}
+      b.fieldValue(v-else) {{defaultTo}}
     span(v-else-if="inputType")
       b-form-input.input-lg(@change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus" aria-describedby='helpfb errfb' :state='checkField')
       <!-- br -->
@@ -269,5 +273,11 @@ export default {
 .mandatory {
   outline: solid red 1px;
   color: red;
+}
+.prompt {
+
+}
+.fieldValue {
+  color: blue;
 }
 </style>
