@@ -17,9 +17,9 @@
           button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
           span &nbsp; &nbsp;
       span.wideScreen
-        Modal.login-modal(type='record' id='login-modal' :title='loginTitle' :options='loginOptions' :note='note')
+        Modal.login-modal(type='record' id='login-modal' :error='authError' :title='loginTitle' :options='loginOptions' :note='note')
         span &nbsp; &nbsp;
-        Modal.signup-modal(type='record' id='register-modal' :title='regTitle' :options='registerOptions' :note='note')
+        Modal.signup-modal(type='record' id='register-modal' :error='authError' :title='regTitle' :options='registerOptions' :note='note')
           p &nbsp;
       span.smallScreen
         div(v-if='!activeForm')
@@ -70,7 +70,7 @@ export default {
         wideOnMobile: true,
         onCancel: this.cancel,
         buttonClass: Config.defaultButtonClass,
-        submitButtonClass: 'btn-success'
+        submitButtonClass: 'btn-primary btn-lg'
       },
 
       registerOptions: {
@@ -84,7 +84,7 @@ export default {
         wideOnMobile: true,
         onCancel: this.cancel,
         buttonClass: Config.defaultButtonClass,
-        submitButtonClass: 'btn-success'
+        submitButtonClass: 'btn-primary btn-lg'
       },
       apiUrl: Config.apiURL,
       status: 'initialized'
@@ -126,18 +126,10 @@ export default {
       }
     },
     loginTitle: function () {
-      if (this.authError) {
-        return this.authError
-      } else {
-        return 'Login'
-      }
+      return 'Login'
     },
     regTitle: function () {
-      if (this.authError) {
-        return this.authError
-      } else {
-        return 'Register'
-      }
+      return 'Register'
     }
   },
   methods: {

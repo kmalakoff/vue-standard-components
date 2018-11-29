@@ -55,13 +55,13 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
   span
     span.modal-anchor
     span(v-if='openButton')
-      button.open-button.btn.btn-primary(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
+      button.open-button.btn.btn-primary.btn-lg(v-on:click="openModal()" :class='btnClass')
         span(v-html='openButton')
     span(v-else-if='openText')
       a.modal-link(href='#' onclick='return false' v-on:click="openModal()")
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
-      button.btn.btn-primary(v-on:click="openModal()" v-bind:class="[{wideButton: wideOnMobile}]")
+      button.btn.btn-primary(v-on:click="openModal()" v-bind:class="[{btnClass: wideOnMobile}]")
         icon(:name='openIcon')
     span(:class='initClass' :id="id")
       transition(name="modal")
@@ -72,22 +72,21 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                 slot(name="header")
                   h2.heading(v-if='myheader') {{myheader}} &nbsp; &nbsp;
                     span.navbar-right
-                      button.btn.btn-danger.btn-xs(@click="closeModal")
+                      button.btn.btn-danger.btn-lg(@click="closeModal")
                         icon(name='times')
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
                   span.navbar-right(v-if='!myheader')
-                    button.btn.btn-danger.btn-xs(@click="closeModal")
+                    button.btn.btn-danger.btn-lg(@click="closeModal")
                       icon(name='times')
                   h2.title(v-if='modalTitle') {{modalTitle}}
-
                   div(v-if="modalType==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="modalType==='record'")
                     DBForm(:options='options' :onSave='save' :append='append' :record='modalRecord')
                     div(v-if='options.addLinks' v-for='link in options.addLinks')
-                      button.btn.btn-default(@click.prevent="link.onPick(modalData)") {{link.name}}
+                      button.btn.btn-primary(@click.prevent="link.onPick(modalData)") {{link.name}}
                   div(v-else-if="modalType==='data'")
                     div(v-if="modalData && modalData.length")
                       DataGrid(:data="modalData" :options="data_options")
@@ -117,13 +116,13 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     b no valid type supplied.  Options: (search, record, data, raw, html, url, ....
                     hr
                   p &nbsp;
-                  b.error-msg(v-if='errorMsg') {{errorMsg}}
+                  b.error-msg(v-if='foundError') {{foundError}}
               Messaging
               div.my-modal-footer
                 slot(name="footer")
                   b {{footer}} &nbsp;
                   span.navbar-right
-                    button.btn.btn-danger.btn-xs(@click="closeModal") {{closeButton}}
+                    button.btn.btn-danger.btn-lg(@click="closeModal") {{closeButton}}
 </template>
 
 <script>
@@ -177,7 +176,7 @@ export default {
       errorMsg: '',
       confirmOptions: {
         submitButton: 'I Agree',
-        buttonClass: 'btn-success',
+        buttonClass: 'btn-primary',
         access: 'append'
       }
     }
@@ -249,6 +248,9 @@ export default {
     // },
     prompt: {
       // use for 'confirmation' and 'input' types
+      type: String
+    },
+    error: {
       type: String
     },
     confirm: {
@@ -420,10 +422,11 @@ export default {
       } else { return '' }
     },
     btnClass: function () {
+      console.log('got button ' + this.options.buttonClass)
       if (this.options.buttonClass) {
         return this.options.buttonClass
       } else {
-        return 'btn-lg btn-info'
+        return 'btn-lg btn-primary'
       }
     },
     openText: function () {
@@ -496,6 +499,9 @@ export default {
       } else if (this.body) {
         return this.body
       } else { return null }
+    },
+    foundError: function () {
+      return this.error || this.errorMsg || ''
     }
   },
   asyncComputed: {
