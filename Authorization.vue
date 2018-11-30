@@ -11,7 +11,7 @@
       <!-- a(href='#' @click.prevent='logout') -->
         <!-- b Log Out -->
       Modal.user-modal(id='profile' type='data')
-    div(v-else)
+    div(v-else-if="nav.path.length <= 1")
       span(v-if='demo')
         span(v-for='i, user in demo')
           button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
@@ -22,16 +22,22 @@
         Modal.signup-modal(type='record' id='register-modal' :error='authError' :title='regTitle' :options='registerOptions' :note='note')
           p &nbsp;
       span.smallScreen
-        div(v-if='!activeForm')
-          button.login-button.btn.btn-primary.btn-lg(v-on:click="activeForm = 'Login'") Login
+        div
+          button.login-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Login')") Login
           br
-          button.signup-button.btn.btn-primary.btn-lg(v-on:click="activeForm = 'Register'") Register
-        div(v-else)
-          DBForm.login-form(:options='loginOptions' :onSave='login' v-if="activeForm === 'Login'")
-          hr
-          DBForm.signup-form(:options='registerOptions' :onSave='register' v-if="activeForm === 'Register'")
+          button.signup-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Register')") Register
+    div(v-else)
+      span.smallScreen
+        div(v-if="nav.page==='Login'")
+          DBForm.login-form(:options='loginOptions' :onSave='login')
+        div(v-else-if="nav.page==='Register'")
+          DBForm.signup-form(:options='registerOptions' :onSave='register')
+        p &nbsp;
         p.error(v-if='authError') {{authError}}
-
+    span.wideScreen(v-for='page, i in nav.path')
+      br
+      a(v-on:click='nav.direct(i)') {{page}}
+        span(v-if='i < nav.path.length') &nbsp; > &nbsp;
 </template>
 <script>
 import Modal from './Modal'
@@ -46,7 +52,6 @@ export default {
     return {
       // We need to initialize the component with any
       // properties that will be used in it
-      activeForm: '',
       credentials: {
         username: '',
         password: ''
@@ -56,6 +61,7 @@ export default {
       note: 'asldfj',
 
       userMenu: [
+        // may supply custom versions in place of this ...
         { label: 'Profile', loadModal: {data: this.getUser, title: 'User Profile', id: 'profile'} },
         { label: 'Logout', onClick: this.logout }
       ],
@@ -99,6 +105,9 @@ export default {
     payload: {
       type: Object
     },
+    nav: {
+      type: Object
+    },
     onPick: { type: Function },
     demo: {
       type: Object,
@@ -108,16 +117,40 @@ export default {
       type: Boolean,
       default: false
     },
+    add2Menu: {
+      type: Array,
+      default () { return [] }
+    },
     testInput: {
       type: Boolean,
       default: false
     }
+  },
+  created: function () {
+    this.$set(this, 'userMenu', this.myUserMenu)
   },
   computed: {
     // payload: function () {
     //   var P = localStorage.getItem('payload')
     //   return P
     // },
+    myUserMenu: function () {
+      if (this.add2Menu) {
+        console.log('add2menu...')
+        var menu = []
+        menu.push(this.userMenu[0])
+        for (var i = 0; i < this.add2Menu.length; i++) {
+          menu.push(this.add2Menu[i])
+          console.log('add + ' + JSON.stringify(this.add2Menu[i]))
+        }
+        menu.push(this.userMenu[1])
+        console.log('got ' + JSON.stringify(menu))
+        return menu
+      } else {
+        console.log('default menu')
+        return this.userMenu
+      }
+    },
     userid: function () {
       if (this.payload && this.payload.userid) {
         return this.payload.userid
@@ -211,29 +244,31 @@ export default {
       }
     },
     logout () {
+      this.nav.goto('Home')
       this.$store.dispatch('AUTH_LOGOUT')
     },
     getUser () {
-      console.log('get user...')
+      this.nav.goto('Home', 'Profile')
+      // console.log('get user...')
 
-      var payload = this.payload || this.$store.getters.payload
-      var show = Object.keys(this.payload)
-      var D = []
-      if (payload.constructor === Object) {
-        for (var i = 0; i < show.length; i++) {
-          if (payload[show[i]]) {
-            console.log('show ' + show[i])
-            D.push({attribute: show[i], value: payload[show[i]]})
-          } else {
-            console.log('no ' + show[i])
-          }
-        }
-        console.log('user data: ' + JSON.stringify(D))
-        return D
-      } else {
-        console.log('expected payload object... found ' + payload.constructor)
-        return D
-      }
+      // var payload = this.payload || this.$store.getters.payload
+      // var show = Object.keys(this.payload)
+      // var D = []
+      // if (payload.constructor === Object) {
+      //   for (var i = 0; i < show.length; i++) {
+      //     if (payload[show[i]]) {
+      //       console.log('show ' + show[i])
+      //       D.push({attribute: show[i], value: payload[show[i]]})
+      //     } else {
+      //       console.log('no ' + show[i])
+      //     }
+      //   }
+      //   console.log('user data: ' + JSON.stringify(D))
+      //   return D
+      // } else {
+      //   console.log('expected payload object... found ' + payload.constructor)
+      //   return D
+      // }
     },
     makeAuth (e) {
       // auth logic
@@ -262,8 +297,8 @@ export default {
     },
     cancel () {
       console.log('cancel this form')
+      this.nav.page('Home')
       this.authError = ''
-      this.activeForm = ''
     }
   }
   // watch: {
@@ -319,7 +354,7 @@ export default {
   }
   .login-form, .signup-form {
     width: 100%;
-    padding-top: 30%;
+    padding-top: 10%;
   }
   .smallScreen {
     display: block
