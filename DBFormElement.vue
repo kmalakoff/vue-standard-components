@@ -1,15 +1,12 @@
 <!-- src/components/Form.vue -->
 
 <template lang='pug'>
-  div
+  div.form-element(role='group')
     b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
       br
-    span(v-if="promptPosition==='top' && access !=='read'")
+    label.element-label(:for='field.name' v-if="promptPosition==='top'" v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}:
       <!-- b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
-      br
-    span(v-else-if="Ftype==='date' && !options.prompt && access !=='read'")
-      b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
-      br
+    label.element-label(:for='field.name' v-else-if="Ftype==='date' && !options.prompt" v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
     <!-- span(v-else-if="access==='read' && !options.prompt") -->
       <!-- b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
       <!-- br -->
@@ -17,39 +14,30 @@
     span(v-if="access==='read'")
       b.fieldValue(v-if="otherType==='date'") {{defaultTo.substring(0,10)}}
       b.fieldValue(v-else) {{defaultTo}}
-    span(v-else-if="inputType")
-      b-form-input.input-lg(@change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus" aria-describedby='helpfb errfb' :state='checkField')
+    b-form-input.input-lg(:id='field.name' v-else-if="inputType" @change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus" aria-describedby='helpfb errfb' :state='checkField')
       <!-- br -->
       <!-- b-form-invalid-feedback(id='errfb') Invalid input -->
 
-    span(v-else-if="otherType==='checkbox'")
-      b-form-checkbox.input-lg(@change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.name' value=true unchecked-value=false)
+    b-form-checkbox.input-lg(:id='field.name' v-else-if="otherType==='checkbox'" @change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.name' value=true unchecked-value=false)
         span &nbsp; &nbsp; {{field.prompt || field.name}}
 
-    span(v-else-if="otherType==='radio'")
-      b-form-radio-group(@change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.prompt' :options='field.options')
+    b-form-radio-group(:id='field.name' v-else-if="otherType==='radio'" @change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.prompt' :options='field.options')
 
-    span(v-else-if="otherType==='date'")
       <!-- b-form-input.input-lg(@change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus") -->
-      b-form-input.input-lg(@change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus" :v-model='vModel')
-    span(v-else-if="otherType==='enum'")
-      <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
-      b-form-select.input-lg(@change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
+    b-form-input.input-lg.date-type(:id='field.name' v-else-if="otherType==='date'" @change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus" :v-model='vModel')
+    <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
 
-    span(v-else-if="otherType==='decimal'")
-      b-form-input.input-lg(type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+    b-form-select.input-lg(:id='field.name' v-else-if="otherType==='enum'" @change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
 
-    span(v-else-if="otherType==='fixed'")
-      b-form-input.input-lg(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+    b-form-input.input-lg(:id='field.name' v-else-if="otherType==='decimal'" type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
 
-    span(v-else-if="otherType==='reference'")
-      b-form-input(type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+    b-form-input.input-lg(:id='field.name' v-else-if="otherType==='fixed'" type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
 
-    span(v-else-if="otherType==='hidden'")
-      b-form-input(v-show=0 type='text' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+    b-form-input(:id='field.name' v-else-if="otherType==='reference'" type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
 
-    // span(v-else-if="otherType==='password'")
-    //   b-form-input.input-lg(@change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
+    b-form-input(:id='field.name' v-else-if="otherType==='hidden'" v-show=0 type='text' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+
+    //   b-form-input.input-lg(:id='field.name' v-else-if="otherType==='password'" @change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
 
     span(v-else)
       b {{Ftype}} ?: {{otherType}} : {{field}}
@@ -84,14 +72,13 @@ export default {
     form: { type: Object },
     access: { type: String },
     record: { type: Object },
-    options: { type: Object },
+    options: {
+      type: Object,
+      default () { return {} }
+    },
     defaultPrompt: {
       type: String,
       default: '-- select --'
-    },
-    promptPosition: {
-      type: String,
-      default: null
     },
     debug: {
       type: Boolean,
@@ -112,6 +99,7 @@ export default {
     label: function () { return this.field.placeholder || this.placeholder },
     name: function () { return this.field.name },
     mval: function (model) { return this[model] },
+    promptPosition: function () { return this.options.promptPosition || 'top' },
     defaultTo: function () {
       if (this.record && this.record[this.field.name]) {
         return this.record[this.field.name]
@@ -270,9 +258,19 @@ export default {
 }
 </script>
 <style>
+.form-element {
+  text-align: left;
+}
+.element-label {
+  font-size: initial;
+}
 .mandatory {
   outline: solid red 1px;
   color: red;
+}
+.dateType {
+  line-height: inherit;
+  /* fixes size for some reason (?) */
 }
 .prompt {
 
