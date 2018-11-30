@@ -23,20 +23,25 @@
 
 <template lang='pug'>
   div(v-if='errorCount || warningCount || messageCount')
+    div
+      p &nbsp;
     div.msg-errors(v-if='errorCount')
-      div.navbar-right
-        button(@click.prevent="clear") x
+      div.right
+        button.btn.btn-danger(@click.prevent="clear")
+          icon(name='times')
       div
         div(v-for='err in errors' align='center')
           b(v-if='err') {{err}}
     div.msg-warnings(v-if='warningCount')
       div.navbar-right
-        button(@click.prevent="clear") x
+        button.btn.btn-danger(@click.prevent="clear")
+          icon(name='times' color='red')
       div(v-for='warn in warnings' align='center')
         b(v-if='warn') {{warn}}
     div.msg-messages(v-if='messageCount')
       div.navbar-right
-        button(@click.prevent="clear") x
+        button.btn.btn-danger(@click.prevent="clear")
+          icon(-name='times', color='red')
       div(v-for='msg in messages' align='center')
         b(v-if='msg') {{msg}}
 </template>
@@ -169,17 +174,23 @@ export default {
     // background-color: lightgrey;
     color: black;
   }
+
   .msg-errors, .msg-warnings, .msg-messages {
     padding: 2rem;
     margin: 10px;
     font-size: 2rem;
     align: center;
+    color: red;
   }
 
-  div.msg-errors {
-    background-color: pink;
-    line-height: 2rem;
+  @media screen and (min-width: 768px) {
+    div.msg-errors {
+      background-color: pink;
+      line-height: 2rem;
+      color: black;
+    }
   }
+
   div.msg-warnings {
     background-color: orange;
   }
