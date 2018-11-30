@@ -14,13 +14,13 @@ Usage:
       p Fields: {{fields}}
       hr
     table.table.form-table
-      tr(v-if='heading')
+      tr.row-heading(v-if='heading')
         td.heading(colspan=3)
           h2 {{heading}}
       tr(v-for="field in fields" v-show="field.type!=='hidden'")
         td(v-if='options.confirmFields')
           b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
-        td.prompt-column(v-if="prompt || myAccess==='read'")
+        td.prompt-column(v-if="promptPosition==='left'")
           b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{label(field)}}:
         td.data-column
           DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :debug='debug')
@@ -235,6 +235,9 @@ export default {
         return false
       }
     },
+    promptPosition: function () {
+      return this.options.promptPosition || 'top'
+    },
     cancelButton: function () {
       return this.options.cancelButton || 'Cancel'
     },
@@ -252,6 +255,8 @@ export default {
     label (field) {
       // console.log('load label for ' + JSON.stringify(field))
       if (!field) {
+        return ''
+      } else if (this.promptPosition === 'top') {
         return ''
       } else if (field.prompt) {
         return field.prompt
@@ -375,13 +380,16 @@ export default {
   .table-form {
     width: 95%;
   }
-
   .form-table {
     bacground-color: red;
   }
 
   table tr td {
     padding: 5px;
+  }
+
+  .row-heading {
+    float: left;
   }
 
   table tr td.prompt-column {
