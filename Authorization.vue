@@ -34,10 +34,12 @@
           DBForm.signup-form(:options='registerOptions' :onSave='register')
         p &nbsp;
         p.error(v-if='authError') {{authError}}
-    span.wideScreen(v-for='page, i in nav.path')
-      br
-      a(v-on:click='nav.direct(i)') {{page}}
-        span(v-if='i < nav.path.length') &nbsp; > &nbsp;
+
+    span.wideScreen(v-if="nav.path.length > 1")
+      div(style='display:inline-block' v-for='page, i in nav.path')
+        br
+        a(v-on:click='nav.direct(i)') {{page}}
+          span(v-if='i < nav.path.length') &nbsp; > &nbsp;
 </template>
 <script>
 import Modal from './Modal'
@@ -297,7 +299,7 @@ export default {
     },
     cancel () {
       console.log('cancel this form')
-      this.nav.page('Home')
+      this.nav.goto('Home')
       this.authError = ''
     }
   }
