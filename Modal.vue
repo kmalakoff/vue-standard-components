@@ -81,10 +81,11 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     button.btn.btn-danger.btn.close-button.right(@click="closeModal")
                       icon(name='times')
                     p &nbsp;
+                  h4(v-if='myPrompt') {{myPrompt}}
                   div(v-if="modalType==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="modalType==='record'")
-                    DBForm(:options='options' :onSave='save' :append='append' :record='modalRecord')
+                    DBForm(:options='options' :onSave='save' :append='append' :record='modalRecord' :cancel='cancel')
                     div(v-if='options.addLinks' v-for='link in options.addLinks')
                       button.btn.btn-primary(@click.prevent="link.onPick(modalData)") {{link.name}}
                   div(v-else-if="modalType==='data'")
@@ -98,8 +99,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     div(v-else)
                       b No Content Supplied
                   div(v-else-if="modalType==='confirm'")
-                    h4(v-if='myPrompt') {{myPrompt}}
-                    DBForm(:options='confirmOptions', :onSave='save')
+                    DBForm(:options='confirmOptions', :onSave='save' :cancel='cancel')
                   div(v-else-if="modalType==='input'")
                     b(v-if='myPrompt') &nbsp; &nbsp; {{myPrompt}}
                     input.input-lg(type='text' name='input' v-model='input' v-on:click='save')
@@ -301,7 +301,7 @@ export default {
     }
 
     // if (this.options.onCancel || this.options.cancelButton) {
-    this.options.cancelForm = this.cancel
+    // this.options.cancelForm = this.cancel
     // }
   },
   computed: {
@@ -461,7 +461,7 @@ export default {
       } else if (this.options && this.options.prompt) {
         return this.options.prompt
       } else {
-        return 'Okay ?'
+        return ''
       }
     },
     // links: function () {
@@ -580,7 +580,6 @@ export default {
         this.options.onCancel()
       }
     }
-
   },
   watch: {
     toggle: function () {
