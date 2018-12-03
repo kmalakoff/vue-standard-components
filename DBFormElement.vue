@@ -4,7 +4,7 @@
   div.form-element(role='group')
     b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
       br
-    label.element-label(v-if="promptPosition==='top'" :for='field.name' :class="dynamicClass(field, 'label')") {{field.prompt || field.name}}:
+    label.element-label(v-if="promptPosition==='top' && otherType !=='checkbox'" :for='field.name' :class="dynamicClass(field, 'label')") {{field.prompt || field.name}}:
       <!-- b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
     label.element-label(v-else-if="Ftype==='date' && !options.prompt" :for='field.name' ) {{field.prompt || field.name}}: &nbsp; &nbsp;
     <!-- span(v-else-if="access==='read' && !options.prompt") -->
@@ -62,7 +62,8 @@ export default {
       vm: this.field.default,
       om: this.vModel,
       test: '',
-      bd: '1999-02-04'
+      bd: '1999-02-04',
+      formChanged: false
     }
   },
   props: {
@@ -167,7 +168,7 @@ export default {
       return true
     },
     disabled: function () {
-      if (this.remoteError) {
+      if (this.remoteError && !this.formChanged) {
         return false
       } else if (this.access === 'read') {
         return true
@@ -203,7 +204,7 @@ export default {
       if (this.onBlur) {
         this.onBlur(evt, this.om)
       }
-      this.remoteError = '' // clear remote errors
+      this.formChanged = true
     },
     myBlur (evt) {
       if (this.field.validate) {
@@ -269,7 +270,7 @@ export default {
       // return this[name].length > 2
     },
     dynamicClass: function (field, type) {
-      if (this.remoteError) {
+      if (this.remoteError && !this.formChanged) {
         if (type === 'label') {
           return 'mandatoryPrompt'
         } else {
