@@ -99,8 +99,12 @@ export default {
       if (this.waitingToClose) { this.showAfterWait = true }
     },
     toggleMenu (force) {
+      console.log('turn off menu : keep on ? ' + this.keepOn)
       this.waitingToClose = false
-      if (this.keepOn) {
+      if (force) {
+        this.visibleMenu = false
+        this.keepOn = false
+      } else if (this.keepOn) {
         this.visibleMenu = false
         this.keepOn = false
       } else {
@@ -129,6 +133,7 @@ export default {
       }
     },
     runMethod (opt) {
+      console.log('run method...')
       if (opt && opt.onClick) {
         opt.onClick(opt)
       }
@@ -157,6 +162,8 @@ export default {
           this.$store.dispatch('toggleModal', id)
         }
       }
+      console.log('force toggle menu off...')
+      this.toggleMenu(1)
     }
   }
 }
@@ -168,6 +175,7 @@ export default {
 
  /* match btn-primary + hover below */
 .option-cell {
+  // match btn-primary
   background-color: #337ab7;
 }
 .option-cell:hover {
