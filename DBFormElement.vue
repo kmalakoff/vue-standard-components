@@ -1,43 +1,32 @@
 <!-- src/components/Form.vue -->
 
-<template lang='pug'>
+<template lang= 'pug'>
   div.form-element(role='group')
-    b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
+    b(v-if= 'debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
       br
-    label.element-label(v-if="promptPosition==='top' && otherType !=='checkbox'" :for='field.name' :class="dynamicClass(field, 'label')") {{field.prompt || field.name}}:
-      <!-- b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
-    label.element-label(v-else-if="Ftype==='date' && !options.prompt" :for='field.name' ) {{field.prompt || field.name}}: &nbsp; &nbsp;
-    <!-- span(v-else-if="access==='read' && !options.prompt") -->
-      <!-- b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
-      <!-- br -->
+    label.element-label(v-if="promptPosition=== 'top' && otherType !== 'checkbox'" :for= 'field.name' :class="dynamicClass(field, 'label')") {{field.prompt || field.name}}:
+    label.element-label(v-else-if="Ftype=== 'date' && !options.prompt" :for= 'field.name' ) {{field.prompt || field.name}}: &nbsp; &nbsp;
 
-    <!-- span(v-if="access==='read'") -->
-      <!-- b.fieldValue(v-if="otherType==='date' && defaultTo") {{defaultTo.substring(0,10)}} -->
-      <!-- b.fieldValue(v-else) {{defaultTo}} -->
-    b-form-input.input-lg(:id='field.name' v-if="inputType" @change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus" aria-describedby='helpfb errfb' :state='checkField' :class="dynamicClass(field)" :disabled='disabled')
-      <!-- br -->
-      <!-- b-form-invalid-feedback(id='errfb') Invalid input -->
+    b-form-input.input-lg(:id= 'field.name' v-if="inputType" @change.native="myChange" :type= 'inputType' :v-model= 'field.name' :placeholder="label" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native="myFocus" aria-describedby= 'helpfb errfb' :state='checkField(field)' :class="dynamicClass(field)" :disabled= 'disabled')
 
-    b-form-checkbox.input-lg(:id='field.name' v-else-if="otherType==='checkbox'" @change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.name' value=true unchecked-value=false :class="dynamicClass(field)" :disabled='disabled')
+    b-form-checkbox.input-lg(:id= 'field.name' v-else-if="otherType=== 'checkbox'" @change.native="myChange" :v-model= 'vModel' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :label= 'field.name' value=true unchecked-value=false :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
         span &nbsp; &nbsp; {{field.prompt || field.name}}
 
-    b-form-radio-group(:id='field.name' v-else-if="otherType==='radio'" @change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.prompt' :options='field.options' :class="dynamicClass(field)" :disabled='disabled')
+    b-form-radio-group(:id= 'field.name' v-else-if="otherType=== 'radio'" @change.native="myChange" :v-model= 'vModel' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :label= 'field.prompt' :options= 'field.options' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-      <!-- b-form-input.input-lg(@change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus") -->
-    b-form-input.input-lg.date-type(:id='field.name' v-else-if="otherType==='date'" @change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus" :v-model='vModel' :class="dynamicClass(field)" :disabled='disabled')
-    <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
+    b-form-input.input-lg.date-type(:id= 'field.name' v-else-if="otherType=== 'date'" @change.native="myChange" type= 'date' :placeholder="datePlaceholder" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :v-model= 'vModel' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-select.input-lg(:id='field.name' v-else-if="otherType==='enum'" @change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus" :class="dynamicClass(field)" :disabled='disabled')
+    b-form-select.input-lg(:id= 'field.name' v-else-if="otherType=== 'enum'" @change.native="myChange" :options="list(field)" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-input.input-lg(:id='field.name' v-else-if="otherType==='decimal'" type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :class="dynamicClass(field)" :disabled='disabled')
+    b-form-input.input-lg(:id= 'field.name' v-else-if="otherType=== 'decimal'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state="isNumber(field)" :disabled= 'disabled')
 
-    b-form-input.input-lg(:id='field.name' v-else-if="otherType==='fixed'" type='text' @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :class="dynamicClass(field)" :disabled='disabled')
+    b-form-input.input-lg(:id= 'field.name' v-else-if="otherType=== 'fixed'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-input(:id='field.name' v-else-if="otherType==='reference'" type='text' @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :class="dynamicClass(field)" :disabled='disabled')
+    b-form-input(:id= 'field.name' v-else-if="otherType=== 'reference'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-input(:id='field.name' v-else-if="otherType==='hidden'" v-show=0 type='text' v-model="vModel" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :class="dynamicClass(field)" :disabled='disabled')
+    b-form-input(:id= 'field.name' v-else-if="otherType=== 'hidden'" v-show=0 type= 'text' v-model="vModel" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    //   b-form-input.input-lg(:id='field.name' v-else-if="otherType==='password'" @change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus' :class="dynamicClass(field)" :disabled='disabled')
+    //   b-form-input.input-lg(:id= 'field.name' v-else-if="otherType=== 'password'" @change.native="myChange" type= 'password' :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent= 'onBlur' @click.prevent= 'onFocus' :class="dynamicClass(field)" :disabled= 'disabled')
 
     span(v-else)
       b {{Ftype}} ?: {{otherType}} : {{field}}
@@ -63,7 +52,8 @@ export default {
       om: this.vModel,
       test: '',
       bd: '1999-02-04',
-      formChanged: false
+      formChanged: false,
+      formLeft: false
     }
   },
   props: {
@@ -80,6 +70,9 @@ export default {
     defaultPrompt: {
       type: String,
       default: '-- select --'
+    },
+    localError: {
+      type: String
     },
     remoteError: {
       type: String
@@ -164,9 +157,6 @@ export default {
         }
       }
     },
-    checkField: function () {
-      return true
-    },
     disabled: function () {
       if (this.remoteError && !this.formChanged) {
         return false
@@ -214,6 +204,8 @@ export default {
       if (this.onBlur) {
         this.onBlur(evt, this.om)
       }
+
+      this.formLeft = true
     },
     myFocus (evt) {
       if (this.onFocus) {
@@ -270,32 +262,44 @@ export default {
       // return this[name].length > 2
     },
     dynamicClass: function (field, type) {
-      if (this.remoteError && !this.formChanged) {
+      var myClass = ''
+      if (this.options.colour === 'off') {
+      } else if (this.remoteError && !this.formChanged) {
         if (type === 'label') {
-          return 'mandatoryPrompt'
+          myClass = 'mandatoryPrompt'
         } else {
-          return 'mandatoryInputNotOK'
+          myClass = 'mandatoryInputNotOK'
         }
+      } else if (!this.formLeft && this.options.colour !== 'on') {
+        myClass = ''
+      // } else if (this.formChanged && !this.localError) {
+      //   myClass = ''
       } else if (field.mandatory) {
         if (type === 'label' && this.form[field.name]) {
-          return 'mandatoryPromptOK'
+          myClass = 'mandatoryPromptOK'
         } else if (type === 'label') {
-          return 'mandatoryPrompt'
+          myClass = 'mandatoryPrompt'
         } else if (this.form[field.name]) {
-          return 'mandatoryInputOK'
+          myClass = 'mandatoryInputOK'
         } else {
-          return 'mandatoryInputNotOK'
+          myClass = 'mandatoryInputNotOK'
         }
       } else {
         if (type !== 'label' && this.form[field.name]) {
-          return 'mandatoryInputOK'
+          myClass = 'mandatoryInputOK'
         } else {
-          return ''
+          myClass = ''
         }
       }
+      // console.log(this.form[field.name] + ' dynamic class for ' + field.name + '; M: ' + field.mandatory + '; C: ' + this.formChanged + ' = ' + myClass)
+      return myClass
+    },
+    checkField: function (field) {
+      if (this.form[field.name]) {
+        return true
+      } else { return false }
     }
   }
-
 }
 </script>
 <style>
@@ -305,18 +309,7 @@ export default {
 .element-label {
   font-size: initial;
 }
-.mandatoryPrompt {
-  color: red;
-}
-.mandatoryPromptOK {
-  color: green
-}
-.mandatoryInputOK {
-  outline: solid green 1px;
-}
-.mandatoryInputNotOK {
-  outline: solid red 1px;
-}
+
 input.input-lg.date-type {
   line-height: inherit !important;
   /* fixes size for some reason (?) */
@@ -326,5 +319,12 @@ input.input-lg.date-type {
 }
 .fieldValue {
   color: blue;
+}
+input.input-lg {
+  width: 100%;
+}
+div.form-element input.is-valid {
+  // box-shadow: 0 0 1px 1px green, 0 0 8px;
+  border-color: 1px solid green !important;
 }
 </style>
