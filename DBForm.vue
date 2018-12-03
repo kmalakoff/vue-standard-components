@@ -6,6 +6,24 @@ Usage:
   Options:
     append: array of addiitional field hashes... (each element MUST include keys; 'name' and 'type')
         eg (append = [ { name: 'user', type: 'string', default: 'Joe'}, { name: 'SIN', type: 'hidden', default: '123456789'}])
+
+*** Form Confirmation / Acceptance Options ***
+Add optional accept form prompt:
+(includes checkbox for user to 'Accept form')
+(with disableSubmit set, the submit button will only be active when that accept form has been checked)
+
+Input options:
+  disableSubmit (disable submit button until fields are confirmed and/or form accepted
+  disabledSubmitMessage (optional error message displayed while submit button is disabled)
+  acceptFormPrompt (prompt for acceptance prior to enabling submit button)
+  confirmFields (flag to require user to select fields for confirmation before field can be submitted)
+
+Relevant methods: disabled, defaultDisabledMessage
+
+options: {
+  disableSubmit: true,
+  acceptFormPrompt: 'I agree that the fields above are filled in correctly'
+}
 -->
 
 <template lang='pug'>
@@ -23,7 +41,7 @@ Usage:
         td.prompt-column(v-if="promptPosition==='left'")
           b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{label(field)}}:
         td.data-column
-          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :debug='debug')
+          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
         td.extra-column(v-if="0 && myAccess === 'edit'")
           span &nbsp;
           a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)")
@@ -33,9 +51,15 @@ Usage:
         td.prompt-column(v-if="prompt || myAccess==='read'")
           b {{label(r)}}:
         td.data-column
-          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :debug='debug')
+          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
+      tr(v-if='acceptFormPrompt && validated(form)')
+        td(colspan=4)
+          hr
+          <!-- icon(v-if='form.accepted' name='check' color='green') -->
+          b-form-checkbox.inline(:form="form" type='checkbox' name='accepted' v-model='form.accepted' v-on:click='acceptForm(form)')
+          b(v-bind:class="[{errorMessage: !form.accepted}]") &nbsp; &nbsp; {{acceptFormPrompt}}
     span(v-for='r in include.hidden')
-      DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)")
+      DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :remoteError='remoteErrors[field.name]')
     hr
     button.btn.btn-primary.btn-lg(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
     span &nbsp; &nbsp;
@@ -59,8 +83,9 @@ export default {
     return {
       url: config.apiURL,
       DBfields: [],
-      form: {},
+      form: { accepted: false },
       idfield: { name: 'id', type: 'fixed' },
+      resetAccess: '',
       error: ''
     }
   },
@@ -92,6 +117,11 @@ export default {
     },
     access: {
       type: String
+    },
+    // remote Errors is a hash returned remotely indicating erros with fields (eg {'name': 'not unique'})
+    remoteErrors: {
+      type: Object,
+      default () { return {} }
     },
     debug: {
       type: Boolean,
@@ -177,7 +207,9 @@ export default {
       return f
     },
     myAccess: function () {
-      if (this.access) {
+      if (this.resetAccess) {
+        return this.resetAccess
+      } else if (this.access) {
         return this.access
       } else if (this.options.access) {
         return this.options.access
@@ -234,6 +266,9 @@ export default {
       } else {
         return false
       }
+    },
+    acceptFormPrompt: function () {
+      return this.options.acceptFormPrompt
     },
     promptPosition: function () {
       return this.options.promptPosition || 'top'
@@ -330,39 +365,68 @@ export default {
         }
       }
     },
-    disabled: function (form) {
-      if (this.options.disableSubmit) {
-        console.log('disable submit if applicable: ' + JSON.stringify(form))
-        var failed = false
-        var checked = 0
-        for (var i = 0; i < this.fields.length; i++) {
-          var verify = ''
-
-          if (this.options.confirmFields) {
-            verify = form.confirmed[this.fields[i].name]
-          } else if (this.options.disableSubmit) {
-            verify = form[this.fields[i].name]
-          }
-
-          if (this.fields[i].mandatory && !verify) {
-            console.log('failed on ' + this.fields[i].name)
-            failed = true
-          } else if (this.fields[i].mandatory) {
-            console.log(this.fields[i].mandatory + ' passed ' + this.fields[i].name + ' = ' + verify)
-            checked++
-          }
-        }
-
-        console.log(failed + ' failed; checked ' + checked)
-        var validated = !failed && checked
-
-        if (!validated) {
-          this.error = this.defaultDisabledMessage
+    acceptedForm: function (form) {
+      if (this.options.acceptFormPrompt) {
+        if (this.form.accepted) {
+          return true
         } else {
-          this.error = ''
+          return false
         }
-        return !validated
+      } else {
+        return true
       }
+    },
+    acceptForm: function (form) {
+      this.form.accepted = true
+    },
+    validated: function (form) {
+      var failed = false
+      var checked = 0
+      var verified = 0
+      console.log('fail check #: ' + JSON.stringify(this.fields.length))
+      for (var i = 0; i < this.fields.length; i++) {
+        var passed = false
+        var check = false
+        if (this.options.confirmFields) {
+          passed = form.confirmed[this.fields[i].name]
+          check = true
+        } else if (this.fields[i].mandatory) {
+          passed = form[this.fields[i].name]
+          check = true
+        }
+        if (passed) {
+          verified++
+          checked++
+        } else if (check) {
+          checked++
+          console.log('failed validation check on ' + this.fields[i].name)
+          failed = true
+        }
+      }
+
+      console.log(' failed: ' + failed + ' : verified ' + verified + ' of ' + checked)
+      var validated = !failed
+      return validated
+    },
+    disabled: function (form) {
+      console.log('check disabled status')
+      var validated = this.validated(form)
+      var accepted = this.acceptedForm(form)
+      console.log('disabled = ' + validated + ' + ' + accepted)
+      if (!validated) {
+        this.error = this.defaultDisabledMessage
+      } else {
+        if (validated && accepted) {
+          console.log('reset access to read...')
+          this.resetAccess = 'read'
+        } else {
+          this.resetAccess = ''
+        }
+        this.error = ''
+      }
+      var disabled = !validated || !accepted
+      console.log('.. ' + disabled)
+      return disabled
     },
     onCancel: function () {
       console.log('cancel form')
@@ -411,5 +475,7 @@ export default {
   .mandatoryPrompt {
     color: red;
   }
-
+  .inline {
+    display: inline-block
+  }
 </style>
