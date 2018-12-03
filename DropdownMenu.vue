@@ -175,20 +175,7 @@ export default {
 
  /* match btn-primary + hover below */
 .option-cell {
-  // match btn-primary
-  background-color: #337ab7;
-}
-.option-cell:hover {
-  background-color: #286090;
-}
-.option-label {
-  color: white;
-}
-.customMenu a {
-  color: blue;
-}
-.customMenu a:hover {
-  color: red;
+  min-width: 400px;
 }
 
 /* Other seeings */
@@ -218,7 +205,6 @@ export default {
 
 .customMenu {
   text-align: right;
-
 }
 
 .customMenu a:hover {
