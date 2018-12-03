@@ -199,6 +199,7 @@ export default {
           console.log(msg)
           return {error: msg}
         })
+      this.nav.goto('Home')
       console.log('Login response:' + JSON.stringify(response))
 
       return this.initializeSession(response)
