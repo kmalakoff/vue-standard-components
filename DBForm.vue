@@ -31,7 +31,7 @@ options: {
     div(v-if='debug')
       p Fields: {{fields}}
       hr
-    table.table.form-table
+    table.table
       tr.row-heading(v-if='heading')
         td.heading(colspan=3)
           h2 {{heading}}
@@ -453,7 +453,6 @@ export default {
     width: 95%;
   }
   .form-table {
-    bacground-color: red;
   }
 
   table tr td {
@@ -470,7 +469,6 @@ export default {
     padding: 10px;
   }
   table tr td.heading {
-    // background-color: #ccc;
     text-align: center;
   }
   table tr td.data-column {
@@ -480,9 +478,6 @@ export default {
     width: 10%;
   }
 
-  .mandatoryPrompt {
-    color: red;
-  }
   .inline {
     display: inline-block
   }
