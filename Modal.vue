@@ -1,4 +1,4 @@
-<!-- Stanard/Modal.vue
+<!-- Standard/Modal.vue
 
   Usage:
 
