@@ -22,26 +22,24 @@
 !-->
 
 <template lang='pug'>
-  div(v-if='errorCount || warningCount || messageCount')
-    div
-      p &nbsp;
+  div.message-block(v-if='errorCount || warningCount || messageCount')
+    p &nbsp;
     div.msg-errors(v-if='errorCount')
       div.right
         button.btn.btn-danger(@click.prevent="clear")
           icon(name='times')
-      div
-        div(v-for='err in errors' align='center')
-          b(v-if='err') {{err}}
+      div(v-for='err in errors' align='center')
+        b(v-if='err') {{err}}
     div.msg-warnings(v-if='warningCount')
-      div.navbar-right
+      div.right
         button.btn.btn-danger(@click.prevent="clear")
-          icon(name='times' color='red')
+          icon(name='times')
       div(v-for='warn in warnings' align='center')
         b(v-if='warn') {{warn}}
     div.msg-messages(v-if='messageCount')
-      div.navbar-right
+      div.right
         button.btn.btn-danger(@click.prevent="clear")
-          icon(-name='times', color='red')
+          icon(name='times')
       div(v-for='msg in messages' align='center')
         b(v-if='msg') {{msg}}
 </template>
@@ -171,7 +169,6 @@ export default {
     padding-right: 20px;
     text-align: center;
     border: 1px solid black;
-    // background-color: lightgrey;
     color: black;
   }
 
@@ -180,27 +177,29 @@ export default {
     margin: 10px;
     font-size: 2rem;
     align: center;
+  }
+
+  .msg-errors {
+    background-color: lightyellow;
     color: red;
+  }
+  .msg-warnings {
+    color: black;
+    background-color: orange;
+  }
+  .msg-messages {
+    color: black;
+    background-color: lightgreen;
   }
 
   @media screen and (min-width: 768px) {
     div.msg-errors {
-      background-color: pink;
       line-height: 2rem;
-      color: black;
+      border: 1px solid red;
     }
   }
 
-  div.msg-warnings {
-    background-color: orange;
-  }
-  div.msg-messages {
-    background-color: lightgreen;
-  }
-
   .note {
-    // color: red;
-    // background: #FF9E80;
     padding: 0.75rem 1.5rem;
     box-sizing: border-box;
     position: relative;
@@ -210,8 +209,6 @@ export default {
     transition: all .5s ease-out;
   }
   .note-mask {
-    // background: #FF9E80;
-    // background: #FFFFFF;
     padding: 0.75rem 1.5rem;
     box-sizing: border-box;
     position: relative;
