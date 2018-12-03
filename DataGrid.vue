@@ -331,8 +331,11 @@ export default {
 
   .result-heading {
     text-align: center;
-    background-color: #999;
+    background-color: #337ab7;
     color: #fff;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .result-prompt {
