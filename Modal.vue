@@ -68,19 +68,19 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
         div.my-modal-mask
           div.my-modal-wrapper
             div.my-modal-container
-              div.my-modal-header
+              div.my-modal-header(v-if='myheader')
                 slot(name="header")
-                  h2.heading(v-if='myheader') {{myheader}} &nbsp; &nbsp;
-                    span.navbar-right
-                      button.btn.btn-danger.btn-lg(@click="closeModal")
-                        icon(name='times')
+                  h2.heading {{myheader}} &nbsp; &nbsp;
+                    button.btn.btn-danger.btn.close-button.right(@click="closeModal")
+                      icon(name='times')
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
-                  span.navbar-right(v-if='!myheader')
-                    button.btn.btn-danger.btn-lg(@click="closeModal")
-                      icon(name='times')
                   h2.title(v-if='modalTitle') {{modalTitle}}
+                  span(v-if='!myheader')
+                    button.btn.btn-danger.btn.close-button.right(@click="closeModal")
+                      icon(name='times')
+                    p &nbsp;
                   div(v-if="modalType==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="modalType==='record'")
@@ -743,4 +743,7 @@ export default {
   min-height: 500px;
 }
 
+.close-button: {
+  float: right;
+}
 </style>
