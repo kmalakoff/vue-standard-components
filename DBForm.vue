@@ -123,6 +123,9 @@ export default {
       type: Object,
       default () { return {} }
     },
+    cancel: {
+      type: Function
+    },
     debug: {
       type: Boolean,
       default: false
@@ -416,7 +419,7 @@ export default {
       if (!validated) {
         this.error = this.defaultDisabledMessage
       } else {
-        if (validated && accepted) {
+        if (validated && accepted && this.acceptFormPrompt) {
           console.log('reset access to read...')
           this.resetAccess = 'read'
         } else {
@@ -434,6 +437,11 @@ export default {
         this.options.cancelForm()
       } else if (this.options.onCancel) {
         this.options.onCancel()
+      }
+
+      if (this.cancel) {
+        // cancel from Modal if applicable...
+        this.cancel()
       }
     }
   }
