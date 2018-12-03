@@ -4,40 +4,40 @@
   div.form-element(role='group')
     b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
       br
-    label.element-label(:for='field.name' v-if="promptPosition==='top'" v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}:
-      <!-- b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
-    label.element-label(:for='field.name' v-else-if="Ftype==='date' && !options.prompt" v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp;
+    label.element-label(v-if="promptPosition==='top'" :for='field.name' :class="dynamicClass(field, 'label')") {{field.prompt || field.name}}:
+      <!-- b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
+    label.element-label(v-else-if="Ftype==='date' && !options.prompt" :for='field.name' ) {{field.prompt || field.name}}: &nbsp; &nbsp;
     <!-- span(v-else-if="access==='read' && !options.prompt") -->
-      <!-- b(v-bind:class="[{mandatory: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
+      <!-- b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{field.prompt || field.name}}: &nbsp; &nbsp; -->
       <!-- br -->
 
-    span(v-if="access==='read'")
-      b.fieldValue(v-if="otherType==='date'") {{defaultTo.substring(0,10)}}
-      b.fieldValue(v-else) {{defaultTo}}
-    b-form-input.input-lg(:id='field.name' v-else-if="inputType" @change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus" aria-describedby='helpfb errfb' :state='checkField')
+    <!-- span(v-if="access==='read'") -->
+      <!-- b.fieldValue(v-if="otherType==='date' && defaultTo") {{defaultTo.substring(0,10)}} -->
+      <!-- b.fieldValue(v-else) {{defaultTo}} -->
+    b-form-input.input-lg(:id='field.name' v-if="inputType" @change.native="myChange" :type='inputType' :v-model='field.name' :placeholder="label" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native="myFocus" aria-describedby='helpfb errfb' :state='checkField' :class="dynamicClass(field)" :disabled='disabled')
       <!-- br -->
       <!-- b-form-invalid-feedback(id='errfb') Invalid input -->
 
-    b-form-checkbox.input-lg(:id='field.name' v-else-if="otherType==='checkbox'" @change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.name' value=true unchecked-value=false)
+    b-form-checkbox.input-lg(:id='field.name' v-else-if="otherType==='checkbox'" @change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.name' value=true unchecked-value=false :class="dynamicClass(field)")
         span &nbsp; &nbsp; {{field.prompt || field.name}}
 
-    b-form-radio-group(:id='field.name' v-else-if="otherType==='radio'" @change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.prompt' :options='field.options')
+    b-form-radio-group(:id='field.name' v-else-if="otherType==='radio'" @change.native="myChange" :v-model='vModel' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :label='field.prompt' :options='field.options' :class="dynamicClass(field)")
 
       <!-- b-form-input.input-lg(@change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus") -->
-    b-form-input.input-lg.date-type(:id='field.name' v-else-if="otherType==='date'" @change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus" :v-model='vModel')
+    b-form-input.input-lg.date-type(:id='field.name' v-else-if="otherType==='date'" @change.native="myChange" type='date' :placeholder="datePlaceholder" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus" :v-model='vModel' :class="dynamicClass(field)")
     <!-- form-select requires use of evt based method (change passes evt instead of value for select list) -->
 
-    b-form-select.input-lg(:id='field.name' v-else-if="otherType==='enum'" @change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus")
+    b-form-select.input-lg(:id='field.name' v-else-if="otherType==='enum'" @change.native="myChange" :options="list(field)" :value='defaultTo' :default='defaultTo'  @blur.native='myBlur' @focus.native="myFocus" :class="dynamicClass(field)")
 
-    b-form-input.input-lg(:id='field.name' v-else-if="otherType==='decimal'" type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+    b-form-input.input-lg(:id='field.name' v-else-if="otherType==='decimal'" type='text' :state="isNumber(field)" @change.native="myChange" :placeholder="placeholder" :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :class="dynamicClass(field)")
 
-    b-form-input.input-lg(:id='field.name' v-else-if="otherType==='fixed'" type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+    b-form-input.input-lg(:id='field.name' v-else-if="otherType==='fixed'" type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :class="dynamicClass(field)")
 
-    b-form-input(:id='field.name' v-else-if="otherType==='reference'" type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+    b-form-input(:id='field.name' v-else-if="otherType==='reference'" type='text' @change.native="myChange" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :class="dynamicClass(field)")
 
-    b-form-input(:id='field.name' v-else-if="otherType==='hidden'" v-show=0 type='text' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus')
+    b-form-input(:id='field.name' v-else-if="otherType==='hidden'" v-show=0 type='text' v-model="vModel" :placeholder="placeholder" disabled :value='defaultTo' :default='defaultTo' @blur.native='myBlur' @focus.native='onFocus' :class="dynamicClass(field)")
 
-    //   b-form-input.input-lg(:id='field.name' v-else-if="otherType==='password'" @change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus')
+    //   b-form-input.input-lg(:id='field.name' v-else-if="otherType==='password'" @change.native="myChange" type='password' :placeholder="placeholder" :value='defaultTo' :default='defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent='onBlur' @click.prevent='onFocus' :class="dynamicClass(field)")
 
     span(v-else)
       b {{Ftype}} ?: {{otherType}} : {{field}}
@@ -80,6 +80,9 @@ export default {
       type: String,
       default: '-- select --'
     },
+    remoteError: {
+      type: String
+    },
     debug: {
       type: Boolean,
       default: false
@@ -93,7 +96,7 @@ export default {
     // console.log(this.field.name + ' found default: ' + defaultTo)
   },
   computed: {
-    datePlaceholder: function () { return this.placeholder || 'YYYY-MM-DD' },
+    datePlaceholder: function () { return this.placeholder || '' },
     refModel: function () { return this.form[this.vModel] },
     Ftype: function () { return this.field.type || 'varchar' },
     label: function () { return this.field.placeholder || this.placeholder },
@@ -162,9 +165,21 @@ export default {
     },
     checkField: function () {
       return true
+    },
+    disabled: function () {
+      if (this.remoteError) {
+        return false
+      } else if (this.access === 'read') {
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {
+    testClass: function (field) {
+      return 'mandatoryPrompt'
+    },
     errid (name) {
       var id = name + '-error'
       console.log('errid field: ' + id)
@@ -188,6 +203,7 @@ export default {
       if (this.onBlur) {
         this.onBlur(evt, this.om)
       }
+      this.remoteError = '' // clear remote errors
     },
     myBlur (evt) {
       if (this.field.validate) {
@@ -251,8 +267,32 @@ export default {
       console.log('name: ' + name)
       return 'ok'
       // return this[name].length > 2
+    },
+    dynamicClass: function (field, type) {
+      if (this.remoteError) {
+        if (type === 'label') {
+          return 'mandatoryPrompt'
+        } else {
+          return 'mandatoryInputNotOK'
+        }
+      } else if (field.mandatory) {
+        if (type === 'label' && this.form[field.name]) {
+          return 'mandatoryPromptOK'
+        } else if (type === 'label') {
+          return 'mandatoryPrompt'
+        } else if (this.form[field.name]) {
+          return 'mandatoryInputOK'
+        } else {
+          return 'mandatoryInputNotOK'
+        }
+      } else {
+        if (type !== 'label' && this.form[field.name]) {
+          return 'mandatoryInputOK'
+        } else {
+          return ''
+        }
+      }
     }
-
   }
 
 }
@@ -264,12 +304,20 @@ export default {
 .element-label {
   font-size: initial;
 }
-.mandatory {
-  outline: solid red 1px;
+.mandatoryPrompt {
   color: red;
 }
-.dateType {
-  line-height: inherit;
+.mandatoryPromptOK {
+  color: green
+}
+.mandatoryInputOK {
+  outline: solid green 1px;
+}
+.mandatoryInputNotOK {
+  outline: solid red 1px;
+}
+input.input-lg.date-type {
+  line-height: inherit !important;
   /* fixes size for some reason (?) */
 }
 .prompt {
