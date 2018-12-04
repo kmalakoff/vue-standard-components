@@ -68,6 +68,7 @@ export default {
         { label: 'Logout', onClick: this.logout }
       ],
       loginOptions: {
+        modalID: 'login-modal',
         openButton: 'Log in',
         access: 'append',
         fields: Config.loginFields,
@@ -78,7 +79,8 @@ export default {
         wideOnMobile: true,
         onCancel: this.cancel,
         buttonClass: Config.defaultButtonClass,
-        submitButtonClass: 'btn-primary btn-lg'
+        submitButtonClass: 'btn-primary btn-lg',
+        noClose: true
       },
 
       registerOptions: {
@@ -92,7 +94,8 @@ export default {
         wideOnMobile: true,
         onCancel: this.cancel,
         buttonClass: Config.defaultButtonClass,
-        submitButtonClass: 'btn-primary btn-lg'
+        submitButtonClass: 'btn-primary btn-lg',
+        noClose: true
       },
       apiUrl: Config.apiURL,
       status: 'initialized'
