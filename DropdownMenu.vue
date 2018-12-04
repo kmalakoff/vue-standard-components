@@ -21,12 +21,12 @@
         icon(v-if="!visibleMenu" name='caret-down')
         span &nbsp; {{title}} &nbsp;
     div.custom-menu(style='position: absolute')
-      table.table.popup-table.input-lg(v-if="visibleMenu" v-on:mouseover="showMenu" v-on:mouseout="hideMenu(1)")
-        tr.option-row(v-for="option, i in options" width='100%')
-          td.option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]")
+      table.table.dropdown-table.input-lg(v-if="visibleMenu" v-on:mouseover="showMenu" v-on:mouseout="hideMenu(1)")
+        tr.dropdown-option-row(v-for="option, i in options" width='100%')
+          td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]")
             <!-- button(v-bind:class="[{option0: i===0}, {optionN: i===options.length}]") -->
             a(href='/' onclick='return false' @click.prevent="runMethod(option)")
-              span.option-label {{option.label}}
+              span.dropdown-option-label {{option.label}}
     Modal(v-if='modal' :id='modal' type='data')
       span &nbsp; &nbsp;
 </template>
@@ -174,56 +174,20 @@ export default {
 /* Colour settings */
 
  /* match btn-primary + hover below */
-.option-cell {
-  // match btn-primary
-  background-color: #337ab7;
-}
-.option-cell:hover {
-  background-color: #286090;
-}
-.option-label {
-  color: white;
-}
-.customMenu a {
-  color: blue;
-}
-.customMenu a:hover {
-  color: red;
-}
 
 /* Other seeings */
 
 .custom-menu {
   right: 10px;
 }
-.option-cell {
+.dropdown-option-cell {
   width: 100%;
   text-align: left;
   padding:10px;
 }
-.firstOption {
-  border-bottom: 1px solid black;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-}
-.lastOption {
-  border-top: 1px solid black;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-}
-
-.menu-title {
-  font-size: 2rem;
-}
 
 .customMenu {
   text-align: right;
-
-}
-
-.customMenu a:hover {
-  font-weight: normal;
-  text-decoration: none;
 }
 
 .customMenu .custom-menu {
@@ -231,34 +195,28 @@ export default {
   z-index: 2;
 }
 
-.menu-option {
-
-}
-
- .popup-table {
+ .dropdown-table {
     position: right;
     right: 0;
     top: 60px;
     margin: 0px;
   }
-  .popup-table tr {
+  .dropdown-table tr {
     /*padding: 5px;*/
   }
-  .popup-table tr td {
+  .dropdown-table tr td {
     /*padding: 0px;*/
     /*padding-left: 15px;*/
   }
 
-  .popup-table a{
+  .dropdown-table a{
     display: block;
     padding: 5px;
     padding-left: 15px;
-    /*text-decoration: none;*/
   }
-  .popup-table a:hover{
+  .dropdown-table a:hover{
     display: block;
     padding: 5px;
     padding-left: 15px;
-    text-decoration: none;
   }
 </style>
