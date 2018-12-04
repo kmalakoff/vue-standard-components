@@ -64,7 +64,7 @@ options: {
     hr
     button.btn.btn-primary.btn-lg(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
     span &nbsp; &nbsp;
-    button.btn.btn-danger.btn-lg(v-if="onCancel" @click.prevent="onCancel()") {{cancelButton}}
+    button.btn.btn-danger.btn-lg(v-if="options.onCancel" @click.prevent="onCancel()") {{cancelButton}}
     br
     p.mandatoryPrompt(v-if='error') {{error}}
     div(v-if='debug')
