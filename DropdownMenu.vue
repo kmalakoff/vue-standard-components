@@ -174,6 +174,9 @@ export default {
 /* Colour settings */
 
  /* match btn-primary + hover below */
+.option-cell {
+  min-width: 400px;
+}
 
 /* Other seeings */
 

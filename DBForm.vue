@@ -30,8 +30,9 @@ options: {
   div.table-form
     div(v-if='debug')
       p Fields: {{fields}}
+      p Record {{record}}
       hr
-    table.table.form-table
+    table.table
       tr.row-heading(v-if='heading')
         td.heading(colspan=3)
           h2 {{heading}}
@@ -386,11 +387,15 @@ export default {
       var failed = false
       var checked = 0
       var verified = 0
+      var hidden = 0
       console.log('fail check #: ' + JSON.stringify(this.fields.length))
       for (var i = 0; i < this.fields.length; i++) {
         var passed = false
         var check = false
-        if (this.options.confirmFields) {
+        if (this.fields[i].type === 'hidden') {
+          hidden++
+        } else if (this.options.confirmFields && this.fields[i].mandatory) {
+          console.log('check mandatory field: ' + this.fields[i].name)
           passed = form.confirmed[this.fields[i].name]
           check = true
         } else if (this.fields[i].mandatory) {
@@ -402,12 +407,11 @@ export default {
           checked++
         } else if (check) {
           checked++
-          console.log('failed validation check on ' + this.fields[i].name)
+          console.log('Failed validation check on ' + this.fields[i].name)
           failed = true
         }
       }
-
-      console.log(' failed: ' + failed + ' : verified ' + verified + ' of ' + checked)
+      console.log(' failed: ' + failed + ' : verified ' + verified + ' of ' + checked + ' - hidden: ' + hidden)
       var validated = !failed
       return validated
     },
@@ -453,7 +457,6 @@ export default {
     width: 95%;
   }
   .form-table {
-    bacground-color: red;
   }
 
   table tr td {
@@ -470,7 +473,6 @@ export default {
     padding: 10px;
   }
   table tr td.heading {
-    // background-color: #ccc;
     text-align: center;
   }
   table tr td.data-column {
@@ -480,9 +482,6 @@ export default {
     width: 10%;
   }
 
-  .mandatoryPrompt {
-    color: red;
-  }
   .inline {
     display: inline-block
   }

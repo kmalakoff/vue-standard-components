@@ -7,15 +7,16 @@
             icon(name='search' color='blue' scale='2')
           span &nbsp; &nbsp;
     div(@mouseleave="hideSearch")
-      table.table.popup-table.input-lg(v-if="visibleSearch")
-        tr(width='100%')
-          td(width='100%')
-            div.form-group
-              span.input-group
-                input.form-control.input-lg.full-page#searchString(type='text' :placeholder='searchPrompt')
-                span.input-group-btn
-                  button.btn.btn-lg.btn-default.full-page(@click.prevent='callSearchMethod')
-                    icon(name='search' color='red' background='blue')
+      form(:onsubmit='callSearchMethod')
+        table.table.search-table.input-lg(v-if="visibleSearch")
+          tr(width='100%')
+            td(width='100%')
+              div.form-group
+                span.input-group
+                  input.form-control.input-lg.full-page#searchString(type='text' :placeholder='searchPrompt')
+                  span.input-group-btn
+                    button.btn.btn-lg.btn-primary.full-page(@click.prevent='callSearchMethod')
+                      icon(name='search' color='white')
     Modal(v-if="target === 'modal'" id='searchresults' type='data')
     div(v-if='results && postResults')
       h2 Results:

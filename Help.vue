@@ -1,11 +1,17 @@
-<!-- src/components/Help.vue -->
-
-  <template lang='pug'>
-    span(v-if="show")
-      Modal(@close="showModal=false" :title="title" :name="name" :openButton="demoStep" buttonClass='btn btn-xs btn-warning' :modalBody="message" close='Close')
-
-  </template>
-
+<template lang='pug'>
+  div.container
+    h2
+      u Help {{show}}
+      h4(v-if='show') test: {{show}}
+    span(v-if="show==='TestForm'")
+      // TestForm()
+    span(v-else-if="show==='Modal'")
+      // Modal()
+    div(v-else)
+      div(v-for='test in tests')
+        a(v-on:click='showMe(test)')
+          button.btn.btn-primary {{test}}
+</template>
 <script>
 import Modal from './Modal'
 
@@ -15,36 +21,22 @@ export default {
   },
   data () {
     return {
-      step: 1,
-      showModal: false
+      show: '',
+      tests: [
+        'Modal'
+      ]
     }
   },
   computed: {
-    id: function () {
-      if (this.demoStep) {
-        return 'demoStep' + this.demoStep
-      } else {
-        return this.name
-      }
+    Modal
+  },
+  methods: {
+    showMe (test) {
+      console.log('show ' + test)
+      this.$set(this, 'test', test)
     }
   },
   props: {
-    demoStep: {
-      type: String
-    },
-    title: {
-      type: String
-    },
-    name: {
-      type: String,
-      default: 'help'
-    },
-    message: {
-      type: String
-    },
-    show: {
-      type: Boolean
-    }
   }
 }
 </script>

@@ -179,6 +179,7 @@ export default {
         credentials[f.name] = form[f.prompt] || form[f.name]
       }
 
+      if (!credentials.username) { credentials.username = credentials.email }
       if (this.noConfirm) {
         credentials.confirmPassword = credentials.password
       }

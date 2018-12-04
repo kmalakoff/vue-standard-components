@@ -1,4 +1,4 @@
-<!-- Stanard/Modal.vue
+<!-- Standard/Modal.vue
 
   Usage:
 
@@ -55,10 +55,10 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
   span
     span.modal-anchor
     span(v-if='openButton')
-      button.open-button.btn.btn-primary.btn-lg(v-on:click="openModal()" :class='btnClass')
+      button.open-button.btn.btn-primary.btn-lg(v-on:click="openModal(id)" :class='btnClass')
         span(v-html='openButton')
     span(v-else-if='openText')
-      a.modal-link(href='#' onclick='return false' v-on:click="openModal()")
+      a.modal-link(href='#' onclick='return false' v-on:click="openModal(id)")
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
       button.btn.btn-primary(v-on:click="openModal()" v-bind:class="[{btnClass: wideOnMobile}]")
@@ -536,12 +536,12 @@ export default {
       this.isVisible = false
       clearTimeout(this.timeoutID)
     },
-    openModal () {
+    openModal (id) {
       if (this.url) {
         console.log('dynamic url content generation')
         console.log(this.urlContent)
       }
-      this.$store.dispatch('toggleModal', this.id)
+      this.$store.dispatch('toggleModal', id)
 
       clearTimeout(this.timeoutID)
     },
