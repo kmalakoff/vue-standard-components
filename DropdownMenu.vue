@@ -99,14 +99,16 @@ export default {
       if (this.waitingToClose) { this.showAfterWait = true }
     },
     toggleMenu (force) {
-      console.log('turn off menu : keep on ? ' + this.keepOn)
+      console.log('toggle menu : keep on ? ' + this.keepOn)
       this.waitingToClose = false
       if (force) {
-        this.visibleMenu = false
-        this.keepOn = false
+        console.log('force toggle')
+        this.$set(this, 'visibleMenu', !this.visibleMenu)
+        this.$set(this, 'keepOn', false)
       } else if (this.keepOn) {
-        this.visibleMenu = false
-        this.keepOn = false
+        this.$set(this, 'visibleMenu', false)
+        this.$set(this, 'keepOn', false)
+        console.log('keep on = ' + this.keepOn)
       } else {
         this.visibleMenu = true
         this.keepOn = true
@@ -115,7 +117,6 @@ export default {
     hideMenu (wait) {
       // Hide menu (delay ignores rapid toggling by mouse out / in movements)
       var _this = this
-      console.log('hide menu...')
       if (this.keepOn) {
         console.log('require direct toggle to turn off')
       } else if (!wait) {
@@ -128,7 +129,7 @@ export default {
           () => {
             _this.waitingToClose = false
             this.visibleMenu = this.showAfterWait
-          }, 1000)
+          }, 100)
         this.waitingToClose = true
       }
     },
