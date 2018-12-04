@@ -71,14 +71,14 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
               div.my-modal-header(v-if='myheader')
                 slot(name="header")
                   h2.heading {{myheader}} &nbsp; &nbsp;
-                    button.btn.btn-danger.btn.close-button.right(@click="closeModal")
+                    button.btn.btn-danger.btn.close-button.right(v-if='!noClose' @click="closeModal")
                       icon(name='times')
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
                   h2.title(v-if='modalTitle') {{modalTitle}}
                   span(v-if='!myheader')
-                    button.btn.btn-danger.btn.close-button.right(@click="closeModal")
+                    button.btn.btn-danger.btn.close-button.right(v-if='!noClose' @click="closeModal")
                       icon(name='times')
                     p &nbsp;
                   h4(v-if='myPrompt') {{myPrompt}}
@@ -118,11 +118,11 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                   p &nbsp;
                   b.error-msg(v-if='foundError') {{foundError}}
               Messaging
-              div.my-modal-footer
+              div.my-modal-footer(v-if='!noFooter')
                 slot(name="footer")
                   b {{footer}} &nbsp;
                   span.navbar-right
-                    button.btn.btn-danger.btn-lg(@click="closeModal") {{closeButton}}
+                    button.btn.btn-danger.btn-lg(v-if='!noClose' @click="closeModal") {{closeButton}}
 </template>
 
 <script>
@@ -502,6 +502,12 @@ export default {
     },
     foundError: function () {
       return this.error || this.errorMsg || ''
+    },
+    noFooter: function () {
+      return this.options.noFooter || true
+    },
+    noClose: function () {
+      return this.options.noClose || false
     }
   },
   asyncComputed: {
