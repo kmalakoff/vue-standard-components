@@ -15,13 +15,13 @@
 -->
 <template lang='pug'>
   div.customMenu
-    a(href='/' onclick='return false' v-on:mouseover="showMenu" v-on:mouseout="hideMenu(1)" v-on:click='toggleMenu')
+    a(href='/' onclick='return false' v-on:mouseover="showMenu" v-on:mouseout="slowHideMenu(1)" v-on:click='toggleMenu')
       span.menu-title
         icon(v-if="visibleMenu" name='caret-up')
         icon(v-if="!visibleMenu" name='caret-down')
         span &nbsp; {{title}} &nbsp;
     div.custom-menu(style='position: absolute')
-      table.table.dropdown-table.input-lg(v-if="visibleMenu" v-on:mouseover="showMenu" v-on:mouseout="hideMenu(1)")
+      table.table.dropdown-table.input-lg(v-if="visibleMenu" v-on:mouseover="showMenu" v-on:mouseout="slowHideMenu(1)")
         tr.option-row(v-for="option, i in options" width='100%')
           td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]")
             <!-- button(v-bind:class="[{option0: i===0}, {optionN: i===options.length}]") -->
@@ -114,7 +114,11 @@ export default {
         this.keepOn = true
       }
     },
-    hideMenu (wait) {
+    hideMenu () {
+      this.$set(this, 'visibleMenu', false)
+      this.$set(this, 'keepOn', false)
+    },
+    slowHideMenu (wait) {
       // Hide menu (delay ignores rapid toggling by mouse out / in movements)
       var _this = this
       if (this.keepOn) {
@@ -164,7 +168,7 @@ export default {
         }
       }
       console.log('force toggle menu off...')
-      this.toggleMenu(1)
+      this.hideMenu()
     }
   }
 }
