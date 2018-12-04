@@ -180,7 +180,8 @@ export default {
   }
 
   .msg-errors {
-    background-color: lightyellow;
+    background-color: lightgrey;
+    box-shadow: 0 0 3pt 2pt;
     color: red;
   }
   .msg-warnings {
