@@ -7,26 +7,26 @@
     label.element-label(v-if="promptPosition=== 'top' && otherType !== 'checkbox'" :for= 'field.name' :class="dynamicClass(field, 'label')") {{field.prompt || field.name}}:
     label.element-label(v-else-if="Ftype=== 'date' && !options.prompt" :for= 'field.name' ) {{field.prompt || field.name}}: &nbsp; &nbsp;
 
-    b-form-input.input-lg(:id= 'field.name' v-if="inputType" @change.native="myChange" :type= 'inputType' :v-model= 'field.name' :placeholder="label" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native="myFocus" aria-describedby= 'helpfb errfb' :state='checkField(field)' :class="dynamicClass(field)" :disabled= 'disabled')
+    b-form-input.input-lg(:id='randomId' v-if="inputType" @change.native="myChange" :type= 'inputType' :v-model= 'field.name' :placeholder="label" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native="myFocus" aria-describedby= 'helpfb errfb' :state='checkField(field)' :class="dynamicClass(field)" :disabled= 'disabled')
 
-    b-form-checkbox.input-lg(:id= 'field.name' v-else-if="otherType=== 'checkbox'" @change.native="myChange" :v-model= 'vModel' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :label= 'field.name' value=true unchecked-value=false :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
+    b-form-checkbox.input-lg(:id='randomId' v-else-if="otherType=== 'checkbox'" @change.native="myChange" :v-model= 'vModel' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :label= 'field.name' value=true unchecked-value=false :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
         span &nbsp; &nbsp; {{field.prompt || field.name}}
 
-    b-form-radio-group(:id= 'field.name' v-else-if="otherType=== 'radio'" @change.native="myChange" :v-model= 'vModel' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :label= 'field.prompt' :options= 'field.options' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
+    b-form-radio-group(:id='randomId' v-else-if="otherType=== 'radio'" @change.native="myChange" :v-model= 'vModel' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :label= 'field.prompt' :options= 'field.options' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-input.input-lg.date-type(:id= 'field.name' v-else-if="otherType=== 'date'" @change.native="myChange" type= 'date' :placeholder="datePlaceholder" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :v-model= 'vModel' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
+    b-form-input.input-lg.date-type(:id='randomId' v-else-if="otherType=== 'date'" @change.native="myChange" type= 'date' :placeholder="datePlaceholder" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :v-model= 'vModel' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-select.input-lg(:id= 'field.name' v-else-if="otherType=== 'enum'" @change.native="myChange" :options="list(field)" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
+    b-form-select.input-lg(:id='randomId' v-else-if="otherType=== 'enum'" @change.native="myChange" :options="list(field)" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-input.input-lg(:id= 'field.name' v-else-if="otherType=== 'decimal'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state="isNumber(field)" :disabled= 'disabled')
+    b-form-input.input-lg(:id='randomId' v-else-if="otherType=== 'decimal'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state="isNumber(field)" :disabled= 'disabled')
 
-    b-form-input.input-lg(:id= 'field.name' v-else-if="otherType=== 'fixed'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
+    b-form-input.input-lg(:id='randomId' v-else-if="otherType=== 'fixed'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-input(:id= 'field.name' v-else-if="otherType=== 'reference'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
+    b-form-input(:id='randomId' v-else-if="otherType=== 'reference'" type= 'text' @change.native="myChange" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    b-form-input(:id= 'field.name' v-else-if="otherType=== 'hidden'" v-show=0 type= 'text' v-model="vModel" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
+    b-form-input(:id='randomId' v-else-if="otherType=== 'hidden'" v-show=0 type= 'text' v-model="vModel" :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
-    //   b-form-input.input-lg(:id= 'field.name' v-else-if="otherType=== 'password'" @change.native="myChange" type= 'password' :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent= 'onBlur' @click.prevent= 'onFocus' :class="dynamicClass(field)" :disabled= 'disabled')
+    //   b-form-input.input-lg(:id='randomId' v-else-if="otherType=== 'password'" @change.native="myChange" type= 'password' :placeholder="placeholder" :value= 'defaultTo' :default= 'defaultTo' :disabled="access !== 'edit' && access !== 'append'" @blur.prevent= 'onBlur' @click.prevent= 'onFocus' :class="dynamicClass(field)" :disabled= 'disabled')
 
     span(v-else)
       b {{Ftype}} ?: {{otherType}} : {{field}}
@@ -53,7 +53,8 @@ export default {
       test: '',
       bd: '1999-02-04',
       formChanged: false,
-      formLeft: false
+      formLeft: false,
+      randomId: '0'
     }
   },
   props: {
@@ -87,6 +88,8 @@ export default {
     var defaultTo = this.field.default || this.form[this.om] || null
 
     this.$set(this.form, this.om, defaultTo)
+    this.randomId = Math.random() + '-form-element'
+    console.log('random: ' + this.randomId)
     // console.log(this.field.name + ' found default: ' + defaultTo)
   },
   computed: {
