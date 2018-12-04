@@ -13,7 +13,7 @@
             td(width='100%')
               div.form-group
                 span.input-group
-                  input.form-control.input-lg.full-page#searchString(type='text' :placeholder='searchPrompt')
+                  input.form-control.input-lg.full-page#searchString(type='text' :placeholder='searchPrompt' @click.prevent='onFocus')
                   span.input-group-btn
                     button.btn.btn-lg.btn-primary.full-page(@click.prevent='callSearchMethod')
                       icon(name='search' color='white')
@@ -67,6 +67,10 @@ export default {
       default: '-- Search --'
     },
     onClick: {
+      type: Function,
+      default: null
+    },
+    onFocus: {
       type: Function,
       default: null
     },
