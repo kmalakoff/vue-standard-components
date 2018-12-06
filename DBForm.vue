@@ -32,6 +32,7 @@ options: {
       p Fields: {{fields}}
       p Record {{record}}
       p Options: {{JSON.stringify(options.onCancel)}}
+      p Error: {{JSON.stringify(remoteErrors)}}
       hr
     table.table
       tr.row-heading(v-if='heading')
@@ -185,6 +186,7 @@ export default {
         }
       }
       console.log('initiate form: ' + JSON.stringify(this.form))
+      if (this.remoteErrors) { }
     }
 
     for (var k = 0; k < DBfields.length; k++) {
@@ -399,16 +401,21 @@ export default {
           console.log('check mandatory field: ' + this.fields[i].name)
           passed = form.confirmed[this.fields[i].name]
           check = true
+          if (!passed) {
+            console.log('failed to confirm ' + this.fields[i].name)
+          }
         } else if (this.fields[i].mandatory) {
           passed = form[this.fields[i].name]
           check = true
+          if (!passed) {
+            console.log(this.fields[i].name + ' is mandatory')
+          }
         }
         if (passed) {
           verified++
           checked++
         } else if (check) {
           checked++
-          console.log('Failed validation check on ' + this.fields[i].name)
           failed = true
         }
       }
@@ -447,6 +454,15 @@ export default {
       if (this.cancel) {
         // cancel from Modal if applicable...
         this.cancel()
+      }
+    }
+  },
+  watch: {
+    remoteError: function () {
+      var keys = Object.key(this.remoteErrors)
+      if (keys && keys.length) {
+        this.form.accepted = false
+        console.log('turn off accept flag')
       }
     }
   }
