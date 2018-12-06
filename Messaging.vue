@@ -168,7 +168,7 @@ export default {
     padding: 3px;
     padding-right: 20px;
     text-align: center;
-    border: 1px solid black;
+    // border: 1px solid black;
     color: black;
   }
 
