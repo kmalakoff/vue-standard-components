@@ -197,7 +197,11 @@ export default {
       if (this.onBlur) {
         this.onBlur(evt, this.om)
       }
-      this.formChanged = true
+      if (this.remoteError) {
+        console.log('cleared error')
+        this.remoteError = ''
+        this.formChanged = true
+      }
     },
     myBlur (evt) {
       if (this.field.validate) {
@@ -267,7 +271,7 @@ export default {
     dynamicClass: function (field, type) {
       var myClass = ''
       if (this.options.colour === 'off') {
-      } else if (this.remoteError && !this.formChanged) {
+      } else if (this.remoteError) {
         if (type === 'label') {
           myClass = 'mandatoryPrompt'
         } else {
@@ -294,7 +298,7 @@ export default {
           myClass = ''
         }
       }
-      // console.log(this.form[field.name] + ' dynamic class for ' + field.name + '; M: ' + field.mandatory + '; C: ' + this.formChanged + ' = ' + myClass)
+      // console.log(this.form[field.name] + ' dynamic class for ' + field.name + '; M: ' + field.mandatory + '; C: ' + this.formChanged + ' = ' + myClass + ' ERR: ' + this.remoteError)
       return myClass
     },
     checkField: function (field) {
@@ -302,6 +306,8 @@ export default {
         return true
       } else { return false }
     }
+  },
+  watch: {
   }
 }
 </script>
