@@ -26,8 +26,11 @@
           button.login-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Login')") Login
           br
           button.signup-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Register')") Register
+        p.error(v-if='authError') {{authError}}
+
     div(v-else)
       span.smallScreen
+        // Not using modal...
         div(v-if="nav.page==='Login'")
           DBForm.login-form(:options='loginOptions' :onSave='login')
         div(v-else-if="nav.page==='Register'")
@@ -203,7 +206,6 @@ export default {
           console.log(msg)
           return {error: msg}
         })
-      this.nav.goto('Home')
       console.log('Login response:' + JSON.stringify(response))
 
       return this.initializeSession(response)
@@ -215,6 +217,7 @@ export default {
         this.$store.dispatch('logError', response.error)
       } else if (response.data) {
         if (response.data && response.data.success) {
+          this.nav.goto('Home')
           if (onSuccess) {
             this.$store.dispatch('logMessage', onSuccess)
           }
@@ -230,7 +233,7 @@ export default {
           return { success: true }
         } else if (response.data && response.data.error) {
           console.log('log error: ' + response.data.error)
-          this.authError = response.data.error
+          this.$set(this, 'authError', response.data.error)
           // this.$store.dispatch('logError', response.data.error)
           return { error: response.data.error }
         } else {
