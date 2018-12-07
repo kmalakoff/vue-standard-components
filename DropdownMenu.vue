@@ -96,6 +96,7 @@ export default {
     // Menu toggling methods (including delayed hide on mouse out/in to allow cursor movement from title to dropdown)
     showMenu (force) {
       this.visibleMenu = true
+      console.log('(show) ' + this.visibleMenu)
       if (this.waitingToClose) { this.showAfterWait = true }
     },
     toggleMenu (force) {
@@ -114,6 +115,7 @@ export default {
         console.log('require direct toggle to turn off')
       } else if (!wait) {
         this.visibleMenu = false
+        console.log('(sh) ' + this.visibleMenu)
       } else if (this.waitingToClose) {
         this.showAfterWait = false
       } else {
@@ -122,6 +124,7 @@ export default {
           () => {
             _this.waitingToClose = false
             this.visibleMenu = this.showAfterWait
+            console.log('(delayed) ' + this.visibleMenu)
           }, 100)
         this.waitingToClose = true
       }
