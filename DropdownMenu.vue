@@ -99,24 +99,13 @@ export default {
       if (this.waitingToClose) { this.showAfterWait = true }
     },
     toggleMenu (force) {
-      console.log('toggle menu : keep on ? ' + this.keepOn)
-      this.waitingToClose = false
-      if (force) {
-        console.log('force toggle')
-        this.$set(this, 'visibleMenu', !this.visibleMenu)
-        this.$set(this, 'keepOn', false)
-      } else if (this.keepOn) {
-        this.$set(this, 'visibleMenu', false)
-        this.$set(this, 'keepOn', false)
-        console.log('keep on = ' + this.keepOn)
-      } else {
-        this.visibleMenu = true
-        this.keepOn = true
-      }
+      this.visibleMenu = !this.visibleMenu
+      console.log('(tm) menu = ' + this.visibleMenu)
     },
     hideMenu () {
       this.$set(this, 'visibleMenu', false)
       this.$set(this, 'keepOn', false)
+      console.log('(hm) menu = ' + this.visibleMenu)
     },
     slowHideMenu (wait) {
       // Hide menu (delay ignores rapid toggling by mouse out / in movements)
