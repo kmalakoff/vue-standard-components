@@ -26,6 +26,8 @@
           button.login-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Login')") Login
           br
           button.signup-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Register')") Register
+          br
+          p.error(v-if='authError') {{authError}}
     div(v-else)
       span.smallScreen
         div(v-if="nav.page==='Login'")
