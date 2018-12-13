@@ -185,12 +185,12 @@ export default {
     color: red;
   }
   .msg-warnings {
-    color: black;
-    background-color: orange;
+    color: orange;
+    // background-color: orange;
   }
   .msg-messages {
-    color: black;
-    background-color: lightgreen;
+    color: green;
+    // background-color: lightgreen;
   }
 
   @media screen and (min-width: 768px) {
