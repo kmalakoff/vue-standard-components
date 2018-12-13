@@ -28,50 +28,56 @@ options: {
 
 <template lang='pug'>
   div.table-form
-    div(v-if='debug')
-      p Fields: {{fields}}
-      p Record {{record}}
-      p Options: {{JSON.stringify(options.onCancel)}}
-      p Error: {{JSON.stringify(remoteErrors)}}
+    form
+      div(v-if='debug')
+        p Fields: {{fields}}
+        p Record {{record}}
+        p Options: {{JSON.stringify(options.onCancel)}}
+        p Error: {{JSON.stringify(remoteErrors)}}
+        hr
+      table.table
+        tr.row-heading(v-if='heading')
+          td.heading(colspan=3)
+            h2 {{heading}}
+        tr(v-for="field in fields" v-show="field.type!=='hidden'")
+          td(v-if='options.confirmFields')
+            b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
+          td.prompt-column(v-if="promptPosition==='left'")
+            b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{label(field)}}:
+          td.data-column
+            DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
+          td.extra-column(v-if="0 && myAccess === 'edit'")
+            span &nbsp;
+            a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)")
+              icon(name='question-circle' color='black' scale='2')
+            b &nbsp;
+        tr(v-for="r in include.visible")
+          td.prompt-column(v-if="prompt || myAccess==='read'")
+            b {{label(r)}}:
+          td.data-column
+            DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
+        tr(v-if='acceptFormPrompt && validated(form)')
+          td(colspan=4)
+            hr
+            <!-- icon(v-if='form.accepted' name='check' color='green') -->
+            table.accept-block
+              tr.accept-block
+                td.accept-checkbox
+                  b-form-checkbox.inline(:form="form" type='checkbox' name='accepted' v-model='form.accepted' v-on:click='acceptForm(form)')
+                td.accept-prompt
+                  b(v-bind:class="[{errorMessage: !form.accepted}]") {{acceptFormPrompt}}
+      span(v-for='r in include.hidden')
+        DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :remoteError='remoteErrors[field.name]')
       hr
-    table.table
-      tr.row-heading(v-if='heading')
-        td.heading(colspan=3)
-          h2 {{heading}}
-      tr(v-for="field in fields" v-show="field.type!=='hidden'")
-        td(v-if='options.confirmFields')
-          b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
-        td.prompt-column(v-if="promptPosition==='left'")
-          b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{label(field)}}:
-        td.data-column
-          DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
-        td.extra-column(v-if="0 && myAccess === 'edit'")
-          span &nbsp;
-          a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)")
-            icon(name='question-circle' color='black' scale='2')
-          b &nbsp;
-      tr(v-for="r in include.visible")
-        td.prompt-column(v-if="prompt || myAccess==='read'")
-          b {{label(r)}}:
-        td.data-column
-          DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
-      tr(v-if='acceptFormPrompt && validated(form)')
-        td(colspan=4)
-          hr
-          <!-- icon(v-if='form.accepted' name='check' color='green') -->
-          b-form-checkbox.inline(:form="form" type='checkbox' name='accepted' v-model='form.accepted' v-on:click='acceptForm(form)')
-          b(v-bind:class="[{errorMessage: !form.accepted}]") &nbsp; &nbsp; {{acceptFormPrompt}}
-    span(v-for='r in include.hidden')
-      DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :remoteError='remoteErrors[field.name]')
-    hr
-    button.btn.btn-primary.btn-lg(v-if="onSave" @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
-    span &nbsp; &nbsp;
-    button.btn.btn-danger.btn-lg(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
-    br
-    p.mandatoryPrompt(v-if='error') {{error}}
-    div(v-if='debug')
-      hr
-      b Form Input: {{myAccess}} : {{form}}
+      button.btn.btn-primary.btn-lg(v-if="onSave" :type='buttonType' @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
+      span &nbsp; &nbsp;
+      button.btn.btn-danger.btn-lg(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
+      br
+      p.mandatoryPrompt(v-if='error') {{error}}
+      p.mandatoryPrompt(v-if='remoteErrors && remoteErrors.form') {{remoteErrors.form}}
+      div(v-if='debug')
+        hr
+        b Form Input: {{myAccess}} : {{form}}
 </template>
 
 <script>
@@ -196,6 +202,10 @@ export default {
     if (this.options.confirmFields) {
       this.$set(this.form, 'confirmed', {})
     }
+
+    if (this.remoteErrors && this.remoteErrors.form) {
+      this.error = this.error || this.remoteErrors.form
+    }
   },
   computed: {
     table: function () {
@@ -266,6 +276,9 @@ export default {
       } else {
         return 'Save'
       }
+    },
+    buttonType: function () {
+      return this.options.buttonType
     },
     prompt: function () {
       if (this.options.prompt) {
@@ -501,5 +514,16 @@ export default {
 
   .inline {
     display: inline-block
+  }
+
+  .accept-block {
+    width: 100%
+  }
+  .accept-checkbox {
+    min-width: 20px;
+  }
+  .accept-prompt {
+    width: 100%;
+    padding-left: 10px;
   }
 </style>
