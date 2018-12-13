@@ -2,10 +2,12 @@
 
 <template lang= 'pug'>
   div.form-element(role='group')
-    b(v-if= 'debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
+    b(v-if='debug') F={{field}} M={{vModel}}; T={{inputType}} or {{otherType}}; D={{defaultTo}})
       br
-    label.element-label(v-if="promptPosition=== 'top' && otherType !== 'checkbox'" :for= 'field.name' :class="dynamicClass(field, 'label')") {{field.prompt || field.name}}:
+    label.element-label(v-if="promptPosition=== 'top' && otherType !== 'checkbox'" :for= 'field.name' :class="dynamicClass(field, 'label')") {{field.prompt || field.name}}: &nbsp; &nbsp;
+      b(v-if='remoteError') &nbsp; &nbsp; {{remoteError}}
     label.element-label(v-else-if="Ftype=== 'date' && !options.prompt" :for= 'field.name' ) {{field.prompt || field.name}}: &nbsp; &nbsp;
+      b(v-if='remoteError') &nbsp; &nbsp; {{remoteError}}
 
     b-form-input.input-lg(:id='randomId' v-if="inputType" @change.native="myChange" :type= 'inputType' :v-model= 'field.name' :placeholder="label" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native="myFocus" aria-describedby= 'helpfb errfb' :state='checkField(field)' :class="dynamicClass(field)" :disabled= 'disabled')
 
@@ -15,6 +17,8 @@
     b-form-radio-group(:id='randomId' v-else-if="otherType=== 'radio'" @change.native="myChange" :v-model= 'vModel' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :label= 'field.prompt' :options= 'field.options' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
     b-form-input.input-lg.date-type(:id='randomId' v-else-if="otherType=== 'date'" @change.native="myChange" type= 'date' :placeholder="datePlaceholder" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :v-model= 'vModel' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
+
+    b-form-input.input-lg.date-type(:id='randomId' v-else-if="otherType=== 'time'" @change.native="myChange" type= 'datetime-local' :placeholder="datePlaceholder" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :v-model= 'vModel' :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
     b-form-select.input-lg(:id='randomId' v-else-if="otherType=== 'enum'" @change.native="myChange" :options="list(field)" :value= 'defaultTo' :default= 'defaultTo'  @blur.native= 'myBlur' @focus.native="myFocus" :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
 
@@ -153,6 +157,7 @@ export default {
           case 'float' : return 'decimal'
           case 'date' : return 'date'
           case 'time' : return 'time'
+          case 'datetime' : return 'time'
           case 'fixed' : return 'fixed'
           case 'reference' : return 'reference'
           case 'hidden' : return 'hidden'
