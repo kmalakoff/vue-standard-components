@@ -85,7 +85,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                   div(v-if="modalType==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="modalType==='record'")
-                    DBForm(:options='options' :onSave='save' :append='append' :record='modalRecord' :cancel='cancel')
+                    DBForm(:options='options' :onSave='save' :append='append' :remoteErrors='remoteErrors' :record='modalRecord' :cancel='cancel')
                     div(v-if='options.addLinks' v-for='link in options.addLinks')
                       button.btn.btn-primary(@click.prevent="link.onPick(modalData)") {{link.name}}
                   div(v-else-if="modalType==='data'")
@@ -99,7 +99,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     div(v-else)
                       b No Content Supplied
                   div(v-else-if="modalType==='confirm'")
-                    DBForm(:options='confirmOptions', :onSave='save' :cancel='cancel')
+                    DBForm(:options='confirmOptions', :onSave='save' :cancel='cancel' :remoteErrors='remoteErrors')
                   div(v-else-if="modalType==='input'")
                     b(v-if='myPrompt') &nbsp; &nbsp; {{myPrompt}}
                     input.input-lg(type='text' name='input' v-model='input' v-on:click='save')
@@ -255,6 +255,9 @@ export default {
     },
     confirm: {
       type: Array
+    },
+    remoteErrors: {
+      type: Object
     }
     // action: {
     //   type: Function
