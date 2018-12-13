@@ -17,9 +17,9 @@
           button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
           span &nbsp; &nbsp;
       span.wideScreen
-        Modal.login-modal(type='record' id='login-modal' :error='authError' :title='loginTitle' :options='loginOptions' :note='note')
+        Modal.login-modal(type='record' id='login-modal' :error='authError' :title='loginTitle' :options='loginOptions' :note='note' :remoteErrors='formErrors')
         span &nbsp; &nbsp;
-        Modal.signup-modal(type='record' id='register-modal' :error='authError' :title='regTitle' :options='registerOptions' :note='note')
+        Modal.signup-modal(type='record' id='register-modal' :error='authError' :title='regTitle' :options='registerOptions' :note='note' :remoteErrors='formErrors')
           p &nbsp;
       span.smallScreen
         div
@@ -32,7 +32,7 @@
       span.smallScreen
         // Not using modal...
         div(v-if="nav.page==='Login'")
-          DBForm.login-form(:options='loginOptions' :onSave='login')
+          DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors')
         div(v-else-if="nav.page==='Register'")
           DBForm.signup-form(:options='registerOptions' :onSave='register')
         p &nbsp;
@@ -49,8 +49,10 @@ import Modal from './Modal'
 import DBForm from './DBForm'
 import DropdownMenu from './DropdownMenu'
 import auth from '../../auth'
+// import { validateResponse } from '../../services/form-validator.js'
 // import Standard from './config.js'
 import Config from '@/config.js'
+import FormValidator from './mixins/FormValidator'
 
 export default {
   data () {
@@ -64,7 +66,7 @@ export default {
       error: '',
       authError: '',
       note: 'asldfj',
-
+      formErrors: {},
       userMenu: [
         // may supply custom versions in place of this ...
         { label: 'Profile', loadModal: {data: this.getUser, title: 'User Profile', id: 'profile'} },
@@ -83,7 +85,8 @@ export default {
         onCancel: this.cancel,
         buttonClass: Config.defaultButtonClass,
         submitButtonClass: 'btn-primary btn-lg',
-        noClose: true
+        noClose: true,
+        buttonType: 'submit'
       },
 
       registerOptions: {
@@ -98,12 +101,16 @@ export default {
         onCancel: this.cancel,
         buttonClass: Config.defaultButtonClass,
         submitButtonClass: 'btn-primary btn-lg',
-        noClose: true
+        noClose: true,
+        buttonType: 'submit'
       },
       apiUrl: Config.apiURL,
       status: 'initialized'
     }
   },
+  mixins: [
+    FormValidator
+  ],
   components: {
     Modal,
     DBForm,
@@ -201,20 +208,43 @@ export default {
       }
       console.log('login ' + form.email)
       var response = await auth.login(this, credentials)
-        .catch(function (error) {
-          var msg = '' + error
-          console.log(msg)
-          return {error: msg}
-        })
       console.log('Login response:' + JSON.stringify(response))
+      // try {
+      // var returnval = await validateResponse(response)
+      // console.log('returned: ' + JSON.stringify(returnval))
 
+      //   if (returnval && returnval.formErrors) { this.formErrors = returnval.formErrors }
+      //   return returnval
+      // } catch (err) {
+      //   console.log('error: ' + err)
+      //   return {error: 'error: ' + err}
+      // }
+      // console.log('validation errors: ' + JSON.stringify(response.data.validation_errors))
+      // var errors = response.data.validation_errors
+      // if (errors.constructor === Array && errors.length) {
+      //   // based on adonis validator format
+      //   if (errors[0] && errors[0].field) {
+      //     for (var i = 0; i < errors.length; i++) {
+      //       console.log('e: ' + JSON.stringify(errors[i]))
+      //       this.$set(this.formErrors, errors[i].field, errors[i].message)
+      //     }
+      //   } else {
+      //     console.log('no errors..')
+      //   }
+      // }
       return this.initializeSession(response)
     },
     initializeSession (response, onSuccess) {
       // console.log('initialize session for ' + response)
       this.$store.dispatch('AUTH_LOGOUT') // clear any existing user sessions first
-      if (response.error) {
+      if (response.data && response.data.validation_errors) {
+        console.log('get service response')
+        var val = this.validateResponse(response)
+        if (val.formErrors) { this.$set(this, 'formErrors', val.formErrors) }
+        return response.data
+      } else if (response.error) {
         this.$store.dispatch('logError', response.error)
+        return response
       } else if (response.data) {
         if (response.data && response.data.success) {
           this.nav.goto('Home')
@@ -241,7 +271,8 @@ export default {
           return 'no recognized response...'
         }
       } else {
-        this.$store.dispatch('logWarning', 'unrecognized respose')
+        this.$store.dispatch('logWarning', 'unrecognized response')
+        return {warning: 'unrecognized response'}
       }
     },
     loadDemo (template) {
@@ -253,9 +284,14 @@ export default {
         console.log(JSON.stringify(this.demo))
       }
     },
-    logout () {
+    async logout () {
       this.nav.goto('Home')
       this.$store.dispatch('AUTH_LOGOUT')
+
+      var loginId = this.payload.login_id
+      console.log(loginId + ' logout via auth')
+      var response = await auth.logout(this, loginId)
+      console.log('Logout response:' + JSON.stringify(response))
     },
     getUser () {
       this.nav.goto('Home', 'Profile')
@@ -306,6 +342,7 @@ export default {
       console.log('validated')
     },
     cancel () {
+      this.$set(this, 'formErrors', {})
       console.log('cancel this form')
       this.nav.goto('Home')
       this.authError = ''
