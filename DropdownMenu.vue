@@ -15,17 +15,21 @@
 -->
 <template lang='pug'>
   div.customMenu
-    a(href='/' onclick='return false' v-on:mouseover="showMenu" v-on:mouseout="slowHideMenu(1)" v-on:click='toggleMenu')
+    a(href='/' onclick='return false' v-on:click='toggleMenu')
+      <!--  v-on:mouseout="slowHideMenu(1)" -->
       span.menu-title
         icon(v-if="visibleMenu" name='caret-up')
         icon(v-if="!visibleMenu" name='caret-down')
         span &nbsp; {{title}} &nbsp;
     div.custom-menu(style='position: absolute')
-      table.table.dropdown-table.input-lg(v-if="visibleMenu" v-on:mouseover="showMenu" v-on:mouseout="slowHideMenu(1)")
+      table.table.dropdown-table.input-lg(v-if="visibleMenu")
         tr.option-row(v-for="option, i in options" width='100%')
           td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]")
             <!-- button(v-bind:class="[{option0: i===0}, {optionN: i===options.length}]") -->
-            a(href='/' onclick='return false' @click.prevent="runMethod(option)")
+            span(v-if="option.checked")
+              icon(name='check-circle')
+              span &nbsp;
+            a.inline(href='/' onclick='return false' @click.prevent="runMethod(option)")
               span.option-label {{option.label}}
     Modal(v-if='modal' :id='modal' type='data')
       span &nbsp; &nbsp;
@@ -54,7 +58,8 @@ export default {
       },
       showAfterWait: false,
       waitingToClose: false,
-      keepOn: false
+      keepOn: false,
+      hovering: false
       // options: [
       //   {label: 'Profile', loadModal: this.getUser},
       //   {label: 'Logout', onClick: this.logout}
@@ -94,13 +99,21 @@ export default {
       console.log('log me out... ')
     },
     // Menu toggling methods (including delayed hide on mouse out/in to allow cursor movement from title to dropdown)
-    showMenu (force) {
+    hoverMenu (force) {
       this.visibleMenu = true
+      this.hovering = true
+      this.keepOn = true
       console.log('(show) ' + this.visibleMenu)
       if (this.waitingToClose) { this.showAfterWait = true }
     },
     toggleMenu (force) {
-      this.visibleMenu = !this.visibleMenu
+      if (this.hovering && this.visibleMenu) {
+        // just close on exit
+        this.visibleMenu = !this.visibleMenu
+        console.log('close when mousing out')
+      } else {
+        this.visibleMenu = !this.visibleMenu
+      }
       console.log('(tm) menu = ' + this.visibleMenu)
     },
     hideMenu () {
@@ -110,6 +123,7 @@ export default {
     },
     slowHideMenu (wait) {
       // Hide menu (delay ignores rapid toggling by mouse out / in movements)
+      this.hovering = false
       var _this = this
       if (this.keepOn) {
         console.log('require direct toggle to turn off')
@@ -229,13 +243,13 @@ export default {
   }
 
   .dropdown-table a{
-    display: block;
+    display: inline-block;
     padding: 5px;
     padding-left: 15px;
     /*text-decoration: none;*/
   }
   .dropdown-table a:hover{
-    display: block;
+    display: inline-block;
     padding: 5px;
     padding-left: 15px;
     text-decoration: none;
