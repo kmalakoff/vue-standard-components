@@ -14,7 +14,7 @@
     h4 {{show}}
     hr
     // TestOCR(v-if="show==='OCR'")
-    TestForm(v-else-if="show==='Form'")
+    TestForm(v-if="show==='Form'")
     TestModalForm(v-else-if="show==='ModalForm'")
     h4 Return:
     p {{returnval}}
