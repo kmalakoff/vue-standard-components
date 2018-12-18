@@ -56,7 +56,7 @@ options: {
             b {{label(r)}}:
           td.data-column
             DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
-        tr(v-if='acceptFormPrompt && validated(form)')
+        tr(v-if='acceptFormPrompt')
           td(colspan=4)
             hr
             <!-- icon(v-if='form.accepted' name='check' color='green') -->
@@ -65,7 +65,7 @@ options: {
                 td.accept-checkbox
                   b-form-checkbox.inline(:form="form" type='checkbox' name='accepted' v-model='form.accepted' v-on:click='acceptForm(form)')
                 td.accept-prompt
-                  b(v-bind:class="[{errorMessage: !form.accepted}]") {{acceptFormPrompt}}
+                  span {{acceptFormPrompt}}
       span(v-for='r in include.hidden')
         DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :remoteError='remoteErrors[field.name]')
       hr
@@ -75,6 +75,7 @@ options: {
       br
       p.mandatoryPrompt(v-if='error') {{error}}
       p.mandatoryPrompt(v-if='remoteErrors && remoteErrors.form') {{remoteErrors.form}}
+      p(v-if='(error || (remoteErrors && remoteErrors.form)) && acceptFormPrompt') Note: you may need to toggle 'accept' checkbox to enable editing of previously entered form elements
       div(v-if='debug')
         hr
         b Form Input: {{myAccess}} : {{form}}
