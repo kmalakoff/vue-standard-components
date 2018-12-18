@@ -36,7 +36,7 @@
           icon(name='times')
       div(v-for='warn in warnings' align='center')
         b(v-if='warn') {{warn}}
-    div.msg-messages(v-if='messageCount')
+    div.msg-messages#hideMe(v-if='messageCount')
       div.right
         button.btn.btn-danger(@click.prevent="clear")
           icon(name='times')
