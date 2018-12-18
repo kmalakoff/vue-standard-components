@@ -5,7 +5,7 @@
     <!-- b V:  -->
     <!-- a (href='#' @click.prevent='profile') Profile -->
     div.user-icon(v-if='userid')
-      DropdownMenu.user-dropdown(:options='userMenu' :title='payload.username')
+      DropdownMenu.user-dropdown(:options='myUserMenu' :title='payload.username')
       <!-- span {{payload.username}} -->
       <!-- span &nbsp; | &nbsp; -->
       <!-- a(href='#' @click.prevent='logout') -->
@@ -67,7 +67,8 @@ export default {
       authError: '',
       note: 'asldfj',
       formErrors: {},
-      userMenu: [
+      // userMenu: [],
+      initMenu: [
         // may supply custom versions in place of this ...
         { label: 'Profile', loadModal: {data: this.getUser, title: 'User Profile', id: 'profile'} },
         { label: 'Logout', onClick: this.logout }
@@ -142,7 +143,7 @@ export default {
     }
   },
   created: function () {
-    this.$set(this, 'userMenu', this.myUserMenu)
+    // this.$set(this, 'userMenu', this.myUserMenu)
   },
   computed: {
     // payload: function () {
@@ -153,17 +154,14 @@ export default {
       if (this.add2Menu) {
         console.log('add2menu...')
         var menu = []
-        menu.push(this.userMenu[0])
+        menu.push(this.initMenu[0])
         for (var i = 0; i < this.add2Menu.length; i++) {
           menu.push(this.add2Menu[i])
-          console.log('add + ' + JSON.stringify(this.add2Menu[i]))
         }
-        menu.push(this.userMenu[1])
-        console.log('got ' + JSON.stringify(menu))
+        menu.push(this.initMenu[1])
         return menu
       } else {
-        console.log('default menu')
-        return this.userMenu
+        return this.initMenu
       }
     },
     userid: function () {
@@ -287,9 +285,10 @@ export default {
     async logout () {
       this.nav.goto('Home')
       this.$store.dispatch('AUTH_LOGOUT')
-
       var loginId = this.payload.login_id
       console.log(loginId + ' logout via auth')
+
+      this.$store.dispatch('payload', { access: 'public' })
       var response = await auth.logout(this, loginId)
       console.log('Logout response:' + JSON.stringify(response))
     },
