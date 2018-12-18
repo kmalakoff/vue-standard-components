@@ -83,11 +83,14 @@ export default {
                   if (min && min.length >= 2) {
                     msg = 'this field must be at least ' + min[1] + ' characters long'
                   } else { msg = 'min length.' }
+                } else if (errors[i].validation === 'unique') {
+                  msg = 'this field must be unique'
                 } else if (errors[i].validation === 'ENGINE_EXCEPTION') {
                   formErrors.form = error
                 }
                 formErrors[errors[i].field] = msg
               }
+              formErrors.form = 'Validation Errors'
             } else {
               console.log('no errors..')
             }
