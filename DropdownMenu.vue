@@ -24,12 +24,12 @@
     div.custom-menu(v-if="visibleMenu" style='position: absolute')
       table.table.dropdown-table.input-lg
         tr.option-row(v-for="option, i in options" width='100%')
-          td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]")
+          td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]"  @click.prevent="runMethod(option)")
             <!-- button(v-bind:class="[{option0: i===0}, {optionN: i===options.length}]") -->
             span(v-if="option.checked")
               icon(name='check-circle')
               span &nbsp;
-            a.inline(href='/' onclick='return false' @click.prevent="runMethod(option)")
+            a.inline(href='/' onclick='return false')
               span.option-label {{option.label}}
     Modal(v-if='modal' :id='modal' type='data')
       span &nbsp; &nbsp;
@@ -144,7 +144,7 @@ export default {
       }
     },
     runMethod (opt) {
-      console.log('run method...')
+      console.log('running method...')
       if (opt && opt.onClick) {
         opt.onClick(opt)
       }
