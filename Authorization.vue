@@ -38,7 +38,7 @@
         p &nbsp;
         p.error(v-if='authError') {{authError}}
 
-    span.wideScreen(v-if="nav.path.length > 1")
+    span.wideScreen.nav-path(v-if="nav.path.length > 1")
       div(style='display:inline-block' v-for='page, i in nav.path')
         br
         a(v-on:click='nav.direct(i)') {{page}}
@@ -443,5 +443,8 @@ export default {
 .note--up {
   transform: translateY(0);
 }
-
+.nav-path {
+  position: relative;
+  top: 30px;
+}
 </style>
