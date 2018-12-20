@@ -21,8 +21,8 @@
         icon(v-if="visibleMenu" name='caret-up')
         icon(v-if="!visibleMenu" name='caret-down')
         span &nbsp; {{title}} &nbsp;
-    div.custom-menu(style='position: absolute')
-      table.table.dropdown-table.input-lg(v-if="visibleMenu")
+    div.custom-menu(v-if="visibleMenu" style='position: absolute')
+      table.table.dropdown-table.input-lg
         tr.option-row(v-for="option, i in options" width='100%')
           td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]")
             <!-- button(v-bind:class="[{option0: i===0}, {optionN: i===options.length}]") -->
