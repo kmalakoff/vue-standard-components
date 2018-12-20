@@ -742,12 +742,12 @@ export default {
 .m-fadeOut {
   visibility: hidden;
   opacity: 0;
-  transition: visibility 0s linear 1000ms, opacity 1000ms;
+  // transition: visibility 0s linear 1000ms, opacity 1000ms;
 }
 .m-fadeIn {
   visibility: visible;
   opacity: 1;
-  transition: visibility 0s linear 0s, opacity 1000ms;
+  // transition: visibility 0s linear 0s, opacity 1000ms;
   min-height: 500px;
 }
 
