@@ -22,24 +22,17 @@
 !-->
 
 <template lang='pug'>
-  div.message-block(v-if='errorCount || warningCount || messageCount')
-    p &nbsp;
-    div.msg-errors(v-if='errorCount')
-      div.right
-        button.btn.btn-danger(@click.prevent="clear")
-          icon(name='times')
+  div.message-block(v-if='errorsFound|| warningsFound || messagesFound')
+    div.right
+      button.btn.btn-danger(@click.prevent="clear")
+        icon(name='times')
+    div.msg-errors(v-if='errorsFound')
       div(v-for='err in errors' align='center')
         b(v-if='err') {{err}}
     div.msg-warnings(v-if='warningCount')
-      div.right
-        button.btn.btn-danger(@click.prevent="clear")
-          icon(name='times')
       div(v-for='warn in warnings' align='center')
         b(v-if='warn') {{warn}}
     div.msg-messages#hideMe(v-if='messageCount')
-      div.right
-        button.btn.btn-danger(@click.prevent="clear")
-          icon(name='times')
       div(v-for='msg in messages' align='center')
         b(v-if='msg') {{msg}}
 </template>
@@ -146,6 +139,33 @@ export default {
         console.log('got immediate errors')
         return { default: this.err }
       }
+    },
+    messagesFound () {
+      if (this.messageCount) {
+        var string = JSON.stringify(this.messages)
+        if (string.match(/a-zA-Z/)) {
+          return true
+        }
+      }
+      return false
+    },
+    warningsFound () {
+      if (this.warningCount) {
+        var string = JSON.stringify(this.warnings)
+        if (string.match(/a-zA-Z/)) {
+          return true
+        }
+      }
+      return false
+    },
+    errorsFound () {
+      if (this.errorCount) {
+        var string = JSON.stringify(this.errors)
+        if (string.match(/[{]/)) {
+          return true
+        }
+      }
+      return false
     }
   },
   methods: {
@@ -170,6 +190,8 @@ export default {
     text-align: center;
     // border: 1px solid black;
     color: black;
+    background-color: lightgrey;
+    margin: 10px;
   }
 
   .msg-errors, .msg-warnings, .msg-messages {
@@ -180,8 +202,7 @@ export default {
   }
 
   .msg-errors {
-    background-color: lightgrey;
-    box-shadow: 0 0 3pt 2pt;
+    // box-shadow: 0 0 3pt 2pt;
     color: red;
   }
   .msg-warnings {
@@ -196,7 +217,7 @@ export default {
   @media screen and (min-width: 768px) {
     div.msg-errors {
       line-height: 2rem;
-      border: 1px solid red;
+      // border: 1px solid red;
     }
   }
 
