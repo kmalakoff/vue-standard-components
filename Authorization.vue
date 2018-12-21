@@ -42,7 +42,7 @@
       div(style='display:inline-block' v-for='page, i in nav.path')
         br
         a(v-on:click='nav.direct(i)') {{page}}
-          span(v-if='i < nav.path.length - 1') &nbsp; > &nbsp;
+        span(v-if='i < nav.path.length - 1') &nbsp; > &nbsp;
 </template>
 <script>
 import Modal from './Modal'
