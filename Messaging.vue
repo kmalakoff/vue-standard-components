@@ -161,7 +161,7 @@ export default {
     errorsFound () {
       if (this.errorCount) {
         var string = JSON.stringify(this.errors)
-        if (string.match(/[{]/)) {
+        if (string.match(/a-zA-Z/)) {
           return true
         }
       }
