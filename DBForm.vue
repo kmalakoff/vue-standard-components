@@ -405,7 +405,6 @@ export default {
       var checked = 0
       var verified = 0
       var hidden = 0
-      console.log('fail check #: ' + JSON.stringify(this.fields.length))
       for (var i = 0; i < this.fields.length; i++) {
         var passed = false
         var check = false
@@ -433,15 +432,13 @@ export default {
           failed = true
         }
       }
-      console.log(' failed: ' + failed + ' : verified ' + verified + ' of ' + checked + ' - hidden: ' + hidden)
       var validated = !failed
+      console.log('verified ' + verified + ' of ' + checked + ' (hidden: ' + hidden + '): ' + validated)
       return validated
     },
     disabled: function (form) {
-      console.log('check disabled status')
       var validated = this.validated(form)
       var accepted = this.acceptedForm(form)
-      console.log('disabled = ' + validated + ' + ' + accepted)
       if (!validated) {
         this.error = this.defaultDisabledMessage
       } else {
@@ -454,7 +451,7 @@ export default {
         this.error = ''
       }
       var disabled = !validated || !accepted
-      console.log('.. ' + disabled)
+      console.log('accepted = ' + accepted + '; validated = ' + validated + ' -> ' + disabled)
       return disabled
     },
     onCancel: function () {
