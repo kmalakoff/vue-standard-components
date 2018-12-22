@@ -29,10 +29,10 @@
     div.msg-errors(v-if='errorsFound')
       div(v-for='err in errors' align='center')
         b(v-if='err') {{err}}
-    div.msg-warnings(v-if='warningCount')
+    div.msg-warnings(v-if='warningsFound')
       div(v-for='warn in warnings' align='center')
         b(v-if='warn') {{warn}}
-    div.msg-messages#hideMe(v-if='messageCount')
+    div.msg-messages(v-if='messagesFound')
       div(v-for='msg in messages' align='center')
         b(v-if='msg') {{msg}}
 </template>
@@ -143,7 +143,7 @@ export default {
     messagesFound () {
       if (this.messageCount) {
         var string = JSON.stringify(this.messages)
-        if (string.match(/a-zA-Z/)) {
+        if (string.match(/[a-zA-Z]/)) {
           return true
         }
       }
@@ -152,7 +152,7 @@ export default {
     warningsFound () {
       if (this.warningCount) {
         var string = JSON.stringify(this.warnings)
-        if (string.match(/a-zA-Z/)) {
+        if (string.match(/[a-zA-Z]/)) {
           return true
         }
       }
@@ -161,7 +161,7 @@ export default {
     errorsFound () {
       if (this.errorCount) {
         var string = JSON.stringify(this.errors)
-        if (string.match(/a-zA-Z/)) {
+        if (string.match(/[a-zA-Z]/)) {
           return true
         }
       }
@@ -177,6 +177,12 @@ export default {
   watch: {
     errorCount: function () {
       console.log('error count changed...')
+    },
+    warningCount: function () {
+      console.log('warning count changed...')
+    },
+    messageCount: function () {
+      console.log('message count changed...')
     }
   }
 
