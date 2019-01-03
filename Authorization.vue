@@ -206,6 +206,9 @@ export default {
       }
       console.log('login ' + form.email)
       var response = await auth.login(this, credentials)
+      if (response && response.expired) {
+        this.$store.dispatch('logWarning', 'Session Expired.  Please log in again.')
+      }
       console.log('Login response:' + JSON.stringify(response))
       // try {
       // var returnval = await validateResponse(response)
