@@ -23,7 +23,7 @@
 
 <template lang='pug'>
   div.message-block(v-if='errorsFound|| warningsFound || messagesFound')
-    div.right
+    div.top-right
       button.btn.btn-danger(@click.prevent="clear")
         icon(name='times')
     div.msg-errors(v-if='errorsFound')
