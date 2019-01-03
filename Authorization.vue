@@ -38,7 +38,7 @@
         p &nbsp;
         p.error(v-if='authError') {{authError}}
 
-    span.wideScreen.nav-path(v-if="nav.path.length > 1")
+    span.vwideScreen.nav-path(v-if="nav.path.length > 1")
       div(style='display:inline-block' v-for='page, i in nav.path')
         br
         a(v-on:click='nav.direct(i)') {{page}}
