@@ -49,31 +49,39 @@ const mutations = {
   message (state, input) {
     var index = state.messages.length
     if (input) {
+      console.log('generated message: ' + input)
       Vue.set(state.messages, index, input)
     }
   },
   warning (state, input) {
-    var index = state.messages.length
+    var index = state.warnings.length
     if (input) {
+      console.log('generated warning: ' + input)
       Vue.set(state.warnings, index, input)
     }
   },
   error (state, input) {
-    var index = state.messages.length
+    var index = state.errors.length
     if (input) {
+      console.log('generated error: ' + input)
       Vue.set(state.errors, index, input)
+      console.log(JSON.stringify(state.errors))
     }
   },
   clearMessages (state) {
+    console.log('cleared messages')
     Vue.set(state, 'messages', [])
   },
   clearWarnings (state) {
+    console.log('cleared warnings')
     Vue.set(state, 'warnings', [])
   },
   clearErrors (state) {
+    console.log('cleared errors')
     Vue.set(state, 'errors', [])
   },
   clearAll (state) {
+    console.log('cleared all')
     Vue.set(state, 'warnings', [])
     Vue.set(state, 'messages', [])
     Vue.set(state, 'errors', [])
@@ -103,6 +111,7 @@ const actions = {
     state.commit('error', input)
   },
   clearMessages (state) {
+    console.log('clear all messages')
     state.commit('clearAll')
   }
 }

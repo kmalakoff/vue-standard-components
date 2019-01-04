@@ -5,6 +5,7 @@ import login from './login'
 import caching from './caching'
 import messaging from './messaging'
 import modal from './modal'
+import kyc from './kyc'
 
 Vue.use(Vuex)
 
@@ -20,7 +21,8 @@ const store = new Vuex.Store({
     login,
     caching,
     messaging,
-    modal
+    modal,
+    kyc
   },
 
   strict: debug

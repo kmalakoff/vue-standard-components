@@ -50,8 +50,7 @@ const getters = {
     return state.updates
   },
   getHash: state => key => {
-    console.log(' Get ' + key + ': ')
-    console.log(JSON.stringify(state.hash[key]))
+    console.log(' Get ' + key + ': ' + JSON.stringify(state.hash[key]))
     console.log('updates: ' + JSON.stringify(state.updates)) // this log message triggers update (required !)
     if (key) {
       return state.hash[key]
@@ -82,8 +81,6 @@ const mutations = {
   },
   setHash (state, options) {
     // define custom hash - typically called from created section of primary component
-    console.log('define hash as: ' + JSON.stringify(options))
-
     if (!options) { options = {} }
     var key = options.key
     var value = options.value
@@ -91,6 +88,7 @@ const mutations = {
     var defaults = options.defaults
     var map = options.map
 
+    console.log('set cached ' + key + ': ' + JSON.stringify(value))
     if (key && fields && fields.length) {
       state.hash_fields[key] = fields
       // for (var i = 0; i < fields.length; i++) {
