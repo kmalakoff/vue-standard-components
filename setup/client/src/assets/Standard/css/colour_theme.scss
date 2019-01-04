@@ -1,0 +1,191 @@
+$base-colour: rgb(93, 148, 208);
+
+.std-colour {
+  color: rgb(93,148,208);
+}
+
+.full-width-padding {
+  padding: 40px 50px;
+}
+
+.thickColourLine {
+  border: 3px solid rgb(93, 148, 208);
+}
+.thickBlackLine {
+  border: 3px solid black;  
+}
+.thinColourLine {
+  border: 1px solid rgb(93, 148, 208);
+}
+.thinBlackLine {
+  border: 1px solid black;  
+}
+
+
+// Generic custom CSS styles
+.transluscent {
+  opacity: 0.3;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.circle {
+	border-radius: 50%;
+}
+
+// Default Table Colours
+table {
+  padding: 1rem;
+}
+table th.heading {
+  color: white;
+  background-color: $base-colour;
+  padding: 1rem;
+  text-align: center;
+}
+
+// Tab Element Themes
+/* Define colour and border specs for Standard/Tab elements */
+
+$tab-background: transparent;
+$tab-text-colour: #666;
+$tab-separator: ''; // may benefit from standard width specs (flexbox: ?)
+$active-colour: black;
+$active-background: lightgray;
+$hover-background: silver;
+$hover-colour: black;
+$active-border-top: '';
+$active-border-bottom: '';
+$full-border-bottom: solid lightgray 2px;
+$full-border-top: solid lightgray 2px;
+
+.tabBar {
+  border-bottom: $full-border-bottom;
+  border-top: $full-border-top;
+}
+
+.visible-tab {
+  background-color: $tab-background;
+}
+
+.visible-tab a {
+  color: $tab-text-colour;
+  text-align: center;
+  text-decoration: none;
+  font-size: 17px;
+  border-left: $tab-separator;
+  border-right: $tab-separator;
+}
+
+.visible-tab a:hover {
+  background-color: $hover-background;
+  color: $hover-colour;
+}
+
+a.activetab {
+  color: $active-colour;
+  background-color: $active-background;
+  font-weight: normal;
+  border-bottom: $active-border-bottom;
+  border-top: $active-border-top;
+}
+
+// Dropdown Settings:
+.customMenu a {
+  color: gray;
+}
+.customMenu a:hover {
+  color: black;
+}
+
+.custom-menu {
+  position: absolute;
+  background-color: lightblue;
+  box-shadow: 0 0 3pt 2pt gray;
+  border: 1px solid gray;
+  z-index: 5;
+}
+
+// Form Elements
+
+.errorPrompt {
+  color: red
+}
+.mandatoryPrompt {
+  color: red;
+}
+.mandatoryPromptOK {
+  color: black;
+}
+.mandatoryInputOK {
+  border-color: 1px solid green;
+  // box-shadow: 0 0 1px 1px green, 0 0 8px;
+}
+.mandatoryInputNotOK {
+  border-color: red;
+  // box-shadow: 0 0 1px 1px red;
+}
+
+
+// Dropdown themes
+.dropdown-option-cell {
+  min-width: (90vw)
+}
+@media screen and (min-width: 768px) {
+  .dropdown-option-cell{
+    min-width: 300px;
+  }
+}
+
+table.dropdown-table {
+  border: 1px solid gray;
+  opacity: 1;
+  border-radius: 6px;
+  min-width: 200px;
+  background-color: white;
+}
+.dropdown-option-cell {
+  // match btn-primary
+  // background-color: #337ab7;
+  color: gray;
+  background-color: white;
+}
+.dropdown-option-cell:hover {
+  // background-color: #286090;
+  background-color: #eee;
+  color: black;
+}
+.dropdown-option-label {
+  color: gray;
+}
+.dropdown-option-label:hover {
+  color: black;
+}
+
+.customMenu a {
+  color: gray;
+}
+.customMenu a:hover {
+  font-weight: normal;
+  text-decoration: none;
+  color: black;
+}
+
+.firstOption {
+  border-bottom: 1px solid black;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+.lastOption {
+  border-top: 1px solid black;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.menu-title {
+  font-size: 2rem;
+}
+
+// Modal Themes
