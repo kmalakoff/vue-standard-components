@@ -22,8 +22,6 @@ const Database = use('Database')
 const customConfig = Config.get('custom.database')
 
 // require('./ABCDRoutes') // Substitute custom routes here (replace 'ABCD' with your route names)
-
-require('./sparc/sparcRoutes')
 // require('./searchRoutes')
 
 Route.on('/').render('welcome')
