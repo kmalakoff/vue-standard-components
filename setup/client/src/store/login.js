@@ -33,6 +33,7 @@ const getters = {
       } else {
         console.log('retrieved payload: ' + JSON.stringify(payload))
         if (payload.constructor === String) {
+          if (payload === '[object Object]') { payload = "{access: 'public'}" }
           return JSON.parse(payload)
         } else {
           return payload
@@ -109,7 +110,7 @@ const mutations = {
   },
   AUTH_CLEAR: (state) => {
     localStorage.setItem('user-token', '')
-    localStorage.setItem('payload', {access: 'public'})
+    localStorage.setItem('payload', "{access: 'public'}")
     localStorage.removeItem('payload-expires')
     state.payloadData = {access: 'public'}
     console.log('cleared local payload & token states')
