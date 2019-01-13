@@ -81,7 +81,7 @@ export default {
         onSave: this.login,
         onBlur: this.checkInput,
         onFocus: this.inputFocus,
-        submitButton: 'Log Me In',
+        submitButton: 'Log In',
         wideOnMobile: true,
         onCancel: this.cancel,
         buttonClass: Config.defaultButtonClass,
@@ -146,10 +146,6 @@ export default {
     // this.$set(this, 'userMenu', this.myUserMenu)
   },
   computed: {
-    // payload: function () {
-    //   var P = localStorage.getItem('payload')
-    //   return P
-    // },
     myUserMenu: function () {
       if (this.add2Menu) {
         console.log('add2menu...')
@@ -248,18 +244,17 @@ export default {
         return response
       } else if (response.data) {
         if (response.data && response.data.success) {
+          if (response.data.token) {
+            console.log('token cached: ' + response.data.token)
+            this.$store.dispatch('AUTH_TOKEN', response.data.token)
+          }
           this.nav.goto('Home')
           if (onSuccess) {
             this.$store.dispatch('logMessage', onSuccess)
           }
-
-          if (response.data.token) {
-            // console.log('token: ' + response.data.token)
-            this.$store.dispatch('AUTH_TOKEN', response.data.token)
-          }
           if (response.data.payload) {
             console.log('payload: ' + JSON.stringify(response.data.payload))
-            this.$store.dispatch('AUTH_PAYLOAD', response.data.payload)
+            this.$store.dispatch('CACHE_PAYLOAD', response.data.payload)
           }
           return { success: true }
         } else if (response.data && response.data.error) {
@@ -291,7 +286,7 @@ export default {
       var loginId = this.payload.login_id
       console.log(loginId + ' logout via auth')
 
-      this.$store.dispatch('payload', { access: 'public' })
+      this.$store.dispatch('CACHE_PAYLOAD', { access: 'public' })
       var response = await auth.logout(this, loginId)
       console.log('Logout response:' + JSON.stringify(response))
     },
