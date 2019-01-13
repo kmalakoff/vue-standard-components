@@ -111,9 +111,10 @@ class AuthController {
 
 				if (authenticator === 'jwt') {
 					console.log('get token...')
-					token = await auth
+					const access = await auth
             			.withRefreshToken()
             			.attempt(email, password)
+            		token = access.token
 				}
 
 				console.log('get authorized user...')

@@ -19,6 +19,7 @@ const getters = {
   authStatus: state => state.status,
   payload: state => {
     var payload = state.payloadData || localStorage.getItem('payload')
+
     if (payload) {
       var expires = localStorage.getItem('payload-expires') || '0'
       expires = parseInt(expires)
@@ -33,9 +34,16 @@ const getters = {
       } else {
         console.log('retrieved payload: ' + JSON.stringify(payload))
         if (payload.constructor === String) {
-          if (payload === '[object Object]') { payload = "{access: 'public'}" }
-          return JSON.parse(payload)
+          const defaultPayload = { access: 'public' }
+          console.log('String: ' + payload)
+          if (payload === '[object Object]') { payload = JSON.stringify(defaultPayload) }
+          if (payload === "{access: 'public'}") { payload = JSON.stringify(defaultPayload) }
+          console.log('String: ' + payload)
+          var parsed = JSON.parse(payload)
+          console.log('parsed: ' + JSON.stringify(parsed))
+          return parsed
         } else {
+          console.log('O: ' + JSON.stringify(payload))
           return payload
         }
       }
@@ -43,19 +51,26 @@ const getters = {
       return {access: 'public'}
     }
   },
-  token: state => state.token,
-  localToken: state => localStorage.getItem('user-token')
+  token: state => {
+    console.log('retrieved token: ' + state.token)
+    return state.token
+  },
+  localToken: state => {
+    var tkn = localStorage.getItem('user-token')
+    console.log('retrieved user-token: ' + tkn)
+    return tkn
+  }
 }
 
 const actions = {
   RESET_EXPIRY: ({commit, dispatch}) => {
     commit('RESET_EXPIRY')
   },
-  AUTH_PAYLOAD: ({commit, dispatch}, payload) => {
-    commit('AUTH_PAYLOAD', payload)
+  CACHE_PAYLOAD: ({commit, dispatch}, payload) => {
+    commit('CACHE_PAYLOAD', payload)
   },
   AUTH_TOKEN: ({commit, dispatch}, token) => {
-    commit('AUTH_PAYLOAD', token)
+    commit('AUTH_TOKEN', token)
   },
   AUTH_CLEAR: ({commit, dispatch}) => {
     commit('AUTH_CLEAR')
@@ -68,7 +83,7 @@ const actions = {
   LOAD_DEMO: ({commit, dispatch}) => {
     return new Promise((resolve, reject) => {
       var payload = {user: 'Demo', id: 3}
-      commit('AUTH_PAYLOAD', payload)
+      commit('CACHE_PAYLOAD', payload)
       resolve()
     })
   }
@@ -84,9 +99,9 @@ const mutations = {
 
     localStorage.setItem('payload-expires', expires) // clear your user's token from localstorage
   },
-  AUTH_PAYLOAD: (state, payload) => {
+  CACHE_PAYLOAD: (state, payload) => {
     state.payloadData = payload
-    console.log('payload:' + JSON.stringify(payload))
+    console.log('cache payload string from:' + JSON.stringify(payload))
     var now = Date.now()
     var expires = now + state.expiration * 60 * 1000
     var expiry = new Date(expires)
@@ -94,11 +109,11 @@ const mutations = {
 
     localStorage.setItem('payload', JSON.stringify(payload)) // clear your user's token from localstorage
     localStorage.setItem('payload-expires', expires) // clear your user's token from localstorage
-    localStorage.removeItem('user-token')
   },
   AUTH_TOKEN: (state, token) => {
     state.status = 'success'
     state.token = token
+    console.log('save local token: ' + token)
     localStorage.setItem('user-token', token) // clear your user's token from localstorage
   },
   AUTH_ERROR: (state) => {
