@@ -24,8 +24,8 @@
 <template lang='pug'>
   div.message-block(v-if='errorsFound|| warningsFound || messagesFound')
     div.top-right
-      button.btn.btn-danger(@click.prevent="clear")
-        icon(name='times')
+      button.btn.btn-close(@click.prevent="clear")
+        icon(name='times' color='lightgray')
     div.msg-errors(v-if='errorsFound')
       div(v-for='err in errors' align='center')
         b(v-if='err') {{err}}
@@ -194,9 +194,9 @@ export default {
     padding: 3px;
     padding-right: 20px;
     text-align: center;
-    // border: 1px solid black;
+    border: 1px solid black;
     color: black;
-    background-color: lightgrey;
+    background-color: lightyellow;
     margin: 10px;
   }
 

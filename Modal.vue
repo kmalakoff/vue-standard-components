@@ -55,7 +55,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
   span
     span.modal-anchor
     span(v-if='openButton')
-      button.open-button.btn.btn-primary.btn-lg(v-on:click="openModal(id)" :class='btnClass')
+      button.open-button.btn.btn-lg(v-on:click="openModal(id)" :class='btnClass')
         span(v-html='openButton')
     span(v-else-if='openText')
       a.modal-link(href='#' onclick='return false' v-on:click="openModal(id)")
@@ -71,15 +71,15 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
               div.my-modal-header(v-if='myheader')
                 slot(name="header")
                   h2.heading {{myheader}} &nbsp; &nbsp;
-                    button.btn.btn-danger.btn.close-button.right(v-if='!noClose' @click="closeModal")
-                      icon(name='times')
+                    button.btn.btn.close.right(v-if='!noClose' @click="closeModal")
+                      icon(name='times' color='lightgray')
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
                   h2.title(v-if='modalTitle') {{modalTitle}}
                   span(v-if='!myheader')
-                    button.btn.btn-danger.btn.close-button.right(v-if='!noClose' @click="closeModal")
-                      icon(name='times')
+                    button.btn.btn-close.right(v-if='!noClose' @click="closeModal")
+                      icon(name='times' color='lightgray')
                     p &nbsp;
                   h4(v-if='myPrompt') {{myPrompt}}
                   div(v-if="modalType==='search'")
@@ -122,7 +122,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                 slot(name="footer")
                   b {{footer}} &nbsp;
                   span.navbar-right
-                    button.btn.btn-danger.btn-lg(v-if='!noClose' @click="closeModal") {{closeButton}}
+                    button.btn.btn-close.btn-lg(v-if='!noClose' @click="closeModal") {{closeButton}} me
 </template>
 
 <script>
