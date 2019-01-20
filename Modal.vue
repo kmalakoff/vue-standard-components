@@ -72,14 +72,14 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                 slot(name="header")
                   h2.heading {{myheader}} &nbsp; &nbsp;
                     button.btn.btn.close.right(v-if='!noClose' @click="closeModal")
-                      icon(name='times' color='lightgray')
+                      icon(name='times' color='black')
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
                   h2.title(v-if='modalTitle') {{modalTitle}}
                   span(v-if='!myheader')
                     button.btn.btn-close.right(v-if='!noClose' @click="closeModal")
-                      icon(name='times' color='lightgray')
+                      icon(name='times' color='black')
                     p &nbsp;
                   h4(v-if='myPrompt') {{myPrompt}}
                   div(v-if="modalType==='search'")

@@ -25,7 +25,7 @@
   div.message-block(v-if='errorsFound|| warningsFound || messagesFound')
     div.top-right
       button.btn.btn-close(@click.prevent="clear")
-        icon(name='times' color='lightgray')
+        icon(name='times' color='black')
     div.msg-errors(v-if='errorsFound')
       div(v-for='err in errors' align='center')
         b(v-if='err') {{err}}

@@ -3,7 +3,7 @@
     div.myOpenCart(v-if='showCart')
       div.navbar-right
         a(href='#' @click.prevent='closeCart')
-          icon(name='times' color='lightgray' scale='2')
+          icon(name='times' color='black' scale='2')
         span &nbsp; &nbsp;
       b.input-lg {{items.count}} items: &nbsp; &nbsp;
       h3
