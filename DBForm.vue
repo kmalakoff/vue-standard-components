@@ -93,7 +93,7 @@ export default {
     return {
       url: config.apiURL,
       DBfields: [],
-      form: { accepted: false },
+      // form: { accepted: false },
       idfield: { name: 'id', type: 'fixed' },
       resetAccess: '',
       error: ''
@@ -104,6 +104,10 @@ export default {
   },
   props: {
     options: {
+      type: Object,
+      default () { return {} }
+    },
+    form: {
       type: Object,
       default () { return {} }
     },
