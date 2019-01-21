@@ -5,7 +5,7 @@
         div(v-if="item.constructor === String")
           b.submenu {{item}}
           span &nbsp; &nbsp;
-        div(v-else if="item.constructor === 'Object")
+        div(v-else if="item.constructor === 'Object' && item.icon")
           icon(:name='item.icon')
         div(v-else)
           b.submenu ?: {{item.constructor}}
