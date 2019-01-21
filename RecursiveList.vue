@@ -47,8 +47,8 @@
       span(v-show='title')
         u
           h4 {{title}} [{{selected_count}} / {{total_count}} selected]
-        span(style='color: green; font-weight: bold' v-show='turnedOn.length') Turned On: {{turnedOn.join(', ')}} &nbsp;
-        span(style='color: red; font-weight: bold' v-show='turnedOff.length') Turned Off: {{turnedOff.join(', ')}} &nbsp;
+        span(style='color: green; font-weight: bold' v-show='turnedOn.length') Add: {{turnedOnName.join(', ')}} &nbsp;
+        span(style='color: red; font-weight: bold' v-show='turnedOff.length') Remove: {{turnedOffName.join(', ')}} &nbsp;
       span(v-if="newItems && promptNew")
         b.undecided {{newItems}}
           i New {{options.label}} option(s) available: &nbsp; &nbsp;
@@ -69,7 +69,7 @@
         br
         div.button.btn.btn-primary(@click.prevent='editList()') Edit
         span &nbsp;
-        div.button.btn.btn-primary(@click.prevent='saveList(1)') Save Changes
+        div.button.btn.btn-primary(v-if='turnedOn.length || turnedOff.length' @click.prevent='saveList(1)') Save Changes
 
       div(v-else)
         ul
@@ -169,7 +169,9 @@ export default {
       selected_count: 0,
       total_count: 0,
       turnedOn: [],
-      turnedOff: []
+      turnedOff: [],
+      turnedOnName: [],
+      turnedOffName: []
     }
   },
   props: {
@@ -191,7 +193,10 @@ export default {
       type: Function,
       default () { return null }
     },
-    options: { type: Object }, // idKey, parentKey, open (defaults to: id, parent_id, false)
+    options: {
+      type: Object,
+      default () { return {} }
+    }, // idKey, parentKey, open (defaults to: id, parent_id, false)
     secondaryPick: {
       type: Object
     },
@@ -372,6 +377,7 @@ export default {
       // console.log('List: ' + JSON.stringify(list))
       console.log('build with chosen values: ' + JSON.stringify(chosen))
       console.log('initial selection: ' + JSON.stringify(this.selected))
+      console.log('build meta data for ' + list.length + ' list items')
       for (var i = 0; i < list.length; i++) {
         var nameKey = this.options.nameKey || this.nameKey || 'name'
         var idKey = this.options.idKey || this.idKey || 'id'
@@ -390,7 +396,10 @@ export default {
         this.refIndex[id] = i
 
         this.$set(this.hash, id, list[i])
-        if (!parent) { seeds.push(id) }
+        if (!parent) {
+          console.log('seed ' + id)
+          seeds.push(id)
+        }
 
         var selected
         if (chosen) {
@@ -463,6 +472,7 @@ export default {
         }
       }
 
+      console.log('seed with: ' + JSON.stringify(seeds))
       for (var k = 0; k < seeds.length; k++) {
         // console.log('seeding ' + k)
         this.addRecursive(seeds[k], 0)
@@ -535,7 +545,7 @@ export default {
       var ids = 'id' + id
       var name = this.id2name[id]
 
-      console.log(id + ids + name)
+      console.log('toggle: ' + ids + ': ' + name)
       console.log('check for clear: ' + this.static.length + '+' + item)
       if (this.selectOne && this.static.length && item) {
         console.log('clearlist ' + this.static[0])
@@ -618,9 +628,11 @@ export default {
       if (onIndex >= 0) {
         console.log('return on ' + id + ' : ' + onIndex)
         this.turnedOn.splice(onIndex, 1)
+        this.turnedOnName.splice(onIndex, 1)
       } else {
         console.log('turn off ' + id + ' : ' + onIndex)
         this.$set(this.turnedOff, this.turnedOff.length, id)
+        this.$set(this.turnedOffName, this.turnedOffName.length, this.id2name[id])
       }
     },
     trackOn: function (id) {
@@ -628,9 +640,11 @@ export default {
       if (offIndex >= 0) {
         console.log('return off ' + id + ' : ' + offIndex)
         this.turnedOff.splice(offIndex, 1)
+        this.turnedOffName.splice(offIndex, 1)
       } else {
         console.log('turn on ' + id + ' : ' + offIndex)
         this.$set(this.turnedOn, this.turnedOn.length, id)
+        this.$set(this.turnedOnName, this.turnedOnName.length, this.id2name[id])
       }
     },
     toggleNo: function (id) {
@@ -677,7 +691,7 @@ export default {
       var keys = Object.keys(this.select)
       for (var i = 0; i < keys.length; i++) {
         if (this.select[keys[i]]) {
-          console.log('save: ' + JSON.stringify(keys[i]))
+          // console.log('save: ' + JSON.stringify(keys[i]))
           this.static.push(keys[i])
         }
       }
@@ -695,6 +709,8 @@ export default {
         console.log('Save changes to database...')
         this.$set(this, 'turnedOn', [])
         this.$set(this, 'turnedOff', [])
+        this.$set(this, 'turnedOnName', [])
+        this.$set(this, 'turnedOffName', [])
       }
 
       this.selected_count += this.turnedOn.length
