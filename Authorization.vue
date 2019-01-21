@@ -5,7 +5,7 @@
     <!-- b V:  -->
     <!-- a (href='#' @click.prevent='profile') Profile -->
     div.user-icon(v-if='userid')
-      DropdownMenu.user-dropdown(:options='myUserMenu' :title='payload.username')
+      DropdownMenu.user-dropdown(:options='myUserMenu' :title='myPayload.username')
       <!-- span {{payload.username}} -->
       <!-- span &nbsp; | &nbsp; -->
       <!-- a(href='#' @click.prevent='logout') -->
@@ -146,6 +146,15 @@ export default {
     // this.$set(this, 'userMenu', this.myUserMenu)
   },
   computed: {
+    myPayload: function () {
+      if (this.payload) {
+        console.log('get payload from prop')
+        return this.payload
+      } else {
+        console.log('get payload from store')
+        return this.$store.getters.payload || {access: 'public'}
+      }
+    },
     myUserMenu: function () {
       if (this.add2Menu) {
         console.log('add2menu...')
@@ -161,8 +170,8 @@ export default {
       }
     },
     userid: function () {
-      if (this.payload && this.payload.userid) {
-        return this.payload.userid
+      if (this.myPayload && this.myPayload.userid) {
+        return this.myPayload.userid
       } else {
         return null
       }
@@ -255,6 +264,7 @@ export default {
           if (response.data.payload) {
             console.log('payload: ' + JSON.stringify(response.data.payload))
             this.$store.dispatch('CACHE_PAYLOAD', response.data.payload)
+            // this.$set(this, 'myPayload', response.data.payload) this should be redundant (?)
           }
           return { success: true }
         } else if (response.data && response.data.error) {
@@ -283,7 +293,7 @@ export default {
     async logout () {
       this.nav.goto('Home')
       this.$store.dispatch('AUTH_LOGOUT')
-      var loginId = this.payload.login_id
+      var loginId = this.myPayload.login_id
       console.log(loginId + ' logout via auth')
 
       this.$store.dispatch('CACHE_PAYLOAD', { access: 'public' })
@@ -294,8 +304,8 @@ export default {
       this.nav.goto('Home', 'Profile')
       // console.log('get user...')
 
-      // var payload = this.payload || this.$store.getters.payload
-      // var show = Object.keys(this.payload)
+      // var payload = this.myPayload || this.$store.getters.payload
+      // var show = Object.keys(this.myPayload)
       // var D = []
       // if (payload.constructor === Object) {
       //   for (var i = 0; i < show.length; i++) {
