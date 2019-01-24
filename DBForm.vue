@@ -71,7 +71,7 @@ options: {
       hr
       button.btn.btn-primary.btn-lg(v-if="onSave" :type='buttonType' @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
       span &nbsp; &nbsp;
-      button.btn.btn-danger.btn-lg(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
+      button.btn.btn-close.btn-lg(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
       br
       p.mandatoryPrompt(v-if='error') {{error}}
       p.mandatoryPrompt(v-if='remoteErrors && remoteErrors.form') {{remoteErrors.form}}
