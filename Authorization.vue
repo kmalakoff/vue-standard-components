@@ -210,11 +210,16 @@ export default {
         password: form.password
       }
       console.log('login ' + form.email)
-      var response = await auth.login(this, credentials)
-      if (response && response.expired) {
-        this.$store.dispatch('logWarning', 'Session Expired.  Please log in again.')
+      try {
+        var response = await auth.login(this, credentials)
+        if (response && response.expired) {
+          this.$store.dispatch('logWarning', 'Session Expired.  Please log in again.')
+        }
+        console.log('Login response:' + JSON.stringify(response))
+      } catch (err) {
+        console.log('caught login error: ' + err)
+        this.$store.dispatch('logError', 'Error encountered during loggin ... Please try again')
       }
-      console.log('Login response:' + JSON.stringify(response))
       // try {
       // var returnval = await validateResponse(response)
       // console.log('returned: ' + JSON.stringify(returnval))
@@ -248,11 +253,11 @@ export default {
         var val = this.validateResponse(response)
         if (val.formErrors) { this.$set(this, 'formErrors', val.formErrors) }
         return response.data
-      } else if (response.error) {
+      } else if (response && response.error) {
         this.$store.dispatch('logError', response.error)
         return response
-      } else if (response.data) {
-        if (response.data && response.data.success) {
+      } else if (response && response.data) {
+        if (response.data.success) {
           if (response.data.token) {
             console.log('token cached: ' + response.data.token)
             this.$store.dispatch('AUTH_TOKEN', response.data.token)
@@ -267,7 +272,7 @@ export default {
             // this.$set(this, 'myPayload', response.data.payload) this should be redundant (?)
           }
           return { success: true }
-        } else if (response.data && response.data.error) {
+        } else if (response.data.error) {
           console.log('log error: ' + response.data.error)
           this.$set(this, 'authError', response.data.error)
           // this.$store.dispatch('logError', response.data.error)
@@ -380,7 +385,7 @@ export default {
 
 .user-icon {
   position: absolute;
-  top: 2rem;
+  top: 3rem;
   right: 2rem;
 }
 
