@@ -47,7 +47,7 @@ async login ({auth, request, response}) {
 
   ....
 
-    axios.get(url)
+    axios.post(url)
       .then(function (response) {
         var validate = this.validateResponse(response)
         this.remoteErrors = validate.remoteErrors
