@@ -218,7 +218,7 @@ export default {
         console.log('Login response:' + JSON.stringify(response))
       } catch (err) {
         console.log('caught login error: ' + err)
-        this.$store.dispatch('logError', 'Error encountered during loggin ... Please try again')
+        this.$store.dispatch('logError', 'Error encountered during log in ... Please try again')
       }
       // try {
       // var returnval = await validateResponse(response)
@@ -248,7 +248,7 @@ export default {
     initializeSession (response, onSuccess) {
       // console.log('initialize session for ' + response)
       this.$store.dispatch('AUTH_LOGOUT') // clear any existing user sessions first
-      if (response.data && response.data.validation_errors) {
+      if (response && response.data && response.data.validation_errors) {
         console.log('get service response')
         var val = this.validateResponse(response)
         if (val.formErrors) { this.$set(this, 'formErrors', val.formErrors) }
