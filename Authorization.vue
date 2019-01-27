@@ -49,6 +49,7 @@ import Modal from './Modal'
 import DBForm from './DBForm'
 import DropdownMenu from './DropdownMenu'
 import auth from '../../auth'
+import axios from 'axios'
 // import { validateResponse } from '../../services/form-validator.js'
 // import Standard from './config.js'
 import Config from '@/config.js'
@@ -194,6 +195,7 @@ export default {
         var f = fields[i]
         credentials[f.name] = form[f.prompt] || form[f.name]
       }
+      delete axios.defaults.headers.common['Authorization']
 
       if (!credentials.username) { credentials.username = credentials.email }
       if (this.noConfirm) {
@@ -211,6 +213,7 @@ export default {
       }
       console.log('login ' + form.email)
       try {
+        delete axios.defaults.headers.common['Authorization']
         var response = await auth.login(this, credentials)
         if (response && response.expired) {
           this.$store.dispatch('logWarning', 'Session Expired.  Please log in again.')
@@ -261,6 +264,11 @@ export default {
           if (response.data.token) {
             console.log('token cached: ' + response.data.token)
             this.$store.dispatch('AUTH_TOKEN', response.data.token)
+
+            var pass = 'Bearer ' + response.data.token
+            axios.defaults.headers.common['Authorization'] = pass
+            // auth.updateToken()
+            console.log('updated token...')
           }
           this.nav.goto('Home')
           if (onSuccess) {
