@@ -193,10 +193,10 @@ export default {
     },
     myChange (evt) {
       if (evt.target.type === 'checkbox') {
-        console.log('change ' + this.om + ' to boolean: ' + evt.target.checked)
+        // console.log('change ' + this.om + ' to boolean: ' + evt.target.checked)
         this.$set(this.form, this.om, evt.target.checked)
       } else {
-        console.log('change ' + evt.target.type + ': ' + this.om + ' to ' + evt.target.value)
+        // console.log('change ' + evt.target.type + ': ' + this.om + ' to ' + evt.target.value)
         this.$set(this.form, this.om, evt.target.value)
       }
       if (this.onBlur) {
