@@ -223,34 +223,10 @@ export default {
         console.log('caught login error: ' + err)
         this.$store.dispatch('logError', 'Error encountered during log in ... Please try again')
       }
-      // try {
-      // var returnval = await validateResponse(response)
-      // console.log('returned: ' + JSON.stringify(returnval))
-
-      //   if (returnval && returnval.formErrors) { this.formErrors = returnval.formErrors }
-      //   return returnval
-      // } catch (err) {
-      //   console.log('error: ' + err)
-      //   return {error: 'error: ' + err}
-      // }
-      // console.log('validation errors: ' + JSON.stringify(response.data.validation_errors))
-      // var errors = response.data.validation_errors
-      // if (errors.constructor === Array && errors.length) {
-      //   // based on adonis validator format
-      //   if (errors[0] && errors[0].field) {
-      //     for (var i = 0; i < errors.length; i++) {
-      //       console.log('e: ' + JSON.stringify(errors[i]))
-      //       this.$set(this.formErrors, errors[i].field, errors[i].message)
-      //     }
-      //   } else {
-      //     console.log('no errors..')
-      //   }
-      // }
       return this.initializeSession(response)
     },
     initializeSession (response, onSuccess) {
       // console.log('initialize session for ' + response)
-      this.$store.dispatch('AUTH_LOGOUT') // clear any existing user sessions first
       if (response && response.data && response.data.validation_errors) {
         console.log('get service response')
         var val = this.validateResponse(response)
@@ -343,10 +319,10 @@ export default {
     checkInput (e) {
       console.log('validate input')
       // const form = document.querySelector('.form')
-      const parent = e.target.parentElement
-      console.log('found ')
-      parent.classList.add('has-error')
-      this.note = 'Failed Validation'
+      // const parent = e.target.parentElement
+      // console.log('found ')
+      // parent.classList.add('has-error')
+      // this.note = 'Failed Validation'
     },
     inputFocus (e) {
       this.note = ''
