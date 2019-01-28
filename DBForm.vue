@@ -383,6 +383,10 @@ export default {
     confirm (evt) {
       console.log('confirm...')
       if (evt.target.type === 'checkbox') {
+        if (!this.form.confirmed) {
+          this.$set(this.form, 'confirmed', {})
+        }
+
         if (evt.target.checked) {
           this.$set(this.form.confirmed, evt.target.name, true)
         } else {
@@ -409,6 +413,13 @@ export default {
       var checked = 0
       var verified = 0
       var hidden = 0
+
+      if (!form) { form = {} }
+
+      if (!form.confirmed) {
+        form.confirmed = {}
+      }
+
       for (var i = 0; i < this.fields.length; i++) {
         var passed = false
         var check = false
