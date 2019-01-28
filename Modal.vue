@@ -61,7 +61,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
       a.modal-link(href='#' onclick='return false' v-on:click="openModal(id)")
         b(style='font-size: larger') {{openText}}
     span(v-else-if='openIcon')
-      button.btn.btn-primary(v-on:click="openModal()" v-bind:class="[{btnClass: wideOnMobile}]")
+      button.btn.btn-primary(v-on:click="openModal(id)" v-bind:class="[{btnClass: wideOnMobile}]")
         icon(:name='openIcon')
     span(:class='initClass' :id="id")
       transition(name="modal")
@@ -549,6 +549,10 @@ export default {
       if (this.url) {
         console.log('dynamic url content generation')
         console.log(this.urlContent)
+      }
+      if (this.options.onOpen) {
+        console.log('call method on modal open')
+        this.options.onOpen(id)
       }
       this.$store.dispatch('toggleModal', id)
 
