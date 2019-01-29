@@ -88,7 +88,9 @@ export default {
         buttonClass: Config.defaultButtonClass,
         submitButtonClass: 'btn-primary btn-lg',
         noClose: true,
-        buttonType: 'submit'
+        buttonType: 'submit',
+        header: 'Login - Demo mode',
+        title: 'Note:  We will notify all registered users when we go live.'
       },
 
       registerOptions: {
@@ -104,7 +106,9 @@ export default {
         buttonClass: Config.defaultButtonClass,
         submitButtonClass: 'btn-primary btn-lg',
         noClose: true,
-        buttonType: 'submit'
+        buttonType: 'submit',
+        header: 'Registration - Demo mode',
+        title: 'Note:  We will notify all registered users when we go live.'
       },
       apiUrl: Config.apiURL,
       status: 'initialized'
