@@ -76,7 +76,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
               div.my-modal-body
                 slot(name="body")
                   <!-- Body -->
-                  h2.title(v-if='modalTitle') {{modalTitle}}
+                  h2.title.modalTitle(v-if='modalTitle') {{modalTitle}}
                   span(v-if='!myheader')
                     button.btn.btn-close.right(v-if='!noClose' @click="closeModal")
                       icon(name='times' color='black')
