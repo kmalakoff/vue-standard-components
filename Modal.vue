@@ -71,7 +71,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
               div.my-modal-header(v-if='myheader')
                 slot(name="header")
                   h2.heading {{myheader}} &nbsp; &nbsp;
-                    button.btn.btn.close.right(v-if='!noClose' @click="closeModal")
+                    button.btn.btn-close.right(v-if='!noClose' @click="closeModal")
                       icon(name='times' color='black')
               div.my-modal-body
                 slot(name="body")
@@ -81,7 +81,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     button.btn.btn-close.right(v-if='!noClose' @click="closeModal")
                       icon(name='times' color='black')
                     p &nbsp;
-                  h4(v-if='myPrompt') {{myPrompt}}
+                  h4.modalPrompt(v-if='myPrompt') {{myPrompt}}
                   div(v-if="modalType==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="modalType==='record'")
@@ -101,7 +101,7 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                   div(v-else-if="modalType==='confirm'")
                     DBForm(:options='confirmOptions', :onSave='save' :cancel='cancel' :remoteErrors='remoteErrors')
                   div(v-else-if="modalType==='input'")
-                    b(v-if='myPrompt') &nbsp; &nbsp; {{myPrompt}}
+                    b.modalPrompt(v-if='myPrompt') &nbsp; &nbsp; {{myPrompt}}
                     input.input-lg(type='text' name='input' v-model='input' v-on:click='save')
                   div(v-else-if="modalType==='html'")
                     div(v-if='htmlContent' v-html="htmlContent")
@@ -117,7 +117,6 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     hr
                   p &nbsp;
                   b.error-msg(v-if='foundError') {{foundError}}
-              Messaging
               div.my-modal-footer(v-if='!noFooter')
                 slot(name="footer")
                   b {{footer}} &nbsp;
