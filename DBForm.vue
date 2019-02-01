@@ -71,11 +71,11 @@ options: {
       hr
       button.btn.btn-primary.btn-lg(v-if="onSave" :type='buttonType' @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
       span &nbsp; &nbsp;
-      button.btn.btn-close.btn-lg(v-if="onCancel" @click.prevent="onCancel") {{cancelButton}}
+      button.btn.btn-close.btn-lg(v-if="hasCancel" @click.prevent="onCancel") {{cancelButton}}
       br
       p.mandatoryPrompt(v-if='error') {{error}}
       p.mandatoryPrompt(v-if='remoteErrors && remoteErrors.form') {{remoteErrors.form}}
-      p(v-if='(error || (remoteErrors && remoteErrors.form)) && acceptFormPrompt') Note: you may need to toggle 'accept' checkbox to enable editing of previously entered form elements
+      <!-- p(v-if='(error || (remoteErrors && remoteErrors.form)) && acceptFormPrompt') Note: you may need to toggle 'accept' checkbox to enable editing of previously entered form elements -->
       div(v-if='debug')
         hr
         b Form Input: {{myAccess}} : {{form}}
@@ -309,6 +309,17 @@ export default {
       } else if (this.options.disableSubmit) {
         return 'input requirements not met'
       }
+    },
+    hasCancel: function () {
+      if (this.options.cancelForm) {
+        return true
+      } else if (this.options.onCancel) {
+        return true
+      } else if (this.cancel) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {
@@ -459,7 +470,7 @@ export default {
       } else {
         if (validated && accepted && this.acceptFormPrompt) {
           console.log('reset access to read...')
-          this.resetAccess = 'read'
+          // this.resetAccess = 'read'
         } else {
           this.resetAccess = ''
         }
