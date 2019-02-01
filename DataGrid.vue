@@ -38,8 +38,8 @@ Advanced Options:
         tr.result-row(v-for="key in data_fields")
           td.result-prompt {{key}}: &nbsp;
           td.result-cell(:class="dynamicClass(record)" v-for="record, index in dynamicData")
-            a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
-
+            span(v-if='suppressLinks' data-html='true' data-model={model} data-attribute={key}) {{record[key]}}
+            a.l1(v-else href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
         tr.result-cell(v-if="deSelectable")
           td Remove
           td button.btn.btn-xs.btn-danger(v-on:click="remove(index)") x {{index}}
@@ -50,7 +50,7 @@ Advanced Options:
               ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="dynamicData[index]" :link="link" :links="links")
             span(v-if="link.type === 'icon'")
               span(v-if="link.modal")
-                a(href="#" onclick='return false' @click.prevent="link.modal.onPick(record)" :record="dynamicData[index]")
+                a.l2(href="#" onclick='return false' @click.prevent="link.modal.onPick(record)" :record="dynamicData[index]")
                   icon(:name='link.name' :color='link.colour' :scale='link.scale')
               span(v-else)
                 icon(:name='link.name' :color='link.colour' :scale='link.scale')
@@ -58,7 +58,8 @@ Advanced Options:
         <!-- Put Records in Rows -->
         tr.result-row(:class="dynamicClass(record)" v-for="record, index in dynamicData")
           td.result-cell(v-for="key in data_fields")
-            a(href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
+            span.l3(v-if='suppressLinks' data-html='true' data-model={model} data-attribute={key}) {{record[key]}}
+            a.l3(v-else href='#' onclick='return false;' data-html='true' data-model={model} data-attribute={key} @click.prevent="pickOne(index)") {{record[key]}}
           td.result-cell(v-if="deSelectable")
             button.btn.btn-xs.btn-danger(v-on:click="remove(index)") x {{index}}
           td.result-cell(v-if="options && options.addLinks" v-for="link in options.addLinks")
@@ -66,7 +67,7 @@ Advanced Options:
               ActionButton(:name="link.name" :type="link.type" :modal="link.modal" :record="dynamicData[index]" :link="link" :links="links")
             span(v-if="link.type === 'icon'")
               span(v-if="link.modal")
-                a(href="#" onclick='return false' @click.prevent="link.modal.onPick(record)" :record="dynamicData[index]")
+                a.l4(href="#" onclick='return false' @click.prevent="link.modal.onPick(record)" :record="dynamicData[index]")
                   icon(:name='link.name' :color='link.colour' :scale='link.scale')
               span(v-else)
                 icon(:name='link.name' :color='link.colour' :scale='link.scale')
@@ -234,6 +235,13 @@ export default {
       }
 
       return count
+    },
+    suppressLinks: function () {
+      if (this.options.noLinks) {
+        return true
+      } else {
+        return false
+      }
     }
   },
 
