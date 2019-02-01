@@ -81,7 +81,8 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                     button.btn.btn-close.right(v-if='!noClose' @click="closeModal")
                       icon(name='times' color='black')
                     p &nbsp;
-                  h4.modalPrompt(v-if='myPrompt') {{myPrompt}}
+                  h4.modalPrompt(v-if='myPrompt' v-html='myPrompt')
+                  p(v-if='myPrompt') &nbsp;
                   div(v-if="modalType==='search'")
                     SearchBlock(:search_options="search_options" :links="links" :data_options="data_options" :picked="picked")
                   div(v-else-if="modalType==='record'")
@@ -101,8 +102,9 @@ Modal(type='data', :data='data') // data = [{example1: 'link to example 1'}, {ex
                   div(v-else-if="modalType==='confirm'")
                     DBForm(:options='confirmOptions', :onSave='save' :cancel='cancel' :remoteErrors='remoteErrors')
                   div(v-else-if="modalType==='input'")
-                    b.modalPrompt(v-if='myPrompt') &nbsp; &nbsp; {{myPrompt}}
+                    b.modalPrompt(v-if='myPrompt' v-html='myPrompt')
                     input.input-lg(type='text' name='input' v-model='input' v-on:click='save')
+
                   div(v-else-if="modalType==='html'")
                     div(v-if='htmlContent' v-html="htmlContent")
                     div(v-else)
