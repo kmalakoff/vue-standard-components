@@ -11,7 +11,16 @@
       <!-- a(href='#' @click.prevent='logout') -->
         <!-- b Log Out -->
       Modal.user-modal(id='profile' type='data')
-    div(v-else-if="nav.path.length <= 1")
+    div(v-else-if="nav.page==='Login' || nav.page==='Register'")
+      span.smallScreen
+        // Not using modal...
+        div(v-if="nav.page==='Login'")
+          DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors')
+        div(v-else-if="nav.page==='Register'")
+          DBForm.signup-form(:options='registerOptions' :onSave='register')
+        p &nbsp;
+        p.error(v-if='authError') {{authError}}
+    div(v-else)
       span(v-if='demo')
         span(v-for='i, user in demo')
           button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
@@ -28,17 +37,7 @@
           button.signup-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Register')") Register
           br
           p.error(v-if='authError') {{authError}}
-    div(v-else)
-      span.smallScreen
-        // Not using modal...
-        div(v-if="nav.page==='Login'")
-          DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors')
-        div(v-else-if="nav.page==='Register'")
-          DBForm.signup-form(:options='registerOptions' :onSave='register')
-        p &nbsp;
-        p.error(v-if='authError') {{authError}}
-
-    span.vwideScreen.nav-path(v-if="nav.path.length > 1")
+    span.vwideScreen.nav-path(v-if="userid && nav.path.length > 1")
       div(style='display:inline-block' v-for='page, i in nav.path')
         br
         a(v-on:click='nav.direct(i)') {{page}}
