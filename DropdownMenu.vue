@@ -8,10 +8,6 @@
 
   eg DropdownMenu(:title='username' :options='options')
 
-  this.options = [
-    {label: 'Profile', loadModal: 'getUserData'},
-    {label: 'Logout', onClick: 'logout'}
-  ]
 -->
 <template lang='pug'>
   div.customMenu
@@ -25,13 +21,12 @@
       table.table.dropdown-table.input-lg
         tr.option-row(v-for="option, i in options" width='100%')
           td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]"  @click.prevent="runMethod(option)")
-            <!-- button(v-bind:class="[{option0: i===0}, {optionN: i===options.length}]") -->
             span(v-if="option.checked")
               icon(name='check-circle')
               span &nbsp;
             a.inline(href='/' onclick='return false')
               span.option-label {{option.label}}
-    Modal(v-if='modal' :id='modal' type='data')
+    <!-- Modal(v-if='modal' :id='modal' type='data') -->
       span &nbsp; &nbsp;
 </template>
 
@@ -41,6 +36,7 @@ import Modal from './Modal'
 import 'vue-awesome/icons/search'
 import 'vue-awesome/icons/caret-up'
 import 'vue-awesome/icons/caret-down'
+import 'vue-awesome/icons/check-circle'
 
 export default {
   name: 'DropdownMenu',
@@ -60,10 +56,6 @@ export default {
       waitingToClose: false,
       keepOn: false,
       hovering: false
-      // options: [
-      //   {label: 'Profile', loadModal: this.getUser},
-      //   {label: 'Logout', onClick: this.logout}
-      // ]
     }
   },
   props: {
@@ -71,30 +63,18 @@ export default {
       type: String,
       default: '?'
     },
-    options: { type: Array }, // list of dropdown items (hashes with keys for: title, onClick, tooltip)
-    modal: { type: String } // modal id (optional)
+    options: {
+      type: Array,
+      default () { return [] }
+    }, // list of dropdown items (hashes with keys for: title, onClick, tooltip)
+    modal: {
+      type: String,
+      default: 'dropdown-modal'
+    } // modal id (optional)
   },
   computed: {
   },
   methods: {
-    getUser (e) {
-      console.log('getUser: ' + JSON.stringify(e))
-      var id = document.getElementById('searchString')
-      var search = ''
-      if (id && id.value) {
-        console.log('search for: ' + id.value)
-        search = id.value
-      } else {
-        console.log('no search string...')
-      }
-      console.log('perform search for ' + search)
-
-      var results = [
-        { name: 'searched for', value: search },
-        { name: 'found_eg', value: 'value_eg' }
-      ]
-      return results
-    },
     logout () {
       console.log('log me out... ')
     },
@@ -109,9 +89,10 @@ export default {
     toggleMenu (force) {
       if (this.hovering && this.visibleMenu) {
         // just close on exit
-        this.visibleMenu = !this.visibleMenu
         console.log('close when mousing out')
+        this.visibleMenu = !this.visibleMenu
       } else {
+        console.log('toggle menu visibility')
         this.visibleMenu = !this.visibleMenu
       }
       console.log('(tm) menu = ' + this.visibleMenu)
@@ -146,6 +127,7 @@ export default {
     runMethod (opt) {
       console.log('running method...')
       if (opt && opt.onClick) {
+        console.log('run onclick for dropdown: ' + JSON.stringify(opt))
         opt.onClick(opt)
       }
 
