@@ -164,9 +164,10 @@ export default {
       DBfields = this.fields
     } else if (this.thisRecord) {
       var f1 = []
-      console.log('load record: ' + JSON.stringify(this.thisRecord))
+      console.log('load Record: ' + JSON.stringify(this.thisRecord, null, 2))
       // console.log('got fields from keys')
       var keys = Object.keys(this.thisRecord)
+      console.log('preset: ' + keys)
       for (var i = 0; i < keys.length; i++) {
         f1.push({name: keys[i], type: 'text'})
       }
@@ -437,8 +438,8 @@ export default {
         if (this.fields[i].type === 'hidden') {
           hidden++
         } else if (this.options.confirmFields && this.fields[i].mandatory) {
-          console.log('check mandatory field: ' + this.fields[i].name)
           passed = form.confirmed[this.fields[i].name]
+          console.log('check mandatory field: ' + this.fields[i].name + ': ' + passed)
           check = true
           if (!passed) {
             console.log('failed to confirm ' + this.fields[i].name)
