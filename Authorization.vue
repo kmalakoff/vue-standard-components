@@ -5,44 +5,44 @@
     <!-- b V:  -->
     <!-- a (href='#' @click.prevent='profile') Profile -->
     div.user-icon(v-if='userid')
-      DropdownMenu.user-dropdown(:options='myUserMenu' :title='myPayload.username')
-      <!-- span {{payload.username}} -->
-      <!-- span &nbsp; | &nbsp; -->
-      <!-- a(href='#' @click.prevent='logout') -->
-        <!-- b Log Out -->
+      <!-- Logged In -->
+      DropdownMenu.user-dropdown(:options='myUserMenu' :title='payload.username')
       Modal.user-modal(id='profile' type='data')
-    div(v-else-if="nav.path.length <= 1")
-      span(v-if='demo')
-        span(v-for='i, user in demo')
-          button.btn.btn-warning(v-on:click='loadDemo(user)') Demo as {{user}}
-          span &nbsp; &nbsp;
-      span.wideScreen
-        Modal.login-modal(type='record' id='login-modal' :error='authError' :title='loginTitle' :options='loginOptions' :note='note' :remoteErrors='formErrors')
-        span &nbsp; &nbsp;
-        Modal.signup-modal(type='record' id='register-modal' :error='authError' :title='regTitle' :options='registerOptions' :note='note' :remoteErrors='formErrors')
-          p &nbsp;
-      span.smallScreen
-        div
-          button.login-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Login')") Login
-          br
-          button.signup-button.btn.btn-primary.btn-lg(v-on:click="nav.next('Register')") Register
-          br
-          p.error(v-if='authError') {{authError}}
     div(v-else)
-      span.smallScreen
-        // Not using modal...
-        div(v-if="nav.page==='Login'")
-          DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors')
-        div(v-else-if="nav.page==='Register'")
-          DBForm.signup-form(:options='registerOptions' :onSave='register')
+      <!-- Not Logged In ... -->
+      div(v-if="$route.path==='Login'")
+        <!-- explicit login page -->
+        DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors')
         p &nbsp;
         p.error(v-if='authError') {{authError}}
 
-    span.vwideScreen.nav-path(v-if="nav.path.length > 1")
-      div(style='display:inline-block' v-for='page, i in nav.path')
+      div(v-else-if="$route.path==='Register'")
+        <!-- explicit registration page -->
+        DBForm.signup-form(:options='registerOptions' :onSave='register')
+        p &nbsp;
+        p.error(v-if='authError') {{authError}}
+
+      div(v-else)
+        <!-- Default if not explicitly set to login or register page -->
+        span.smallScreen
+          button.login-button.btn.btn-primary.btn-lg(v-on:click="$router.push('Login')") Login
+          br
+          button.signup-button.btn.btn-primary.btn-lg(v-on:click="$router.push('Register')") Register
+          br
+          p &nbsp;
+          p.error(v-if='authError') {{authError}}
+
+        span.wideScreen
+          Modal.login-modal(type='record' id='login-modal' :error='authError' :title='loginTitle' :options='loginOptions' :note='note' :remoteErrors='formErrors')
+          span &nbsp; &nbsp;
+          Modal.signup-modal(type='record' id='register-modal' :error='authError' :title='regTitle' :options='registerOptions' :note='note' :remoteErrors='formErrors')
+            p &nbsp;
+    span.vwideScreen.nav-path(v-if="path.length > 1")
+      <!-- Breadcrumb -->
+      div(style='display:inline-block' v-for='page, i in path')
         br
-        a(v-on:click='nav.direct(i)') {{page}}
-        span(v-if='i < nav.path.length - 1') &nbsp; > &nbsp;
+        a(v-on:click='$router.push(path[i])') {{page}}
+        span(v-if='i < path.length - 1') &nbsp; > &nbsp;
 </template>
 <script>
 import Modal from './Modal'
@@ -71,7 +71,6 @@ export default {
       // userMenu: [],
       initMenu: [
         // may supply custom versions in place of this ...
-        { label: 'Profile', loadModal: {data: this.getUser, title: 'User Profile', id: 'profile'} },
         { label: 'Logout', onClick: this.logout }
       ],
       loginOptions: {
@@ -123,11 +122,12 @@ export default {
     DropdownMenu
   },
   props: {
-    payload: {
-      type: Object
-    },
-    nav: {
-      type: Object
+    // payload: {
+    //   type: Object
+    // },
+    path: {
+      type: Array,
+      default () { return [] }
     },
     onPick: { type: Function },
     demo: {
@@ -151,32 +151,35 @@ export default {
     // this.$set(this, 'userMenu', this.myUserMenu)
   },
   computed: {
-    myPayload: function () {
-      if (this.payload) {
-        console.log('get payload from prop')
-        return this.payload
-      } else {
-        console.log('get payload from store')
-        return this.$store.getters.payload || {access: 'public'}
-      }
+    payload: function () {
+      return this.$store.getters.payload || {access: 'public'}
     },
+    // payload: function () {
+    //   if (this.payload) {
+    //     console.log('get payload from prop')
+    //     return this.payload
+    //   } else {
+    //     console.log('get payload from store')
+    //     return this.$store.getters.payload || {}
+    //   }
+    // },
     myUserMenu: function () {
       if (this.add2Menu) {
         console.log('add2menu...')
         var menu = []
-        menu.push(this.initMenu[0])
+        // menu.push(this.initMenu[0])
         for (var i = 0; i < this.add2Menu.length; i++) {
           menu.push(this.add2Menu[i])
         }
-        menu.push(this.initMenu[1])
+        menu.push(this.initMenu[0])
         return menu
       } else {
         return this.initMenu
       }
     },
     userid: function () {
-      if (this.myPayload && this.myPayload.userid) {
-        return this.myPayload.userid
+      if (this.payload && this.payload.userid) {
+        return this.payload.userid
       } else {
         return null
       }
@@ -250,14 +253,14 @@ export default {
             // auth.updateToken()
             console.log('updated token...')
           }
-          this.nav.goto('Home')
+          this.$router.push('Home')
           if (onSuccess) {
             this.$store.dispatch('logMessage', onSuccess)
           }
           if (response.data.payload) {
             console.log('payload: ' + JSON.stringify(response.data.payload))
             this.$store.dispatch('CACHE_PAYLOAD', response.data.payload)
-            // this.$set(this, 'myPayload', response.data.payload) this should be redundant (?)
+            // this.$set(this, 'payload', response.data.payload) this should be redundant (?)
           }
           return { success: true }
         } else if (response.data.error) {
@@ -284,37 +287,14 @@ export default {
       }
     },
     async logout () {
-      this.nav.goto('Home')
+      this.$router.push('Home')
       this.$store.dispatch('AUTH_LOGOUT')
-      var loginId = this.myPayload.login_id
+      var loginId = this.payload.login_id
       console.log(loginId + ' logout via auth')
 
       this.$store.dispatch('CACHE_PAYLOAD', { access: 'public' })
       var response = await auth.logout(this, loginId)
       console.log('Logout response:' + JSON.stringify(response))
-    },
-    getUser () {
-      this.nav.goto('Home', 'Profile')
-      // console.log('get user...')
-
-      // var payload = this.myPayload || this.$store.getters.payload
-      // var show = Object.keys(this.myPayload)
-      // var D = []
-      // if (payload.constructor === Object) {
-      //   for (var i = 0; i < show.length; i++) {
-      //     if (payload[show[i]]) {
-      //       console.log('show ' + show[i])
-      //       D.push({attribute: show[i], value: payload[show[i]]})
-      //     } else {
-      //       console.log('no ' + show[i])
-      //     }
-      //   }
-      //   console.log('user data: ' + JSON.stringify(D))
-      //   return D
-      // } else {
-      //   console.log('expected payload object... found ' + payload.constructor)
-      //   return D
-      // }
     },
     makeAuth (e) {
       // auth logic
@@ -331,20 +311,28 @@ export default {
     inputFocus (e) {
       this.note = ''
       this.authError = ''
-      const parent = e.target.parentElement
-      parent.classList.remove('has-error')
-      console.log('checkinput')
+      if (e && e.target) {
+        const parent = e.target.parentElement
+        parent.classList.remove('has-error')
+        console.log('checkinput')
+      } else {
+        console.log('no e-target to focus on')
+      }
     },
     inputValidate (e) {
       this.note = ''
-      const parent = e.target.parentElement
-      parent.classList.add('has-success')
-      console.log('validated')
+      if (e && e.target) {
+        const parent = e.target.parentElement
+        parent.classList.add('has-success')
+        console.log('validated')
+      } else {
+        console.log('no e-target to validate')
+      }
     },
     cancel () {
       this.$set(this, 'formErrors', {})
       console.log('cancel this form')
-      this.nav.goto('Home')
+      this.$router.back()
       this.authError = ''
     }
   }
