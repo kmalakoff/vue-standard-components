@@ -135,4 +135,20 @@ export default {
   color: lightblue;
 }
 
+.doc-content table {
+  width: 100%;
+  border: 2px solid black;
+}
+
+.doc-content table th {
+  background-color: lightgray;
+  border: 1px solid black;
+  padding: 2rem;
+  text-align: center;
+}
+
+.doc-content table tr td {
+  border: 1px solid grey;
+  padding: 2rem;
+}
 </style>
