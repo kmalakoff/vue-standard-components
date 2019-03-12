@@ -60,6 +60,7 @@ export default {
     return {
       // We need to initialize the component with any
       // properties that will be used in it
+      env: 'undef',
       credentials: {
         username: '',
         password: ''
@@ -73,6 +74,9 @@ export default {
         // may supply custom versions in place of this ...
         { label: 'Logout', onClick: this.logout }
       ],
+      apiUrl: Config.apiURL,
+      status: 'initialized',
+
       loginOptions: {
         modalID: 'login-modal',
         openButton: 'Log in',
@@ -88,29 +92,9 @@ export default {
         submitButtonClass: 'btn-primary btn-lg',
         noClose: true,
         buttonType: 'submit',
-        header: 'Login - Demo mode',
-        title: 'Note:  We will notify all registered users when we go live.'
-      },
-
-      registerOptions: {
-        openButton: 'Sign up',
-        access: 'append',
-        fields: Config.registrationFields,
-        onSave: this.register,
-        onBlur: this.checkInput,
-        onFocus: this.inputFocus,
-        submitButton: 'Register',
-        wideOnMobile: true,
-        onCancel: this.cancel,
-        buttonClass: Config.defaultButtonClass,
-        submitButtonClass: 'btn-primary btn-lg',
-        noClose: true,
-        buttonType: 'submit',
-        header: 'Registration - Demo mode',
-        title: 'Note:  We will notify all registered users when we go live.'
-      },
-      apiUrl: Config.apiURL,
-      status: 'initialized'
+        header: 'Login',
+        title: ''
+      }
     }
   },
   mixins: [
@@ -148,21 +132,12 @@ export default {
     }
   },
   created: function () {
-    // this.$set(this, 'userMenu', this.myUserMenu)
+    this.loadEnv()
   },
   computed: {
     payload: function () {
       return this.$store.getters.payload || {access: 'public'}
     },
-    // payload: function () {
-    //   if (this.payload) {
-    //     console.log('get payload from prop')
-    //     return this.payload
-    //   } else {
-    //     console.log('get payload from store')
-    //     return this.$store.getters.payload || {}
-    //   }
-    // },
     myUserMenu: function () {
       if (this.add2Menu) {
         console.log('add2menu...')
@@ -189,11 +164,66 @@ export default {
     },
     regTitle: function () {
       return 'Register'
+    },
+    registerOptions: function () {
+      var opt = {
+        openButton: 'Sign up',
+        access: 'append',
+        fields: Config.registrationFields,
+        onSave: this.register,
+        onBlur: this.checkInput,
+        onFocus: this.inputFocus,
+        submitButton: 'Register',
+        wideOnMobile: true,
+        onCancel: this.cancel,
+        buttonClass: Config.defaultButtonClass,
+        submitButtonClass: 'btn-primary btn-lg',
+        noClose: true,
+        buttonType: 'submit',
+        header: 'Registration',
+        title: ''
+      }
+      if (this.env !== 'production') {
+        opt.title = 'Note:  You are only registering for the ' + this.env + ' mode'
+        opt.header += ' - ' + this.env + ' mode'
+      }
+      return opt
     }
   },
   methods: {
     profile () {
       console.log('verify current profile')
+    },
+    loadEnv () {
+      var _this = this
+      axios.get(this.apiUrl + '/env')
+        .then(function (response) {
+          if (response.data && response.data.env) {
+            console.log('*** env: ')
+            _this.env = response.data.env
+            console.log(JSON.stringify(response.data))
+
+            if (_this.env !== 'production') {
+              _this.loginOptions.title = 'Note:  You are logging into the ' + _this.env + ' system'
+              _this.loginOptions.header += ' - ' + _this.env + ' mode'
+            }
+          } else {
+            console.log('*** no env detected: ' + JSON.stringify(response))
+          }
+        })
+        .catch(function (err) {
+          console.log('Error checking environment: ' + err)
+        })
+    },
+    adjustForEnv: function (env) {
+      this.env = env
+      if (env !== 'production') {
+        this.loginOptions.title = 'Note:  You are logging into the ' + env + ' system'
+        this.registerOptions.title = 'Note:  You are only registering for the ' + env + ' mode'
+
+        this.loginOptions.header += ' - ' + env + ' mode'
+        this.registerOptions.header += ' - ' + env + ' mode'
+      }
     },
     async register (form) {
       var fields = this.registerOptions.fields
@@ -245,8 +275,10 @@ export default {
       } else if (response && response.data) {
         if (response.data.success) {
           if (response.data.token) {
+            var refreshToken = response.data.refreshToken
             console.log('token cached: ' + response.data.token)
-            this.$store.dispatch('AUTH_TOKEN', response.data.token)
+            console.log('refresh token: ' + refreshToken)
+            this.$store.dispatch('AUTH_TOKEN', {token: response.data.token, refreshToken: refreshToken})
 
             var pass = 'Bearer ' + response.data.token
             axios.defaults.headers.common['Authorization'] = pass
@@ -332,7 +364,7 @@ export default {
     cancel () {
       this.$set(this, 'formErrors', {})
       console.log('cancel this form')
-      this.$router.back()
+      // this.$router.back()
       this.authError = ''
     }
   }
