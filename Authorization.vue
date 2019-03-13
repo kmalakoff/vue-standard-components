@@ -370,9 +370,15 @@ export default {
     },
     back () {
       this.$set(this, 'formErrors', {})
-      console.log('cancel this form')
+      console.log('go back')
       this.authError = ''
-      this.$router.back()
+      this.$router.go(-1)
+    },
+    home () {
+      this.$set(this, 'formErrors', {})
+      console.log('go home')
+      this.authError = ''
+      this.$router.push('/Home')
     }
   }
   // watch: {
