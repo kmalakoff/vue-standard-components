@@ -13,14 +13,14 @@
       div.smallScreen(v-if="$route.path==='/Login'")
         <!-- explicit login page -->
         h3 Login
-        DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors' onCancel='back')
+        DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors' :onCancel='back')
         p &nbsp;
         p.error(v-if='authError') {{authError}}
 
       div.smallScreen(v-else-if="$route.path==='/Register'")
         <!-- explicit registration page -->
         h3 Register
-        DBForm.signup-form(:options='registerOptions' :onSave='register' onCancel='back')
+        DBForm.signup-form(:options='registerOptions' :onSave='register' :onCancel='back')
         p &nbsp;
         p.error(v-if='authError') {{authError}}
 
@@ -373,12 +373,6 @@ export default {
       console.log('go back')
       this.authError = ''
       this.$router.go(-1)
-    },
-    home () {
-      this.$set(this, 'formErrors', {})
-      console.log('go home')
-      this.authError = ''
-      this.$router.push('/Home')
     }
   }
   // watch: {
