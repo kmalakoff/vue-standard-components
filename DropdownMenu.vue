@@ -17,7 +17,7 @@
         icon(v-if="visibleMenu" name='caret-up')
         icon(v-if="!visibleMenu" name='caret-down')
         span &nbsp; {{title}} &nbsp;
-    div.custom-menu(v-if="visibleMenu" style='position: absolute')
+    div.custom-menu(v-if="visibleMenu" style='position: absolute' v-on:mouseover="insideOf('bottom')" v-on:mouseleave="outsideOf('bottom')")
       table.table.dropdown-table.input-lg
         tr.option-row(v-for="option, i in options" width='100%')
           td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]"  @click.prevent="runMethod(option)")
@@ -78,7 +78,7 @@ export default {
   },
   computed: {
     visibleMenu: function () {
-      if (this.outside.top) {
+      if (this.outside.top && this.outside.bottom) {
         return false
       } else {
         return true
@@ -87,14 +87,12 @@ export default {
   },
   methods: {
     outsideOf (section) {
-      console.log('outside ' + section)
       this.$set(this.outside, section, true)
-      this.hideMenu()
+      console.log('outside: ' + JSON.stringify(this.outside))
     },
     insideOf (section) {
-      console.log('inside ' + section)
       this.$set(this.outside, section, false)
-      console.log('inside ' + section)
+      console.log('inside: ' + JSON.stringify(this.outside))
     },
     logout () {
       console.log('log me out... ')
@@ -122,6 +120,7 @@ export default {
     },
     hideMenu () {
       this.outside.top = true
+      this.outside.bottom = true
     },
     // slowHideMenu (wait) {
     //   // Hide menu (delay ignores rapid toggling by mouse out / in movements)
