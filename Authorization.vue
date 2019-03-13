@@ -10,24 +10,26 @@
       Modal.user-modal(id='profile' type='data')
     div(v-else)
       <!-- Not Logged In ... -->
-      div(v-if="$route.path==='Login'")
+      div.smallScreen(v-if="$route.path==='/Login'")
         <!-- explicit login page -->
-        DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors')
+        h3 Login
+        DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors' onCancel='back')
         p &nbsp;
         p.error(v-if='authError') {{authError}}
 
-      div(v-else-if="$route.path==='Register'")
+      div.smallScreen(v-else-if="$route.path==='/Register'")
         <!-- explicit registration page -->
-        DBForm.signup-form(:options='registerOptions' :onSave='register')
+        h3 Register
+        DBForm.signup-form(:options='registerOptions' :onSave='register' onCancel='back')
         p &nbsp;
         p.error(v-if='authError') {{authError}}
 
       div(v-else)
         <!-- Default if not explicitly set to login or register page -->
         span.smallScreen
-          button.login-button.btn.btn-primary.btn-lg(v-on:click="$router.push('Login')") Login
+          button.login-button.btn.btn-primary.btn-lg(v-on:click="$router.push('/Login')") Login
           br
-          button.signup-button.btn.btn-primary.btn-lg(v-on:click="$router.push('Register')") Register
+          button.signup-button.btn.btn-primary.btn-lg(v-on:click="$router.push('/Register')") Register
           br
           p &nbsp;
           p.error(v-if='authError') {{authError}}
@@ -364,8 +366,13 @@ export default {
     cancel () {
       this.$set(this, 'formErrors', {})
       console.log('cancel this form')
-      // this.$router.back()
       this.authError = ''
+    },
+    back () {
+      this.$set(this, 'formErrors', {})
+      console.log('cancel this form')
+      this.authError = ''
+      this.$router.back()
     }
   }
   // watch: {
