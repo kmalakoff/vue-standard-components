@@ -71,7 +71,7 @@ options: {
       hr
       button.btn.btn-primary.btn-lg(v-if="onSave" :type='buttonType' @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
       span &nbsp; &nbsp;
-      button.btn.btn-close.btn-lg(v-if="hasCancel" @click.prevent="onCancel") {{cancelButton}}
+      button.btn.btn-close.btn-lg(v-if="hasCancel" @click.prevent="myCancel") {{cancelButton}}
       br
       p.mandatoryPrompt(v-if='error') {{error}}
       p.mandatoryPrompt(v-if='remoteErrors && remoteErrors.form') {{remoteErrors.form}}
@@ -121,6 +121,9 @@ export default {
       type: Array
     },
     onSave: {
+      type: Function
+    },
+    onCancel: {
       type: Function
     },
     append: {
@@ -314,6 +317,8 @@ export default {
     hasCancel: function () {
       if (this.options.cancelForm) {
         return true
+      } else if (this.onCancel) {
+        return true
       } else if (this.options.onCancel) {
         return true
       } else if (this.cancel) {
@@ -481,9 +486,11 @@ export default {
       console.log('accepted = ' + accepted + '; validated = ' + validated + ' -> ' + disabled)
       return disabled
     },
-    onCancel: function () {
+    myCancel: function () {
       console.log('cancel form')
-      if (this.options.cancelForm) {
+      if (this.onCancel) {
+        this.onCancel()
+      } else if (this.options.cancelForm) {
         this.options.cancelForm()
       } else if (this.options.onCancel) {
         this.options.onCancel()
