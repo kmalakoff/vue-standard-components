@@ -11,13 +11,13 @@
 -->
 <template lang='pug'>
   div.customMenu
-    a(href='/' onclick='return false' v-on:click='toggleMenu')
+    a(href='/' onclick='return false' v-on:click='toggleMenu' v-on:blur="outsideOf('top')" v-on:mouseover="insideOf('top')")
       <!--  v-on:mouseout="slowHideMenu(1)" -->
       span.menu-title
         icon(v-if="visibleMenu" name='caret-up')
         icon(v-if="!visibleMenu" name='caret-down')
         span &nbsp; {{title}} &nbsp;
-    div.custom-menu(v-if="visibleMenu" style='position: absolute')
+    div.custom-menu(v-if="visibleMenu" style='position: absolute' v-on:blur="outsideOf('bottom')" v-on:mouseover="insideOf('bottom')")
       table.table.dropdown-table.input-lg
         tr.option-row(v-for="option, i in options" width='100%')
           td.dropdown-option-cell(v-bind:class="[{firstOption: i===0}, {lastOption: i===options.length-1}]"  @click.prevent="runMethod(option)")
@@ -28,6 +28,7 @@
               span.option-label {{option.label}}
     <!-- Modal(v-if='modal' :id='modal' type='data') -->
       span &nbsp; &nbsp;
+      h5 Outside: {{JSON.stringify(outside)}}
 </template>
 
 <script>
@@ -45,7 +46,10 @@ export default {
   },
   data () {
     return {
-      visibleMenu: false,
+      outside: {
+        top: true,
+        bottom: true
+      },
       activeOption: '',
 
       searchIcon: {
@@ -55,7 +59,8 @@ export default {
       showAfterWait: false,
       waitingToClose: false,
       keepOn: false,
-      hovering: false
+      hovering: false,
+      hide: false
     }
   },
   props: {
@@ -73,57 +78,81 @@ export default {
     } // modal id (optional)
   },
   computed: {
+    visibleMenu: function () {
+      if (this.outside.top) {
+        return false
+      } else {
+        return true
+      }
+    }
   },
   methods: {
+    outsideOf (section) {
+      console.log('outside ' + section)
+      this.outside[section] = true
+      console.log(this.outside.top + ' AND ' + this.outside.bottom)
+      if (this.outside.top && this.outside.bottom) {
+        this.hideMenu()
+      } else {
+        console.log('still in other section')
+      }
+    },
+    insideOf (section) {
+      console.log('inside ' + section)
+      this.outside[section] = false
+      console.log('inside ' + section)
+    },
     logout () {
       console.log('log me out... ')
     },
     // Menu toggling methods (including delayed hide on mouse out/in to allow cursor movement from title to dropdown)
-    hoverMenu (force) {
-      this.visibleMenu = true
-      this.hovering = true
-      this.keepOn = true
-      console.log('(show) ' + this.visibleMenu)
-      if (this.waitingToClose) { this.showAfterWait = true }
-    },
+    // hoverMenu (force) {
+    //   this.visibleMenu = true
+    //   this.hovering = true
+    //   this.keepOn = true
+    //   console.log('(show) ' + this.visibleMenu)
+    //   if (this.waitingToClose) { this.showAfterWait = true }
+    // },
     toggleMenu (force) {
-      if (this.hovering && this.visibleMenu) {
-        // just close on exit
-        console.log('close when mousing out')
-        this.visibleMenu = !this.visibleMenu
-      } else {
-        console.log('toggle menu visibility')
-        this.visibleMenu = !this.visibleMenu
-      }
-      console.log('(tm) menu = ' + this.visibleMenu)
+      this.outside.top = !this.outside.top
+      // if (this.hovering && this.visibleMenu) {
+      //   // just close on exit
+      //   console.log('close when mousing out')
+      //   this.visibleMenu = !this.outside.top
+      // } else {
+      //   console.log('toggle menu visibility')
+      //   this.outside.top = !this.outside.top
+      // }
+      // console.log('(tm) menu = ' + this.visibleMenu)
     },
     hideMenu () {
       this.$set(this, 'visibleMenu', false)
       this.$set(this, 'keepOn', false)
       console.log('(hm) menu = ' + this.visibleMenu)
+      this.outside.top = true
     },
-    slowHideMenu (wait) {
-      // Hide menu (delay ignores rapid toggling by mouse out / in movements)
-      this.hovering = false
-      var _this = this
-      if (this.keepOn) {
-        console.log('require direct toggle to turn off')
-      } else if (!wait) {
-        this.visibleMenu = false
-        console.log('(sh) ' + this.visibleMenu)
-      } else if (this.waitingToClose) {
-        this.showAfterWait = false
-      } else {
-        this.showAfterWait = false
-        setTimeout(
-          () => {
-            _this.waitingToClose = false
-            this.visibleMenu = this.showAfterWait
-            console.log('(delayed) ' + this.visibleMenu)
-          }, 100)
-        this.waitingToClose = true
-      }
-    },
+    // slowHideMenu (wait) {
+    //   // Hide menu (delay ignores rapid toggling by mouse out / in movements)
+    //   this.hovering = false
+    //   var _this = this
+    //   if (this.keepOn) {
+    //     console.log('require direct toggle to turn off')
+    //   } else if (!wait) {
+    //     this.visibleMenu = false
+    //     console.log('(sh) ' + this.visibleMenu)
+    //   } else if (this.waitingToClose) {
+    //     this.showAfterWait = false
+    //   } else {
+    //     this.showAfterWait = false
+    //     setTimeout(
+    //       () => {
+    //         _this.waitingToClose = false
+    //         this.visibleMenu = this.showAfterWait
+    //         console.log('(delayed) ' + this.visibleMenu)
+    //       }, 100)
+    //     this.waitingToClose = true
+    //   }
+    // },
     runMethod (opt) {
       console.log('running method...')
       if (opt && opt.onClick) {
