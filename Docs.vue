@@ -1,22 +1,22 @@
 <template lang='pug'>
-  div.container
-      h4 Documents:
-      <!-- iframe(src='/help?file=Data_Structures.md') -->
-      hr
-      div.flex-container
-        div.flex-item(v-for='scope in scopes')
-          h4 {{scope}}:
-          span(v-for='doc in docs')
-            button.btn(v-if='scope===doc.scope' v-on:click='load(doc)' v-bind:class="[{'btn-primary': doc.scope === 'public'}, {'btn-danger': doc.scope === 'private'}]") {{doc.name}}
-            span(v-if='scope===doc.scope') &nbsp; &nbsp;
-          hr
-      div.navbar-right
-        button.btn-close(v-on:click='close')
-          icon(name='times')
-      div.doc-image(v-if='image')
-        img(:src='image')
-      div.doc-content(v-else-if='content' v-html='content')
-      p &nbsp;
+  div
+    h4 Documents:
+    <!-- iframe(src='/help?file=Data_Structures.md') -->
+    hr
+    div.flex-container
+      div.flex-item(v-for='scope in scopes')
+        h4 {{scope}}:
+        span(v-for='doc in docs')
+          button.btn(v-if='scope===doc.scope' v-on:click='load(doc)' v-bind:class="[{'btn-primary': doc.scope === 'public'}, {'btn-danger': doc.scope === 'private'}]") {{doc.name}}
+          span(v-if='scope===doc.scope') &nbsp; &nbsp;
+        hr
+    div.navbar-right
+      button.btn-close(v-on:click='close')
+        icon(name='times')
+    div.doc-image(v-if='image')
+      img(:src='image')
+    div.doc-content(v-else-if='content' v-html='content')
+    p &nbsp;
 </template>
 
 <script>
@@ -102,7 +102,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .iframe {
   border: 2px solid grey;
   width: 80%;
@@ -111,11 +111,11 @@ export default {
 
 .flex-container {
   display: flex;
-  flex-direction: row
+  flex-direction: column
 }
 
 .flex-item {
-  width: 50%;
+  width: 100%;
 }
 
 .doc-content {
