@@ -200,11 +200,9 @@ export default {
       var _this = this
       axios.get(this.apiUrl + '/env')
         .then(function (response) {
-          if (response.data && response.data.env) {
+          if (response.data && response.data.codeVersion) {
             console.log('*** env: ')
-            if (response.data.db === 'pgkyc') {
-              _this.env = 'production'
-            } else { _this.env = response.data.env }
+            _this.env = response.data.codeVersion
 
             console.log(JSON.stringify(response.data))
 
