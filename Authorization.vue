@@ -202,7 +202,9 @@ export default {
         .then(function (response) {
           if (response.data && response.data.env) {
             console.log('*** env: ')
-            _this.env = response.data.env
+            if (response.data.db === 'pgkyc') { _this.env = 'production' }
+            else { _this.env = response.data.env }
+
             console.log(JSON.stringify(response.data))
 
             if (_this.env !== 'production') {
