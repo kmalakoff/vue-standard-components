@@ -10,20 +10,31 @@
       Modal.user-modal(id='profile' type='data')
     div(v-else)
       <!-- Not Logged In ... -->
-      div.smallScreen(v-if="$route.path==='/Login'")
-        <!-- explicit login page -->
-        h3 Login
-        DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors' :onCancel='back')
-        p &nbsp;
-        p.error(v-if='authError') {{authError}}
-
-      div.smallScreen(v-else-if="$route.path==='/Register'")
-        <!-- explicit registration page -->
-        h3 Register
-        DBForm.signup-form(:options='registerOptions' :onSave='register' :onCancel='back')
-        p &nbsp;
-        p.error(v-if='authError') {{authError}}
-
+      div(v-if="$route.path==='/Login'")
+        div.smallScreen
+          h3 Login
+          DBForm.login-form(:options='loginOptions' :onSave='login' :remoteErrors='formErrors' :onCancel='back')
+          p &nbsp;
+          p.error(v-if='authError') {{authError}}
+        div.wideScreen
+          Modal.login-modal(type='record' id='login-modal' :error='authError' :title='loginTitle' :options='loginOptions' :note='note' :remoteErrors='formErrors')
+          span &nbsp; &nbsp;
+          Modal.signup-modal(type='record' id='register-modal' :error='authError' :title='regTitle' :options='registerOptions' :note='note' :remoteErrors='formErrors')
+            p &nbsp;
+      div(v-else-if="$route.path==='/Register'")
+        div.smallScreen
+          <!-- explicit registration page -->
+          h3 Register
+          DBForm.signup-form(:options='registerOptions' :onSave='register' :onCancel='back')
+          p &nbsp;
+          p.error(v-if='authError') {{authError}}
+        div.wideScreen
+          Modal.login-modal(type='record' id='login-modal' :error='authError' :title='loginTitle' :options='loginOptions' :note='note' :remoteErrors='formErrors')
+          span &nbsp; &nbsp;
+          Modal.signup-modal(type='record' id='register-modal' :error='authError' :title='regTitle' :options='registerOptions' :note='note' :remoteErrors='formErrors')
+            p &nbsp;
+      div(v-else-if="$route.path==='Construction'")
+        Modal.signup-modal(type='record' id='construction-modal' title='Under Construction' :options='constructionOptions')
       div(v-else)
         <!-- Default if not explicitly set to login or register page -->
         span.smallScreen
@@ -77,26 +88,7 @@ export default {
         { label: 'Logout', onClick: this.logout }
       ],
       apiUrl: Config.apiURL,
-      status: 'initialized',
-
-      loginOptions: {
-        modalID: 'login-modal',
-        openButton: 'Log in',
-        access: 'append',
-        fields: Config.loginFields,
-        onSave: this.login,
-        onBlur: this.checkInput,
-        onFocus: this.inputFocus,
-        submitButton: 'Log In',
-        wideOnMobile: true,
-        onCancel: this.cancel,
-        buttonClass: Config.defaultButtonClass,
-        submitButtonClass: 'btn-primary btn-lg',
-        noClose: true,
-        buttonType: 'submit',
-        header: 'Login',
-        title: ''
-      }
+      status: 'initialized'
     }
   },
   mixins: [
@@ -108,9 +100,9 @@ export default {
     DropdownMenu
   },
   props: {
-    // payload: {
-    //   type: Object
-    // },
+    mode: {
+      type: String
+    },
     path: {
       type: Array,
       default () { return [] }
@@ -140,6 +132,37 @@ export default {
     payload: function () {
       return this.$store.getters.payload || {access: 'public'}
     },
+    registerMode: function () {
+      if (this.mode === 'Register') {
+        console.log('reg mode')
+        return true
+      } else if (this.$route.params.mode === 'Register') {
+        console.log('found mode param')
+        return true
+      } else {
+        return false
+      }
+    },
+    loginMode: function () {
+      if (this.mode === 'Login') {
+        console.log('login mode')
+        return true
+      } else if (this.$route.params.mode === 'Login') {
+        console.log('found login mode param')
+        return true
+      } else {
+        console.log('NOT login mode: ' + this.mode)
+        return false
+      }
+    },
+    constructionMode: function () {
+      if (this.mode === 'Register') {
+        console.log('construction mode')
+        return true
+      } else {
+        return false
+      }
+    },
     myUserMenu: function () {
       if (this.add2Menu) {
         console.log('add2menu...')
@@ -167,8 +190,35 @@ export default {
     regTitle: function () {
       return 'Register'
     },
+    loginOptions: function () {
+      var opt = {
+        show: this.loginMode,
+        modalID: 'login-modal',
+        openButton: 'Log in',
+        access: 'append',
+        fields: Config.loginFields,
+        onSave: this.login,
+        onBlur: this.checkInput,
+        onFocus: this.inputFocus,
+        submitButton: 'Log In',
+        wideOnMobile: true,
+        onCancel: this.cancel,
+        buttonClass: Config.defaultButtonClass,
+        submitButtonClass: 'btn-primary btn-lg',
+        noClose: true,
+        buttonType: 'submit',
+        header: 'Login',
+        title: ''
+      }
+      if (this.env !== 'production') {
+        opt.title = 'Note:  You are logging into the ' + this.env + ' mode'
+        opt.header = 'Login - ' + this.env + ' mode'
+      }
+      return opt
+    },
     registerOptions: function () {
       var opt = {
+        show: this.registerMode,
         openButton: 'Sign up',
         access: 'append',
         fields: Config.registrationFields,
@@ -187,7 +237,16 @@ export default {
       }
       if (this.env !== 'production') {
         opt.title = 'Note:  You are only registering for the ' + this.env + ' mode'
-        opt.header += ' - ' + this.env + ' mode'
+        opt.header += 'Registration - ' + this.env + ' mode'
+      }
+      return opt
+    },
+    constructionOptions: function () {
+      var opt = {
+        show: this.constructionMode,
+        modalID: 'construction-modal',
+        header: 'We are currently updating our site.... Thanks for your patience',
+        title: 'Under Construction'
       }
       return opt
     }
