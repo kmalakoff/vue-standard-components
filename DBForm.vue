@@ -35,10 +35,11 @@ options: {
         p Options: {{JSON.stringify(options.onCancel)}}
         p Error: {{JSON.stringify(remoteErrors)}}
         hr
+      h2.DBForm-title(v-if='title') {{title}}
       table.table
         tr.row-heading(v-if='heading')
           td.heading(colspan=3)
-            h2 {{heading}}
+            h2.DBForm-heading {{heading}}
         tr(v-for="field in fields" v-show="field.type!=='hidden'")
           td(v-if='options.confirmFields')
             b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
@@ -258,7 +259,12 @@ export default {
         return camel
       } else if (this.options.formPrompt) {
         return this.options.formPrompt
+      } else if (this.options.header) {
+        return this.options.header
       } else { return null }
+    },
+    title: function () {
+      return this.options.title
     },
     include: function () {
       var visible = []
