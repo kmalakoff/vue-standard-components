@@ -9,7 +9,7 @@
     label.element-label(v-else-if="Ftype=== 'date' && !options.prompt" :for= 'field.name' ) {{field.prompt || field.name}}: &nbsp; &nbsp;
       b(v-if='remoteError') &nbsp; &nbsp; {{remoteError}}
 
-    b-form-input.input-lg(:id='randomId' v-if="inputType" @change.native="myChange" :type= 'inputType' :name='field.name' :v-model= 'field.name' :placeholder="label" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native="myFocus" aria-describedby= 'helpfb errfb' :state='checkField(field)' :class="dynamicClass(field)" :disabled= 'disabled')
+    b-form-input.input-lg(:id='randomId' v-if="inputType" @change.native="myChange" :type= 'inputType' :name='field.name' :v-model= 'field.name' :placeholder="label" :value= 'defaultTo' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native="myFocus" aria-describedby= 'helpfb errfb' :state='checkField(field)' :class="dynamicClass(field)" :disabled= 'disabled' :required='field.mandatory')
 
     b-form-checkbox.input-lg(:id='randomId' v-else-if="otherType=== 'checkbox'" @change.native="myChange" :v-model= 'vModel' :default= 'defaultTo' @blur.native= 'myBlur' @focus.native= 'onFocus' :label= 'field.name' value=true unchecked-value=false :class="dynamicClass(field)" :state='checkField(field)' :disabled= 'disabled')
         span &nbsp; &nbsp; {{field.prompt || field.name}}
@@ -139,6 +139,8 @@ export default {
         case 'integer' : return 'number'
         case 'varchar' : return 'text'
         case 'text' : return 'text'
+        case 'email' : return 'email'
+        case 'tel' : return 'tel'
         case 'string' : return 'string'
         case 'password' : return 'password'
         default: return false
