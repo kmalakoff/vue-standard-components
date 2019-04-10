@@ -77,8 +77,7 @@ export default {
                 var msg = errors[i].message
                 if (errors[i].validation === 'email') {
                   msg = 'valid email address required'
-                }
-                else if (errors[i].field === errors[i].validation) {
+                } else if (errors[i].field === errors[i].validation) {
                   msg = 'this is a required field'
                 } else if (errors[i].validation === 'min' && response.data.rules) {
                   var rule = response.data.rules[errors[i].field]
@@ -88,6 +87,8 @@ export default {
                   } else { msg = 'min length.' }
                 } else if (errors[i].validation === 'unique') {
                   msg = 'this field must be unique'
+                } else if (errors[i].validation === 'required') {
+                  msg = 'this is a required field'
                 } else if (errors[i].validation === 'ENGINE_EXCEPTION') {
                   formErrors.form = error
                 }
