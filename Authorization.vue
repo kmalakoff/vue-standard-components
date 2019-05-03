@@ -347,7 +347,7 @@ export default {
             // auth.updateToken()
             console.log('updated token...')
           }
-          this.$router.push('Home')
+          this.$router.push('/Home')
           if (onSuccess) {
             this.$store.dispatch('logMessage', onSuccess)
           }
@@ -381,7 +381,7 @@ export default {
       }
     },
     async logout () {
-      this.$router.push('Home')
+      this.$router.push('/Home')
       this.$store.dispatch('AUTH_LOGOUT')
       var loginId = this.payload.login_id
       console.log(loginId + ' logout via auth')
