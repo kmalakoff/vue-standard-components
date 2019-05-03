@@ -230,6 +230,10 @@ export default {
       } else if (this.DBfields.length) {
         console.log('got fields from config')
         f = this.DBfields
+      } else if (this.thisRecord) {
+        // Note this is a default but is unsorted ...
+        var keys = Object.keys(this.thisRecord)
+        f = keys
       }
       return f
     },
@@ -338,15 +342,17 @@ export default {
     label (field) {
       // console.log('load label for ' + JSON.stringify(field))
       if (!field) {
+        console.log('no field defined to retrieve label from')
         return ''
       } else if (this.promptPosition === 'top') {
+        console.log('top prompt (no label)')
         return ''
       } else if (field.prompt) {
         return field.prompt
       } else if (field.name) {
         return field.name
       } else {
-        // console.log('no label supplied for ' + JSON.stringify(field))
+        console.log('no label supplied for ' + JSON.stringify(field))
         return ''
       }
     },
@@ -377,7 +383,7 @@ export default {
         })
         .catch(function (err) {
           if (err) {
-            console.log('Err: ' + err)
+            console.log('Load Err: ' + err)
           }
           _this.DBfields = []
         })
@@ -401,6 +407,7 @@ export default {
     vModel: function (field) {
       var label = this.label(field)
       var vModel = field.name || label
+      console.log(vModel + ' from ' + label + ' or ' + JSON.stringify(field))
       return vModel
     },
     confirm (evt) {
