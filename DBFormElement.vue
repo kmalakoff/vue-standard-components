@@ -52,8 +52,8 @@ export default {
   // },
   data () {
     return {
-      vm: this.field.default,
-      om: this.vModel,
+      // vm: this.field.default,
+      // om: this.vModel,
       test: '',
       bd: '1999-02-04',
       formChanged: false,
@@ -65,7 +65,10 @@ export default {
     field: { type: Object },
     placeholder: { type: String },
     vModel: { type: String },
-    form: { type: Object },
+    form: {
+      type: Object,
+      default () { return {} }
+    },
     access: { type: String },
     record: { type: Object },
     options: {
@@ -89,9 +92,9 @@ export default {
   },
   created: function () {
     // var keys = _.pluck(this.field.default)
-    var defaultTo = this.field.default || this.form[this.om] || null
+    var defaultTo = this.field.default || this.form[this.vModel] || null
 
-    this.$set(this.form, this.om, defaultTo)
+    this.$set(this.form, this.vModel, defaultTo)
     this.randomId = Math.random() + '-form-element'
     console.log('random: ' + this.randomId)
     // console.log(this.field.name + ' found default: ' + defaultTo)
@@ -108,7 +111,7 @@ export default {
       if (this.record && this.record[this.field.name]) {
         return this.record[this.field.name]
       } else {
-        return this.field.default || this.field.value || this.form[this.om] || null
+        return this.field.default || this.field.value || this.form[this.vModel] || null
       }
     },
     addClass: function () {
@@ -121,6 +124,8 @@ export default {
     onBlur: function () {
       if (this.options && this.options.onBlur) {
         return this.options.onBlur
+      } else if (this.options && this.options.onChange) {
+        return this.options.onChange
       } else {
         return ''
       }
@@ -189,18 +194,18 @@ export default {
     },
     saveMe (val) {
       console.log('save Me')
-      this.$set(this.form, this.om, this.vm)
+      this.$set(this.form, this.vModel, this.field.default)
     },
     myChange (evt) {
       if (evt.target.type === 'checkbox') {
-        // console.log('change ' + this.om + ' to boolean: ' + evt.target.checked)
-        this.$set(this.form, this.om, evt.target.checked)
+        // console.log('change ' + this.vModel + ' to boolean: ' + evt.target.checked)
+        this.$set(this.form, this.vModel, evt.target.checked)
       } else {
-        // console.log('change ' + evt.target.type + ': ' + this.om + ' to ' + evt.target.value)
-        this.$set(this.form, this.om, evt.target.value)
+        // console.log('change ' + evt.target.type + ': ' + this.vModel + ' to ' + evt.target.value)
+        this.$set(this.form, this.vModel, evt.target.value)
       }
       if (this.onBlur) {
-        this.onBlur(evt, this.om)
+        this.onBlur(evt, this.vModel)
       }
       if (this.remoteError) {
         console.log('cleared error')
@@ -214,16 +219,16 @@ export default {
       }
 
       if (this.onBlur) {
-        this.onBlur(evt, this.om)
+        this.onBlur(evt, this.vModel)
       }
 
       this.formLeft = true
     },
     myFocus (evt) {
       if (this.onFocus) {
-        console.log('DBFE focused on ' + this.om)
+        console.log('DBFE focused on ' + this.vModel + ' : ' + this.vModel)
         console.log(JSON.stringify(evt))
-        this.onFocus(evt, this.om)
+        this.onFocus(evt, this.vModel)
       }
     },
     validate (evt) {
@@ -246,6 +251,7 @@ export default {
 
     list: function (field) {
       var regex = /^(enum|radio)\(['"]?(.*?)['"]?\)/
+      // var regex = /^(enum|radio)[([]['"]?(.*?)['"]?[)\]]/i
       var list = this.Ftype.match(regex)
       var prompt = field.prompt || field.name
 
