@@ -345,7 +345,6 @@ export default {
         console.log('no field defined to retrieve label from')
         return ''
       } else if (this.promptPosition === 'top') {
-        console.log('top prompt (no label)')
         return ''
       } else if (field.prompt) {
         return field.prompt
@@ -496,7 +495,6 @@ export default {
         this.error = ''
       }
       var disabled = !validated || !accepted
-      console.log('accepted = ' + accepted + '; validated = ' + validated + ' -> ' + disabled)
       return disabled
     },
     myCancel: function () {
