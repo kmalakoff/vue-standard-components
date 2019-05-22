@@ -50,20 +50,20 @@ export default {
   },
   props: {
     msg: {
-      type: Array,
-      default () { return [] }
+      type: String,
+      default () { return '' }
     },
     warn: {
-      type: Array,
-      default () { return [] }
+      type: String,
+      default () { return '' }
     },
     err: {
-      type: Array,
-      default () { return [] }
+      type: String,
+      default () { return '' }
     },
-    stored: {
+    storeExists: {
       type: Boolean,
-      default: true // use stored messages
+      default: true
     }
   },
   // computed: {
@@ -72,6 +72,14 @@ export default {
   //   errors () { return store.errors }
   // },
   computed: {
+    stored: function () {
+      if (this.msg || this.err || this.warn) {
+        return false
+      } else {
+        return this.storeExists
+      }
+    },
+
     messageCount: function () {
       if (this.stored) {
         return this.$store.getters.messageCount || 0
@@ -97,14 +105,22 @@ export default {
       if (this.stored) {
         return this.$store.getters.messages
       } else {
-        return { default: this.msg }
+        if (this.msg) {
+          return [this.msg]
+        } else {
+          return null
+        }
       }
     },
     warnings: function () {
       if (this.stored) {
         return this.$store.getters.warnings
       } else {
-        return { default: this.warn }
+        if (this.warn) {
+          return [this.warn]
+        } else {
+          return null
+        }
       }
     },
     errors: function () {
@@ -137,7 +153,11 @@ export default {
         return errors
       } else {
         console.log('got immediate errors')
-        return { default: this.err }
+        if (this.err) {
+          return [this.err]
+        } else {
+          return null
+        }
       }
     },
     messagesFound () {
