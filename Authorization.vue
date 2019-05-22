@@ -381,10 +381,11 @@ export default {
       }
     },
     async logout () {
-      this.$store.dispatch('AUTH_LOGOUT')
+      console.log('P: ' + JSON.stringify(this.payload))
       var loginId = this.payload.login_id
       console.log(loginId + ' logout via auth ')
 
+      this.$store.dispatch('AUTH_LOGOUT')
       this.$store.dispatch('CACHE_PAYLOAD', { access: 'public' })
       var response = await auth.logout(this, loginId)
       console.log('Logout response:' + JSON.stringify(response))
