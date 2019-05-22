@@ -381,14 +381,14 @@ export default {
       }
     },
     async logout () {
-      this.$router.push('/Home')
       this.$store.dispatch('AUTH_LOGOUT')
       var loginId = this.payload.login_id
-      console.log(loginId + ' logout via auth')
+      console.log(loginId + ' logout via auth ')
 
       this.$store.dispatch('CACHE_PAYLOAD', { access: 'public' })
       var response = await auth.logout(this, loginId)
       console.log('Logout response:' + JSON.stringify(response))
+      this.$router.push('/Home')
     },
     makeAuth (e) {
       // auth logic
