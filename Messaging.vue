@@ -191,6 +191,9 @@ export default {
   methods: {
     clear (scope) {
       console.log('clear messages')
+      this.message = ''
+      this.warning = ''
+      this.error = ''
       this.$store.dispatch('clearMessages')
     }
   },
