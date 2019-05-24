@@ -128,7 +128,8 @@ export default {
       type: Function
     },
     append: {
-      type: Array
+      type: Array,
+      default () { return [] }
     },
     record: {
       type: Object
@@ -147,75 +148,14 @@ export default {
     debug: {
       type: Boolean,
       default: false
+    },
+    included: {
+      type: Object,
+      default () { return {} }
     }
   },
   created: function () {
-    var DBfields = []
-
-    console.log('confirm field list...')
-    if (this.table) {
-      // load fields dynamically from table..
-      // Construction
-      console.log('.. from table')
-      if (config.forms && config.forms[this.table]) {
-        DBfields = config.forms[this.table]
-      } else {
-        console.log('Error retrieving configuration for ' + this.table)
-        console.log('(Include form hash for ' + this.table + ' in /src/config.js file)')
-      }
-    } else if (this.fields && this.fields.length) {
-      console.log('.. from specified list')
-      DBfields = this.fields
-    } else if (this.thisRecord) {
-      var f1 = []
-      console.log('load Record: ' + JSON.stringify(this.thisRecord, null, 2))
-      // console.log('got fields from keys')
-      var keys = Object.keys(this.thisRecord)
-      console.log('preset: ' + keys)
-      for (var i = 0; i < keys.length; i++) {
-        f1.push({name: keys[i], type: 'text'})
-      }
-      DBfields = f1
-      console.log('initiate fields: ' + JSON.stringify(keys))
-    } else {
-      console.log('Error retrieving configuration (require fields or table spec)')
-      console.log(JSON.stringify(this.options))
-    }
-
-    if (DBfields && DBfields.length && this.thisRecord) {
-      var f = DBfields
-      for (var j = 0; j < f.length; j++) {
-        if (this.thisRecord[f[j].name]) {
-          if (f[j].type === 'checkbox' || f[j].type === 'boolean') {
-            if (typeof f[j].default === 'undefined') {
-              this.$set(this.form, f[j].name, false)
-            } else {
-              this.$set(this.form, f[j].name, this.thisRecord[f[j].default])
-            }
-          } else if (f[j].type === 'date') {
-            var defaultDate = this.thisRecord[f[j].name] || f[j].default || ''
-            this.$set(this.form, f[j].name, defaultDate.substring(0, 10))
-          } else {
-            var defaultTo = this.thisRecord[f[j].name] || f[j].default || null
-            this.$set(this.form, f[j].name, defaultTo)
-          }
-        }
-      }
-      console.log('initiate form: ' + JSON.stringify(this.form))
-      if (this.remoteErrors) { }
-    }
-
-    for (var k = 0; k < DBfields.length; k++) {
-      this.$set(this.DBfields, k, DBfields[k])
-    }
-
-    if (this.options.confirmFields) {
-      this.$set(this.form, 'confirmed', {})
-    }
-
-    if (this.remoteErrors && this.remoteErrors.form) {
-      this.error = this.error || this.remoteErrors.form
-    }
+    this.initializeRecord()
   },
   computed: {
     table: function () {
@@ -271,20 +211,7 @@ export default {
       return this.options.title
     },
     include: function () {
-      var visible = []
-      var hidden = []
-      if (this.append) {
-        for (var i = 0; i < this.append.length; i++) {
-          var name = this.append[i].name
-          this.$set(this.form, name, this.append[i].default)
-          if (this.append[i].type === 'hidden') {
-            hidden.push(this.append[i])
-          } else {
-            visible.push(this.append[i])
-          }
-        }
-      }
-      return {visible: visible, hidden: hidden}
+      return this.included
     },
     default: function (key) {
       return this.form[key] || ''
@@ -339,6 +266,95 @@ export default {
     }
   },
   methods: {
+    initializeRecord () {
+      var DBfields = []
+      console.log('confirm field list...')
+      if (this.table) {
+        // load fields dynamically from table..
+        // Construction
+        console.log('.. from table')
+        if (config.forms && config.forms[this.table]) {
+          DBfields = config.forms[this.table]
+        } else {
+          console.log('Error retrieving configuration for ' + this.table)
+          console.log('(Include form hash for ' + this.table + ' in /src/config.js file)')
+        }
+      } else if (this.fields && this.fields.length) {
+        console.log('.. from specified list')
+        DBfields = this.fields
+      } else if (this.thisRecord) {
+        var f1 = []
+        console.log('load Record: ' + JSON.stringify(this.thisRecord, null, 2))
+        // console.log('got fields from keys')
+        var keys = Object.keys(this.thisRecord)
+        console.log('preset: ' + keys)
+        for (var i = 0; i < keys.length; i++) {
+          f1.push({name: keys[i], type: 'text'})
+        }
+        DBfields = f1
+        console.log('initiate fields: ' + JSON.stringify(keys))
+      } else {
+        console.log('Error retrieving configuration (require fields or table spec)')
+        console.log(JSON.stringify(this.options))
+      }
+      this.initializeForm(DBfields)
+    },
+    initializeForm (DBfields) {
+      this.form = {}
+      console.log('use Record: ' + JSON.stringify(this.thisRecord))
+
+      if (DBfields && DBfields.length && this.thisRecord) {
+        var f = DBfields
+        for (var j = 0; j < f.length; j++) {
+          if (this.thisRecord[f[j].name]) {
+            if (f[j].type === 'checkbox' || f[j].type === 'boolean') {
+              if (typeof f[j].default === 'undefined') {
+                this.$set(this.form, f[j].name, false)
+              } else {
+                this.$set(this.form, f[j].name, this.thisRecord[f[j].default])
+              }
+            } else if (f[j].type === 'date') {
+              var defaultDate = this.thisRecord[f[j].name] || f[j].default || ''
+              this.$set(this.form, f[j].name, defaultDate.substring(0, 10))
+            } else {
+              var defaultTo = this.thisRecord[f[j].name] || f[j].default || null
+              this.$set(this.form, f[j].name, defaultTo)
+            }
+          }
+        }
+        console.log('initialized form: ' + JSON.stringify(this.form))
+        if (this.remoteErrors) { }
+      }
+
+      for (var k = 0; k < DBfields.length; k++) {
+        this.$set(this.DBfields, k, DBfields[k])
+      }
+
+      if (this.options.confirmFields) {
+        this.$set(this.form, 'confirmed', {})
+        console.log('confirm fields...')
+      }
+
+      if (this.remoteErrors && this.remoteErrors.form) {
+        this.error = this.error || this.remoteErrors.form
+      }
+
+      var visible = []
+      var hidden = []
+      if (this.append) {
+        for (var i = 0; i < this.append.length; i++) {
+          var name = this.append[i].name
+          this.$set(this.form, name, this.append[i].default)
+          console.log('preset ' + name)
+          if (this.append[i].type === 'hidden') {
+            hidden.push(this.append[i])
+          } else {
+            visible.push(this.append[i])
+          }
+        }
+      }
+      this.$set(this, 'included', {visible: visible, hidden: hidden})
+    },
     label (field) {
       // console.log('load label for ' + JSON.stringify(field))
       if (!field) {
@@ -406,7 +422,6 @@ export default {
     vModel: function (field) {
       var label = this.label(field)
       var vModel = field.name || label
-      console.log(vModel + ' from ' + label + ' or ' + JSON.stringify(field))
       return vModel
     },
     confirm (evt) {
@@ -468,6 +483,20 @@ export default {
             console.log(this.fields[i].name + ' is mandatory')
           }
         }
+        if (this.fields[i].type === 'email') {
+          console.log('email test for ' + this.fields[i].value + ' or ' + form[this.vModel])
+          if (form[this.vModel] && this.form[this.vModel].match(/[a-zA-Z0-9.]+@[a-zA-Z]+\.[a-z]+/)) {
+            console.log(form[this.vModel] + ' is an email')
+          } else {
+            console.log(form[this.vModel] + ' is NOT an email')
+            failed = true
+          }
+        }
+
+        if (this.fields[i].regexp) {
+          console.log(this.fields[i].regexp + ' regexp match ' + this.fields[i].value + ' or ' + this.form[this.vModel])
+        }
+
         if (passed) {
           verified++
           checked++
@@ -520,6 +549,10 @@ export default {
         this.form.accepted = false
         console.log('turn off accept flag')
       }
+    },
+    record: function () {
+      console.log('record changed - reinitialize')
+      this.initializeRecord()
     }
   }
 }
