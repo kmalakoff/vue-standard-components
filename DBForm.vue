@@ -484,11 +484,11 @@ export default {
           }
         }
         if (this.fields[i].type === 'email') {
-          console.log('email test for ' + this.fields[i].value + ' or ' + form[this.vModel])
-          if (form[this.vModel] && this.form[this.vModel].match(/[a-zA-Z0-9.]+@[a-zA-Z]+\.[a-z]+/)) {
-            console.log(form[this.vModel] + ' is an email')
+          console.log('email test for ' + this.fields[i].value + ' or ' + form[this.fields[i].name])
+          if (form[this.fields[i].name] && form[this.fields[i].name].match(/[a-zA-Z0-9.]+@[a-zA-Z]+\.[a-z]+/)) {
+            console.log(form[this.fields[i].name] + ' IS an email')
           } else {
-            console.log(form[this.vModel] + ' is NOT an email')
+            console.log(form[this.fields[i].name] + ' is NOT an email')
             failed = true
           }
         }
