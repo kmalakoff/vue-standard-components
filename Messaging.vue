@@ -161,9 +161,13 @@ export default {
     },
     clear (scope) {
       console.log('clear messages')
-      this.message = ''
-      this.warning = ''
-      this.error = ''
+      this.messageCount = 0
+      this.warningCount = 0
+      this.errorCount = 0
+      this.messages = []
+      this.warnings = []
+      this.errors = []
+
       this.$store.dispatch('clearMessages')
       this.parse()
     }
@@ -180,17 +184,14 @@ export default {
     },
     msg: function () {
       console.log('message changed .. reloaded')
-      this.$forceUpdate()
       this.parse()
     },
     warn: function () {
       console.log('warning changed .. reloaded')
-      this.$forceUpdate()
       this.parse()
     },
     err: function () {
       console.log('error changed .. reloaded')
-      this.$forceUpdate()
       this.parse()
     }
   }
