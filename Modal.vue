@@ -234,7 +234,8 @@ export default {
       default () { return {} }
     },
     append: {
-      type: Array
+      type: Array,
+      default () { return {} }
     },
     // title: {
     //   type: String,
@@ -281,32 +282,7 @@ export default {
     // },
   },
   created: function () {
-    if (this.confirm || this.options.confirm) {
-      var fields = []
-      var confirm = this.confirm || this.options.confirm
-
-      for (var i = 0; i < confirm.length; i++) {
-        var fld = confirm[i]
-        if (fld.constructor === String) {
-          fld = {name: fld}
-        }
-        if (!fld.type) { fld.type = 'checkbox' }
-        fields.push(fld)
-      }
-
-      if (this.record) {
-        var Fkeys = Object.keys(this.record)
-        for (var j = 0; j < Fkeys.length; j++) {
-          var f = Fkeys[j]
-          fields.push({name: f, default: this.record[f], type: 'hidden'})
-        }
-      }
-      this.$set(this.confirmOptions, 'fields', fields)
-    }
-
-    // if (this.options.onCancel || this.options.cancelButton) {
-    // this.options.cancelForm = this.cancel
-    // }
+    this.initialize()
   },
   computed: {
     wideOnMobile: function () {
@@ -538,6 +514,35 @@ export default {
     }
   },
   methods: {
+    initialize () {
+      console.log('generate modal...')
+      if (this.confirm || this.options.confirm) {
+        var fields = []
+        var confirm = this.confirm || this.options.confirm
+
+        for (var i = 0; i < confirm.length; i++) {
+          var fld = confirm[i]
+          if (fld.constructor === String) {
+            fld = {name: fld}
+          }
+          if (!fld.type) { fld.type = 'checkbox' }
+          fields.push(fld)
+        }
+
+        if (this.record) {
+          var Fkeys = Object.keys(this.record)
+          for (var j = 0; j < Fkeys.length; j++) {
+            var f = Fkeys[j]
+            fields.push({name: f, default: this.record[f], type: 'hidden'})
+          }
+        }
+        this.$set(this.confirmOptions, 'fields', fields)
+      }
+
+      // if (this.options.onCancel || this.options.cancelButton) {
+      // this.options.cancelForm = this.cancel
+      // }
+    },
     showMe () {
       this.isVisible = true
       clearTimeout(this.timeoutID)
@@ -597,7 +602,15 @@ export default {
   },
   watch: {
     toggle: function () {
-      console.log('changed body')
+      console.log('changed modal body')
+    },
+    modalRecord: function () {
+      console.log('modal record changed')
+      console.log(JSON.stringify(this.append))
+      this.initialize()
+      // this.$set(this, 'append', [])
+      // this.$forceUpdate() // doesn't work ?
+      console.log('forced reload')
     }
   }
 }
