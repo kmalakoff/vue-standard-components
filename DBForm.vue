@@ -42,21 +42,21 @@ options: {
             h2.DBForm-heading {{heading}}
         tr(v-for="field in fields" v-show="field.type!=='hidden'")
           td(v-if='options.confirmFields')
-            b-form-checkbox(:form="form" type='checkbox' :name='field.name' @change.native='confirm')
+            b-form-checkbox(:form="myForm" type='checkbox' :name='field.name' @change.native='confirm')
           td.prompt-column(v-if="promptPosition==='left'")
             b(v-bind:class="[{mandatoryPrompt: field.mandatory}]") {{label(field)}}:
           td.data-column
-            DBFormElement(:form="form" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
+            DBFormElement(:form="myForm" :field="field" :options='options' :vModel='vModel(field)' :addLinks="addLinks" :placeholder="label(field)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
           td.extra-column(v-if="0 && myAccess === 'edit'")
             span &nbsp;
-            a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(form)")
+            a(href='/' onclick='return false' data-toggle='tooltip' :title="JSON.stringify(myForm)")
               icon(name='question-circle' color='black' scale='2')
             b &nbsp;
         tr(v-for="r in include.visible")
           td.prompt-column(v-if="prompt || myAccess==='read'")
             b {{label(r)}}:
           td.data-column
-            DBFormElement(:form="form" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
+            DBFormElement(:form="myForm" :field="r" :options='options' :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :access='myAccess' :record='thisRecord' :remoteError='remoteErrors[field.name]' :debug='debug')
         tr(v-if='acceptFormPrompt')
           td(colspan=4)
             hr
@@ -64,13 +64,13 @@ options: {
             table.accept-block
               tr.accept-block
                 td.accept-checkbox
-                  b-form-checkbox.inline(:form="form" type='checkbox' name='accepted' v-model='form.accepted' v-on:click='acceptForm(form)')
+                  b-form-checkbox.inline(:form="myForm" type='checkbox' name='accepted' v-model='myForm.accepted' v-on:click='acceptForm(myForm)')
                 td.accept-prompt
                   span {{acceptFormPrompt}}
       span(v-for='r in include.hidden')
-        DBFormElement(:form="form" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :remoteError='remoteErrors[field.name]')
+        DBFormElement(:form="myForm" :field="r" :vModel='vModel(r)' :addLinks="addLinks" :placeholder="label(r)" :remoteError='remoteErrors[field.name]')
       hr
-      button.btn.btn-primary.btn-lg(v-if="onSave" :type='buttonType' @click.prevent="onSave(form)" :class='options.submitButtonClass' :disabled='disabled(form)') {{submitButton}}
+      button.btn.btn-primary.btn-lg(v-if="onSave" :type='buttonType' @click.prevent="onSave(myForm)" :class='options.submitButtonClass' :disabled='disabled(myForm)') {{submitButton}}
       span &nbsp; &nbsp;
       button.btn.btn-close.btn-lg(v-if="hasCancel" @click.prevent="myCancel") {{cancelButton}}
       br
@@ -97,7 +97,8 @@ export default {
       // form: { accepted: false },
       idfield: { name: 'id', type: 'fixed' },
       resetAccess: '',
-      error: ''
+      error: '',
+      myForm: {}
     }
   },
   components: {
@@ -214,7 +215,7 @@ export default {
       return this.included
     },
     default: function (key) {
-      return this.form[key] || ''
+      return this.myForm[key] || ''
     },
     submitButton: function () {
       if (this.options.submitButton) {
@@ -300,7 +301,7 @@ export default {
       this.initializeForm(DBfields)
     },
     initializeForm (DBfields) {
-      this.form = {}
+      this.myForm = this.form || {}
       console.log('use Record: ' + JSON.stringify(this.thisRecord))
 
       if (DBfields && DBfields.length && this.thisRecord) {
@@ -309,20 +310,24 @@ export default {
           if (this.thisRecord[f[j].name]) {
             if (f[j].type === 'checkbox' || f[j].type === 'boolean') {
               if (typeof f[j].default === 'undefined') {
-                this.$set(this.form, f[j].name, false)
+                this.$set(this.myForm, f[j].name, false)
+                // this.$set(this, f[j].name, false)
               } else {
-                this.$set(this.form, f[j].name, this.thisRecord[f[j].default])
+                this.$set(this.myForm, f[j].name, this.thisRecord[f[j].default])
+                // this.$set(this, f[j].name, this.thisRecord[f[j].default])
               }
             } else if (f[j].type === 'date') {
               var defaultDate = this.thisRecord[f[j].name] || f[j].default || ''
-              this.$set(this.form, f[j].name, defaultDate.substring(0, 10))
+              this.$set(this.myForm, f[j].name, defaultDate.substring(0, 10))
+              // this.$set(this, f[j].name, defaultDate.substring(0, 10))
             } else {
               var defaultTo = this.thisRecord[f[j].name] || f[j].default || null
-              this.$set(this.form, f[j].name, defaultTo)
+              this.$set(this.myForm, f[j].name, defaultTo)
+              this.$set(this, f[j].name, defaultTo)
             }
           }
         }
-        console.log('initialized form: ' + JSON.stringify(this.form))
+        console.log('initialized form: ' + JSON.stringify(this.myForm))
         if (this.remoteErrors) { }
       }
 
@@ -331,7 +336,7 @@ export default {
       }
 
       if (this.options.confirmFields) {
-        this.$set(this.form, 'confirmed', {})
+        this.$set(this.myForm, 'confirmed', {})
         console.log('confirm fields...')
       }
 
@@ -344,7 +349,7 @@ export default {
       if (this.append) {
         for (var i = 0; i < this.append.length; i++) {
           var name = this.append[i].name
-          this.$set(this.form, name, this.append[i].default)
+          this.$set(this.myForm, name, this.append[i].default)
           console.log('preset ' + name)
           if (this.append[i].type === 'hidden') {
             hidden.push(this.append[i])
@@ -405,7 +410,7 @@ export default {
     },
 
     validate (evt) {
-      console.log('validate ' + JSON.stringify(evt.target))
+      console.log('form validate ' + JSON.stringify(evt.target))
     },
     type: function (field) {
       if (!field) {
@@ -427,20 +432,20 @@ export default {
     confirm (evt) {
       console.log('confirm...')
       if (evt.target.type === 'checkbox') {
-        if (!this.form.confirmed) {
-          this.$set(this.form, 'confirmed', {})
+        if (!this.myForm.confirmed) {
+          this.$set(this.myForm, 'confirmed', {})
         }
 
         if (evt.target.checked) {
-          this.$set(this.form.confirmed, evt.target.name, true)
+          this.$set(this.myForm.confirmed, evt.target.name, true)
         } else {
-          this.$set(this.form.confirmed, evt.target.name, false)
+          this.$set(this.myForm.confirmed, evt.target.name, false)
         }
       }
     },
-    acceptedForm: function (form) {
+    acceptedForm: function (myForm) {
       if (this.options.acceptFormPrompt) {
-        if (this.form.accepted) {
+        if (myForm.accepted) {
           return true
         } else {
           return false
@@ -449,8 +454,8 @@ export default {
         return true
       }
     },
-    acceptForm: function (form) {
-      this.form.accepted = true
+    acceptForm: function (myForm) {
+      myForm.accepted = true
     },
     validated: function (form) {
       var failed = false
@@ -485,7 +490,7 @@ export default {
         }
         if (this.fields[i].type === 'email') {
           console.log('email test for ' + this.fields[i].value + ' or ' + form[this.fields[i].name])
-          if (form[this.fields[i].name] && form[this.fields[i].name].match(/[a-zA-Z0-9.]+@[a-zA-Z]+\.[a-z]+/)) {
+          if (form[this.fields[i].name] && form[this.fields[i].name].match(/[a-zA-Z0-9.+-]+@[a-zA-Z.+-]+\.[a-z]+/)) {
             console.log(form[this.fields[i].name] + ' IS an email')
           } else {
             console.log(form[this.fields[i].name] + ' is NOT an email')
@@ -494,7 +499,7 @@ export default {
         }
 
         if (this.fields[i].regexp) {
-          console.log(this.fields[i].regexp + ' regexp match ' + this.fields[i].value + ' or ' + this.form[this.vModel])
+          console.log(this.fields[i].regexp + ' regexp match ' + this.fields[i].value + ' or ' + form[this.vModel])
         }
 
         if (passed) {
@@ -509,9 +514,9 @@ export default {
       console.log('verified ' + verified + ' of ' + checked + ' (hidden: ' + hidden + '): ' + validated)
       return validated
     },
-    disabled: function (form) {
-      var validated = this.validated(form)
-      var accepted = this.acceptedForm(form)
+    disabled: function (myForm) {
+      var validated = this.validated(myForm)
+      var accepted = this.acceptedForm(myForm)
       if (!validated) {
         this.error = this.defaultDisabledMessage
       } else {
@@ -540,13 +545,23 @@ export default {
         // cancel from Modal if applicable...
         this.cancel()
       }
+    },
+    resetForm: function () {
+      console.log('RESET FORM')
+      const reset = {}
+      this.$set(this, 'myForm', reset)
+      var elems = Object.keys(this.myForm)
+      for (var i = 0; i < elems.length; i++) {
+        this.$set(this.myForm, elems[i], null)
+        console.log('clear ' + elems[i])
+      }
     }
   },
   watch: {
     remoteError: function () {
       var keys = Object.key(this.remoteErrors)
       if (keys && keys.length) {
-        this.form.accepted = false
+        this.myForm.accepted = false
         console.log('turn off accept flag')
       }
     },
