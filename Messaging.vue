@@ -44,7 +44,16 @@
 export default {
   data () {
     return {
-      status: ''
+      status: '',
+      messages: [],
+      warnings: [],
+      errors: [],
+      messageCount: 0,
+      warningCount: 0,
+      errorCount: 0,
+      messagesFound: false,
+      warningsFound: false,
+      errorsFound: false
       // note: ''
     }
   },
@@ -66,6 +75,9 @@ export default {
       default: true
     }
   },
+  created: function () {
+    this.parse()
+  },
   // computed: {
   //   count () { return store.count },
   //   errorCount () { return store.errorCount },
@@ -78,123 +90,82 @@ export default {
       } else {
         return this.storeExists
       }
-    },
-
-    messageCount: function () {
-      if (this.stored) {
-        return this.$store.getters.messageCount || 0
-      } else {
-        return this.msg.length
-      }
-    },
-    warningCount: function () {
-      if (this.stored) {
-        return this.$store.getters.warningCount || 0
-      } else {
-        return this.warn.length
-      }
-    },
-    errorCount: function () {
-      if (this.stored) {
-        return this.$store.getters.errorCount || 0
-      } else {
-        return this.err.length
-      }
-    },
-    messages: function () {
-      if (this.stored) {
-        return this.$store.getters.messages
-      } else {
-        if (this.msg) {
-          return [this.msg]
-        } else {
-          return null
-        }
-      }
-    },
-    warnings: function () {
-      if (this.stored) {
-        return this.$store.getters.warnings
-      } else {
-        if (this.warn) {
-          return [this.warn]
-        } else {
-          return null
-        }
-      }
-    },
-    errors: function () {
-      if (this.stored) {
-        var errs = this.$store.getters.errors
-        console.log('got ' + errs.length + ' stored errors')
-        var errors = []
-        for (var i = 0; i < errs.length; i++) {
-          var err = errs[i]
-          if (err && err.constructor === Array) {
-            for (var j = 0; j < err.length; j++) {
-              errors.push(err[j])
-            }
-          } else {
-            errors.push(err)
-          }
-        }
-        for (var k = 0; k < errors.length; k++) {
-          var error = errors[k]
-          if (error && error.constructor === Object) {
-            if (error.message) {
-              errors[k] = errors[k].message
-            } else if (error.error) {
-              errors[k] = errors[k].error
-            } else {
-              errors[k] = JSON.stringify(error)
-            }
-          }
-        }
-        return errors
-      } else {
-        console.log('got immediate errors')
-        if (this.err) {
-          return [this.err]
-        } else {
-          return null
-        }
-      }
-    },
-    messagesFound () {
-      if (this.messageCount) {
-        var string = JSON.stringify(this.messages)
-        if (string.match(/[a-zA-Z]/)) {
-          return true
-        }
-      }
-      return false
-    },
-    warningsFound () {
-      if (this.warningCount) {
-        var string = JSON.stringify(this.warnings)
-        if (string.match(/[a-zA-Z]/)) {
-          return true
-        }
-      }
-      return false
-    },
-    errorsFound () {
-      if (this.errorCount) {
-        var string = JSON.stringify(this.errors)
-        if (string.match(/[a-zA-Z]/)) {
-          return true
-        }
-      }
-      return false
     }
   },
   methods: {
+    parse () {
+      if (this.stored) {
+        this.messageCount = this.$store.getters.messageCount || 0
+        this.warningCount = this.$store.getters.warningCount || 0
+        this.errorCount = this.$store.getters.errorCount || 0
+
+        this.messages = this.$store.getters.messages
+        this.warnings = this.$store.getters.warnings
+        this.errors = this.$store.getters.errors
+      } else {
+        this.messageCount = this.msg.length
+        this.warningCount = this.warn.length
+        this.errorCount = this.err.length
+
+        this.messages = [this.msg]
+        this.warnings = [this.warn]
+        this.errors = [this.err]
+      }
+      // var errs = this.$store.getters.errors
+      // console.log('got ' + errs.length + ' stored errors')
+      // var errors = []
+      // for (var i = 0; i < errs.length; i++) {
+      //   var err = errs[i]
+      //   if (err && err.constructor === Array) {
+      //     for (var j = 0; j < err.length; j++) {
+      //       errors.push(err[j])
+      //     }
+      //   } else {
+      //     errors.push(err)
+      //   }
+      // }
+      // for (var k = 0; k < errors.length; k++) {
+      //   var error = errors[k]
+      //   if (error && error.constructor === Object) {
+      //     if (error.message) {
+      //       errors[k] = errors[k].message
+      //     } else if (error.error) {
+      //       errors[k] = errors[k].error
+      //     } else {
+      //       errors[k] = JSON.stringify(error)
+      //     }
+      //   }
+      this.messagesFound = false
+      if (this.messageCount) {
+        var Mstring = JSON.stringify(this.messages)
+        if (Mstring.match(/[a-zA-Z]/)) {
+          this.messagesFound = true
+        }
+      }
+
+      this.warningsFound = false
+      if (this.warningCount) {
+        var Wstring = JSON.stringify(this.warnings)
+        if (Wstring.match(/[a-zA-Z]/)) {
+          this.warningsFound = true
+        }
+      }
+
+      this.errorsFound = false
+      if (this.errorCount) {
+        var Estring = JSON.stringify(this.errors)
+        if (Estring.match(/[a-zA-Z]/)) {
+          this.errorsFound = true
+        }
+      }
+    },
     clear (scope) {
       console.log('clear messages')
       this.message = ''
       this.warning = ''
       this.error = ''
       this.$store.dispatch('clearMessages')
+      this.parse()
     }
   },
   watch: {
@@ -206,6 +177,21 @@ export default {
     },
     messageCount: function () {
       console.log('message count changed...')
+    },
+    msg: function () {
+      console.log('message changed .. reloaded')
+      this.$forceUpdate()
+      this.parse()
+    },
+    warn: function () {
+      console.log('warning changed .. reloaded')
+      this.$forceUpdate()
+      this.parse()
+    },
+    err: function () {
+      console.log('error changed .. reloaded')
+      this.$forceUpdate()
+      this.parse()
     }
   }
 
