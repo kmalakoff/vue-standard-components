@@ -241,10 +241,8 @@ export default {
     myChange (evt) {
       console.log('execute on change...')
       if (evt.target.type === 'checkbox') {
-        console.log('change ' + this.vModel + ' to boolean: ' + evt.target.checked)
         this.$set(this.myForm, this.vModel, evt.target.checked)
       } else {
-        console.log('change ' + evt.target.type + ': ' + this.vModel + ' to ' + evt.target.value)
         this.$set(this.myForm, this.vModel, evt.target.value)
       }
       if (this.validateOn === 'keyup') {
@@ -288,8 +286,6 @@ export default {
       if (this.field.regexp) {
         regexp = new RegExp(this.field.regexp)
       }
-
-      console.log('validate ' + type + ' = ' + val + ' : ' + regexp)
 
       if (this.field.mandatory && !val) {
         this.myClass = 'mandatoryInputNotOK'
