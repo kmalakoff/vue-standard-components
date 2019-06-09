@@ -1,0 +1,16 @@
+{
+  "name": "vue-standard-components",
+  "version": "1.0.0",
+  "description": "Toolbox of standard vue components",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ran-guin/vue-standard-components.git"
+  },
+  "author": "Ran Guin",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/ran-guin/vue-standard-components/issues"
+  },
+  "homepage": "https://github.com/ran-guin/vue-standard-components#readme"
+}
